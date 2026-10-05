@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Printer, ScanLine } from "lucide-react";
-import { Switch } from "@/components/ui/switch"; // Assuming we have this, but I'll use native if not
 // Instead of depending on ui/switch, I'll use a styled native checkbox for simplicity in this artifact.
 
 function CustomSwitch({ checked, label, blue }: { checked: boolean, label?: string, blue?: boolean }) {
