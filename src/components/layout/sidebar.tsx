@@ -31,6 +31,7 @@ export function Sidebar() {
     'transaksi': pathname.includes('/approvals') || pathname.includes('/pos') || pathname.includes('/riwayat-transaksi') || pathname.includes('/tutup-kas') || pathname.includes('/returns'),
     'gudang': pathname.includes('/purchases') || pathname.includes('/suppliers') || pathname.includes('/slow-moving') || pathname.includes('/warehouse') || pathname.includes('/restock'),
     'keuangan': pathname.includes('/cashflow') || pathname.includes('/laporan-utama') || pathname.includes('/reports'),
+    'sistem': pathname.includes('/users') || pathname.includes('/settings') || pathname.includes('/audit-trail'),
   });
 
   useEffect(() => {
@@ -45,6 +46,9 @@ export function Sidebar() {
     }
     if (pathname.includes('/cashflow') || pathname.includes('/laporan-utama') || pathname.includes('/reports')) {
       setOpenMenus(prev => ({ ...prev, keuangan: true }));
+    }
+    if (pathname.includes('/users') || pathname.includes('/settings') || pathname.includes('/audit-trail')) {
+      setOpenMenus(prev => ({ ...prev, sistem: true }));
     }
   }, [pathname]);
 
@@ -97,7 +101,16 @@ export function Sidebar() {
         { title: 'Laporan (Lama)', href: '/reports' },
       ]
     },
-    { title: 'Sistem & Admin', icon: Settings, key: 'sistem' },
+    { 
+      title: 'Sistem & Admin', icon: Settings, key: 'sistem',
+      children: [
+        { title: 'Manajemen User', href: '/users' },
+        { title: 'Pengaturan (Ca...', href: '/settings' },
+        { title: 'Audit Trail', href: '/audit-trail' },
+        { title: 'Insight AI Owner', href: '#' },
+        { title: 'Super Admin Pa...', href: '#' },
+      ]
+    },
   ];
 
   return (
