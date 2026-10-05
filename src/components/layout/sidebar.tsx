@@ -28,15 +28,23 @@ export function Sidebar() {
   
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     'master': pathname.includes('/products') || pathname.includes('/categories') || pathname.includes('/customers') || pathname.includes('/promos') || pathname.includes('/rewards'),
-    'transaksi': pathname.includes('/approvals') || pathname.includes('/pos') || pathname.includes('/reports') || pathname.includes('/returns'),
+    'transaksi': pathname.includes('/approvals') || pathname.includes('/pos') || pathname.includes('/riwayat-transaksi') || pathname.includes('/tutup-kas') || pathname.includes('/returns'),
+    'gudang': pathname.includes('/purchases') || pathname.includes('/suppliers') || pathname.includes('/slow-moving') || pathname.includes('/warehouse') || pathname.includes('/restock'),
+    'keuangan': pathname.includes('/cashflow') || pathname.includes('/laporan-utama') || pathname.includes('/reports'),
   });
 
   useEffect(() => {
     if (pathname.includes('/products') || pathname.includes('/categories') || pathname.includes('/customers') || pathname.includes('/promos') || pathname.includes('/rewards')) {
       setOpenMenus(prev => ({ ...prev, master: true }));
     }
-    if (pathname.includes('/approvals') || pathname.includes('/pos') || pathname.includes('/reports') || pathname.includes('/returns')) {
+    if (pathname.includes('/approvals') || pathname.includes('/pos') || pathname.includes('/riwayat-transaksi') || pathname.includes('/tutup-kas') || pathname.includes('/returns')) {
       setOpenMenus(prev => ({ ...prev, transaksi: true }));
+    }
+    if (pathname.includes('/purchases') || pathname.includes('/suppliers') || pathname.includes('/slow-moving') || pathname.includes('/warehouse') || pathname.includes('/restock')) {
+      setOpenMenus(prev => ({ ...prev, gudang: true }));
+    }
+    if (pathname.includes('/cashflow') || pathname.includes('/laporan-utama') || pathname.includes('/reports')) {
+      setOpenMenus(prev => ({ ...prev, keuangan: true }));
     }
   }, [pathname]);
 
@@ -66,13 +74,29 @@ export function Sidebar() {
       children: [
         { title: 'Approval Owner', href: '/approvals' },
         { title: 'Kasir (POS)', href: '/pos' },
-        { title: 'Riwayat Transaksi', href: '/reports' },
-        { title: 'Tutup Kas', href: '#' },
+        { title: 'Riwayat Transaksi', href: '/riwayat-transaksi' },
+        { title: 'Tutup Kas', href: '/tutup-kas' },
         { title: 'Retur / Tukar', href: '/returns' },
       ]
     },
-    { title: 'Gudang & Supplier', icon: Store, key: 'gudang' },
-    { title: 'Keuangan & Laporan', icon: Wallet, key: 'keuangan' },
+    { 
+      title: 'Gudang & Supplier', icon: Store, key: 'gudang',
+      children: [
+        { title: 'Restock Barang', href: '/purchases' },
+        { title: 'Utang Supplier', href: '/suppliers' },
+        { title: 'Stok Mengendap', href: '/slow-moving' },
+        { title: 'Barang Bermasa...', href: '/warehouse' },
+        { title: 'AI Restock', href: '/restock' },
+      ]
+    },
+    { 
+      title: 'Keuangan & Laporan', icon: Wallet, key: 'keuangan',
+      children: [
+        { title: 'Buku Kas', href: '/cashflow' },
+        { title: 'Laporan Utama', href: '/laporan-utama' },
+        { title: 'Laporan (Lama)', href: '/reports' },
+      ]
+    },
     { title: 'Sistem & Admin', icon: Settings, key: 'sistem' },
   ];
 
