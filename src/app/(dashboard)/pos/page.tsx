@@ -25,7 +25,7 @@ type Customer = {
 };
 
 export default function PosPage() {
-  const { session } = useAuth();
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -105,7 +105,7 @@ export default function PosPage() {
       const { data: saleData, error: saleError } = await supabase.from('sales').insert({
         receipt_number: receiptNumber,
         customer_id: selectedCustomerId,
-        cashier_id: session?.user?.id || null, // Might fail if no user logged in, but we handle it via RLS usually. For now passing null if no session.
+        cashier_id: user?.id || null, // Might fail if no user logged in, but we handle it via RLS usually. For now passing null if no session.
         subtotal,
         discount,
         total_amount: totalAkhir,
@@ -128,11 +128,11 @@ export default function PosPage() {
         });
 
         // Deduct Stock
-        await supabase.rpc('deduct_stock', { p_id: item.id, p_qty: item.qty })
-          .catch(async () => {
-             // Fallback if RPC doesn't exist
-             await supabase.from('products').update({ stock_global: item.stock_global - item.qty }).eq('id', item.id);
-          });
+        const { error: rpcError } = await supabase.rpc('deduct_stock', { p_id: item.id, p_qty: item.qty });
+        if (rpcError) {
+          // Fallback if RPC doesn't exist
+          await supabase.from('products').update({ stock_global: item.stock_global - item.qty }).eq('id', item.id);
+        }
       }
 
       alert("Transaksi Berhasil!");
