@@ -109,7 +109,7 @@ export function Sidebar() {
         { title: 'Pengaturan (Ca...', href: '/settings' },
         { title: 'Audit Trail', href: '/audit-trail' },
         { title: 'Insight AI Owner', href: '#' },
-        { title: 'Super Admin Pa...', href: '#' },
+        { title: 'Super Admin Panel', href: '/superadmin' },
       ]
     },
   ];
