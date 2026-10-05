@@ -8,7 +8,7 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState(""); // For registration
+  const [fullName, setFullName] = useState(""); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -31,12 +31,11 @@ export default function LoginPage() {
           router.push("/");
         }
       } else {
-        // Register flow
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: fullName, role: 'owner' } // Default as owner on sign up
+            data: { full_name: fullName, role: 'owner' }
           }
         });
         
@@ -52,36 +51,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#fdfdfd] p-4 font-sans">
+      <div className="w-full max-w-[420px] bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100">
         
         {/* Header Gradient */}
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-8 text-center text-white">
-          <div className="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-4 shadow-lg overflow-hidden p-2">
-            {/* Logo placeholder - using text to mimic the logo in screenshot */}
-            <span className="text-pink-500 font-bold text-2xl" style={{ fontFamily: 'cursive' }}>Septy</span>
+        <div className="bg-gradient-to-br from-[#1c5ffb] to-[#4c39f1] pt-10 pb-8 text-center text-white">
+          <div className="w-[72px] h-[72px] bg-white rounded-full mx-auto flex items-center justify-center mb-4 shadow-sm overflow-hidden">
+            <span className="text-[#f76d8b] font-bold text-2xl italic tracking-tighter" style={{ fontFamily: 'cursive' }}>Septy</span>
           </div>
-          <h1 className="text-2xl font-bold mb-1">Septy Softlens</h1>
-          <p className="text-blue-100 text-sm">Otentikasi Mesin Kasir (Device Login)</p>
+          <h1 className="text-2xl font-extrabold mb-1 tracking-tight">Septy Softlens</h1>
+          <p className="text-blue-100/90 text-xs font-medium tracking-wide">Otentikasi Mesin Kasir (Device Login)</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b">
+        <div className="flex px-8 pt-6">
           <button 
-            className={`flex-1 py-4 text-sm font-semibold transition-colors ${
+            type="button"
+            className={`flex-1 pb-3 text-sm font-bold transition-colors border-b-2 ${
               activeTab === "login" 
-                ? "text-blue-600 border-b-2 border-blue-600" 
-                : "text-gray-400 hover:text-gray-600"
+                ? "text-[#1f5ffe] border-[#1f5ffe]" 
+                : "text-gray-400 border-transparent hover:text-gray-600"
             }`}
             onClick={() => { setActiveTab("login"); setError(null); setSuccess(null); }}
           >
             Login Owner
           </button>
           <button 
-            className={`flex-1 py-4 text-sm font-semibold transition-colors ${
+            type="button"
+            className={`flex-1 pb-3 text-sm font-bold transition-colors border-b-2 ${
               activeTab === "register" 
-                ? "text-blue-600 border-b-2 border-blue-600" 
-                : "text-gray-400 hover:text-gray-600"
+                ? "text-[#1f5ffe] border-[#1f5ffe]" 
+                : "text-gray-400 border-transparent hover:text-gray-600"
             }`}
             onClick={() => { setActiveTab("register"); setError(null); setSuccess(null); }}
           >
@@ -90,25 +90,26 @@ export default function LoginPage() {
         </div>
 
         {/* Form Body */}
-        <div className="p-8">
-          <form onSubmit={handleAuth} className="space-y-5">
+        <div className="px-8 pb-8 pt-6">
+          <form onSubmit={handleAuth} className="space-y-4">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center font-medium">
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center">
+              <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center font-medium">
                 {success}
               </div>
             )}
 
             {activeTab === "register" && (
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Nama Toko / Pemilik</label>
+              <div className="space-y-1.5">
+                <label className="block text-[13px] font-bold text-gray-700">Nama Pemilik Toko</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 bg-blue-50/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Septy"
+                  className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1f5ffe] focus:ring-1 focus:ring-[#1f5ffe] transition-all"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
@@ -116,22 +117,24 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Email Owner</label>
+            <div className="space-y-1.5">
+              <label className="block text-[13px] font-bold text-gray-700">Email Owner</label>
               <input 
                 type="email" 
-                className="w-full px-4 py-3 bg-blue-50/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="123456"
+                className="w-full px-3.5 py-2.5 bg-[#f0f4ff] border border-transparent rounded-lg text-sm focus:outline-none focus:border-[#1f5ffe] focus:ring-1 focus:ring-[#1f5ffe] transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="space-y-1.5">
+              <label className="block text-[13px] font-bold text-gray-700">Password</label>
               <input 
                 type="password" 
-                className="w-full px-4 py-3 bg-blue-50/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="••••••"
+                className="w-full px-3.5 py-2.5 bg-[#f0f4ff] border border-transparent rounded-lg text-sm focus:outline-none focus:border-[#1f5ffe] focus:ring-1 focus:ring-[#1f5ffe] transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -140,7 +143,7 @@ export default function LoginPage() {
 
             <button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-lg transition-colors mt-2"
+              className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold py-3.5 rounded-lg transition-colors mt-2 text-sm shadow-sm"
               disabled={loading}
             >
               {loading 
@@ -149,8 +152,10 @@ export default function LoginPage() {
               }
             </button>
             
-            <p className="text-center text-xs text-gray-400 mt-6 px-4">
-              Login ini hanya dilakukan 1x untuk menghubungkan perangkat dengan toko Anda.
+            <p className="text-center text-[11px] text-gray-400 mt-6 px-2 font-medium">
+              {activeTab === "login" 
+                ? "Login ini hanya dilakukan 1x untuk menghubungkan perangkat dengan toko Anda." 
+                : "Akun yang didaftarkan akan otomatis menjadi Owner Utama."}
             </p>
           </form>
         </div>
