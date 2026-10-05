@@ -41,6 +41,22 @@ export default function PosPage() {
   const [discount, setDiscount] = useState<number>(0);
   const [salesChannel, setSalesChannel] = useState<"Toko" | "WhatsApp" | "Marketplace">("Toko");
   
+  // Persist cart to localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem('septy_pos_cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.error("Failed to parse saved cart");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('septy_pos_cart', JSON.stringify(cart));
+  }, [cart]);
+  
   // Customer selection
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
