@@ -181,13 +181,15 @@ export const productsService = {
     return (data || []) as Category[];
   },
 
-  async createCategory(cat: { name: string; code?: string; description?: string }) {
+  async createCategory(cat: { name: string; target_margin?: number; use_expired?: boolean }) {
     const { data, error } = await supabase
       .from('categories')
       .insert({
         name: cat.name,
-        code: cat.code || `CAT-${Date.now().toString().slice(-4)}`,
-        description: cat.description || null,
+        target_margin: cat.target_margin || 15,
+        target_margin_percent: cat.target_margin || 15,
+        use_expired: cat.use_expired || false,
+        track_expired: cat.use_expired || false,
       })
       .select()
       .single();
@@ -196,10 +198,21 @@ export const productsService = {
     return data as Category;
   },
 
-  async updateCategory(id: string, cat: { name: string; code?: string; description?: string }) {
+  async updateCategory(id: string, cat: { name?: string; target_margin?: number; use_expired?: boolean }) {
+    const updateData: any = {};
+    if (cat.name !== undefined) updateData.name = cat.name;
+    if (cat.target_margin !== undefined) {
+      updateData.target_margin = cat.target_margin;
+      updateData.target_margin_percent = cat.target_margin;
+    }
+    if (cat.use_expired !== undefined) {
+      updateData.use_expired = cat.use_expired;
+      updateData.track_expired = cat.use_expired;
+    }
+
     const { data, error } = await supabase
       .from('categories')
-      .update(cat)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
