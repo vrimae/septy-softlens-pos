@@ -122,9 +122,9 @@ export default function CategoriesPage() {
       
       setIsModalOpen(false);
       fetchCategories();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Gagal menyimpan data.");
+      alert(err.message || "Gagal menyimpan data.");
     } finally {
       setIsSubmitting(false);
     }

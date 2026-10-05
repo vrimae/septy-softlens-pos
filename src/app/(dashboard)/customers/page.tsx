@@ -96,8 +96,9 @@ export default function CustomersPage() {
       }
       setIsModalOpen(false);
       fetchCustomers();
-    } catch (err) {
-      alert("Gagal menyimpan.");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Gagal menyimpan.");
     } finally {
       setIsSubmitting(false);
     }

@@ -115,8 +115,9 @@ export default function ProductsPage() {
       
       setIsModalOpen(false);
       fetchProducts();
-    } catch (err) {
-      alert("Gagal menyimpan data.");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Gagal menyimpan data.");
     } finally {
       setIsSubmitting(false);
     }
