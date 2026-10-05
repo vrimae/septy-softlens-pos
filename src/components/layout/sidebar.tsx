@@ -16,6 +16,8 @@ import {
   Building,
   LogOut,
   User,
+  ShieldCheck,
+  MonitorPlay
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -62,7 +64,6 @@ export function Sidebar() {
   };
 
   const menuItems = [
-    { title: 'Dashboard', icon: LayoutDashboard, href: '/' },
     { 
       title: 'Master Data', icon: Box, key: 'master',
       children: [
@@ -145,62 +146,77 @@ export function Sidebar() {
           </div>
         </div>
 
+        <div className="mb-6">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">MENU UTAMA</p>
+          <ul className="space-y-1">
+            <li>
+              <Link
+                href="/owner-dashboard"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
+                  pathname === '/owner-dashboard' ? "bg-[#f0f4ff] text-[#1c5ffb]" : "text-gray-600 hover:bg-gray-50"
+                )}
+              >
+                <div className={cn("p-1.5 rounded-md", pathname === '/owner-dashboard' ? "bg-[#1c5ffb] text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                Dashboard Eksekutif
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
+                  pathname === '/' ? "bg-[#f0f4ff] text-[#1c5ffb]" : "text-gray-600 hover:bg-gray-50"
+                )}
+              >
+                <div className={cn("p-1.5 rounded-md", pathname === '/' ? "bg-[#1c5ffb] text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
+                  <MonitorPlay className="h-4 w-4" />
+                </div>
+                Dashboard Kasir
+              </Link>
+            </li>
+          </ul>
+        </div>
+
         <div>
           <ul className="space-y-1">
             {menuItems.map((item) => (
               <li key={item.title}>
-                {item.children ? (
-                  <>
-                    <button 
-                      onClick={() => toggleMenu(item.key!)}
-                      className={cn("w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors", 
-                        openMenus[item.key!] ? "text-gray-900" : "text-gray-600 hover:bg-gray-50"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn("p-1.5 rounded-md", openMenus[item.key!] ? "bg-gray-100 text-gray-700" : "bg-gray-50 text-gray-500")}>
-                          <item.icon className="h-4 w-4" />
-                        </div>
-                        {item.title}
-                      </div>
-                      <ChevronDown className={cn("h-4 w-4 text-gray-400 transition-transform", openMenus[item.key!] ? "rotate-180" : "-rotate-90")} />
-                    </button>
-                    {openMenus[item.key!] && (
-                      <ul className="mt-1 mb-2 ml-10 border-l border-gray-100 pl-4 space-y-1 py-1">
-                        {item.children.map(child => (
-                          <li key={child.title}>
-                            <Link 
-                              href={child.href} 
-                              className={cn(
-                                "block py-2 text-sm font-semibold transition-colors px-3 -ml-3 rounded-md",
-                                pathname === child.href ? "text-[#1c5ffb] bg-[#f0f4ff]" : "text-gray-500 hover:text-gray-900"
-                              )}
-                            >
-                              <div className="flex items-center gap-2">
-                                {pathname === child.href && <item.icon className="h-3.5 w-3.5 opacity-80" />}
-                                {child.title}
-                              </div>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </>
-                ) : (
-                  <Link
-                    href={item.href!}
-                    className={cn(
-                      "flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-                      pathname === item.href ? "bg-[#f0f4ff] text-[#1c5ffb]" : "text-gray-600 hover:bg-gray-50"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn("p-1.5 rounded-md", pathname === item.href ? "bg-[#1c5ffb] text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                      {item.title}
+                <button 
+                  onClick={() => toggleMenu(item.key!)}
+                  className={cn("w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors", 
+                    openMenus[item.key!] ? "text-gray-900" : "text-gray-600 hover:bg-gray-50"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn("p-1.5 rounded-md", openMenus[item.key!] ? "bg-gray-100 text-gray-700" : "bg-gray-50 text-gray-500")}>
+                      <item.icon className="h-4 w-4" />
                     </div>
-                  </Link>
+                    {item.title}
+                  </div>
+                  <ChevronDown className={cn("h-4 w-4 text-gray-400 transition-transform", openMenus[item.key!] ? "rotate-180" : "-rotate-90")} />
+                </button>
+                {openMenus[item.key!] && (
+                  <ul className="mt-1 mb-2 ml-10 border-l border-gray-100 pl-4 space-y-1 py-1">
+                    {item.children.map(child => (
+                      <li key={child.title}>
+                        <Link 
+                          href={child.href} 
+                          className={cn(
+                            "block py-2 text-sm font-semibold transition-colors px-3 -ml-3 rounded-md",
+                            pathname === child.href ? "text-[#1c5ffb] bg-[#f0f4ff]" : "text-gray-500 hover:text-gray-900"
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            {pathname === child.href && <item.icon className="h-3.5 w-3.5 opacity-80" />}
+                            {child.title}
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </li>
             ))}
@@ -209,7 +225,7 @@ export function Sidebar() {
       </div>
 
       <div className="p-4 border-t border-gray-100 shrink-0 space-y-2">
-        <Link href="/settings" className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+        <Link href="/store-profile" className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">
           <Settings className="h-4 w-4 text-gray-400" />
           Profil Toko
         </Link>
