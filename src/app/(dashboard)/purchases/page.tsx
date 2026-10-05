@@ -1,22 +1,93 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+type PurchaseOrder = {
+  id: string;
+  poNumber: string;
+  supplier: string;
+  invoice: string;
+  date: string;
+  status: "LUNAS" | "UTANG" | "PENDING";
+  paymentMethod: string;
+  totalCost: number;
+};
 
 export default function PurchasesPage() {
+  const [purchases, setPurchases] = useState<PurchaseOrder[]>([
+    {
+      id: "1",
+      poNumber: "PO-2026-001",
+      supplier: "PT Optik Sentosa Abadi",
+      invoice: "INV-9921",
+      date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+      status: "LUNAS",
+      paymentMethod: "Transfer Bank",
+      totalCost: 12500000,
+    },
+  ]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [supplier, setSupplier] = useState("");
+  const [invoice, setInvoice] = useState("");
+  const [totalCost, setTotalCost] = useState("");
+  const [status, setStatus] = useState<"LUNAS" | "UTANG" | "PENDING">("LUNAS");
+  const [paymentMethod, setPaymentMethod] = useState("Transfer Bank");
+
+  const handleOpenAdd = () => {
+    setSupplier("");
+    setInvoice("");
+    setTotalCost("");
+    setStatus("LUNAS");
+    setPaymentMethod("Transfer Bank");
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supplier.trim() || !totalCost.trim()) return;
+
+    const newPO: PurchaseOrder = {
+      id: Date.now().toString(),
+      poNumber: `PO-${new Date().getFullYear()}-${String(purchases.length + 1).padStart(3, "0")}`,
+      supplier: supplier.trim(),
+      invoice: invoice.trim() || "-",
+      date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+      status,
+      paymentMethod,
+      totalCost: parseFloat(totalCost) || 0,
+    };
+
+    setPurchases([newPO, ...purchases]);
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-start">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Pembelian Barang (PO)</h1>
           <p className="text-gray-500 mt-1">Catat belanja stok dari supplier pabrik secara lengkap.</p>
         </div>
-        <Button className="bg-[#00a84e] hover:bg-green-600 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
-          + Tambah Pembelian Baru
+        <Button 
+          onClick={handleOpenAdd}
+          className="bg-[#00a84e] hover:bg-green-600 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+        >
+          <Plus className="h-4 w-4" /> Tambah Pembelian Baru
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1 mt-4">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
@@ -28,14 +99,108 @@ export default function PurchasesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-16 text-gray-500 font-medium border-b-0">
-                Belum ada riwayat pembelian.
-              </TableCell>
-            </TableRow>
+            {purchases.map((p) => (
+              <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <TableCell className="px-6 py-4 font-bold text-blue-600 font-mono text-sm">{p.poNumber}</TableCell>
+                <TableCell className="px-6 py-4 text-center">
+                  <p className="font-bold text-gray-900 text-sm">{p.supplier}</p>
+                  <p className="text-xs text-gray-400">Inv: {p.invoice}</p>
+                </TableCell>
+                <TableCell className="px-6 py-4 text-center text-xs text-gray-600 font-medium">{p.date}</TableCell>
+                <TableCell className="px-6 py-4 text-center">
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    p.status === "LUNAS" ? "bg-green-100 text-green-700" : p.status === "UTANG" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {p.status}
+                  </span>
+                  <p className="text-[11px] text-gray-400 mt-1">{p.paymentMethod}</p>
+                </TableCell>
+                <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-base">
+                  Rp {p.totalCost.toLocaleString()}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
+
+      {/* Modal Tambah PO */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[460px]">
+          <DialogHeader>
+            <DialogTitle>Catat Pembelian Stok (PO)</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4 pt-3">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Supplier / Pabrik</label>
+              <input
+                type="text"
+                placeholder="Contoh: PT Optik Sentosa Abadi"
+                value={supplier}
+                onChange={(e) => setSupplier(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">No. Faktur / Invoice Supplier</label>
+              <input
+                type="text"
+                placeholder="Contoh: INV-9921"
+                value={invoice}
+                onChange={(e) => setInvoice(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Total Biaya Belanja (Rp)</label>
+              <input
+                type="number"
+                min="1"
+                placeholder="Contoh: 5000000"
+                value={totalCost}
+                onChange={(e) => setTotalCost(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Status Pembayaran</label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as any)}
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                >
+                  <option value="LUNAS">LUNAS</option>
+                  <option value="UTANG">UTANG / TEMPO</option>
+                  <option value="PENDING">PENDING</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Metode Bayar</label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                >
+                  <option value="Transfer Bank">Transfer Bank</option>
+                  <option value="Tunai (Kas)">Tunai (Kas)</option>
+                  <option value="Giro / Cek">Giro / Cek</option>
+                </select>
+              </div>
+            </div>
+            <DialogFooter className="pt-3 border-t">
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                Batal
+              </Button>
+              <Button type="submit" className="bg-[#00a84e] hover:bg-green-600 text-white font-bold">
+                Simpan Pembelian
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

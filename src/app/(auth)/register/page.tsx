@@ -45,19 +45,19 @@ export default function RegisterPage() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Buat record profil di tabel profiles agar role dikenali
+        // Buat record profil di tabel profiles dengan status PENDING menunggu Super Admin
         await supabase.from("profiles").upsert({
           id: data.user.id,
           full_name: fullName.trim() || "Owner",
           role: "OWNER",
-          status: "ACTIVE",
+          status: "PENDING",
         });
       }
 
-      setSuccess("Pendaftaran berhasil! Akun toko Anda telah dibuat. Mengarahkan ke login...");
+      setSuccess("Pendaftaran berhasil! Akun Anda sedang menunggu konfirmasi/verifikasi dari Super Admin (vrimae23@gmail.com). Silakan hubungi Super Admin untuk mengaktifkan akun Anda.");
       setTimeout(() => {
         router.push("/login");
-      }, 1500);
+      }, 3500);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Terjadi kesalahan saat pendaftaran akun.");

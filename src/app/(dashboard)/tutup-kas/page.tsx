@@ -1,53 +1,170 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { supabase } from "@/lib/supabase/client";
+
+type ShiftClosing = {
+  id: string;
+  timestamp: string;
+  systemCash: number;
+  actualCash: number;
+  difference: number;
+  status: "PAS" | "LEBIH" | "KURANG";
+};
 
 export default function TutupKasPage() {
+  const [systemCash, setSystemCash] = useState(0);
+  const [actualCashInput, setActualCashInput] = useState("0");
+  const [closings, setClosings] = useState<ShiftClosing[]>([
+    {
+      id: "CLS-1",
+      timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+      systemCash: 150000,
+      actualCash: 150000,
+      difference: 0,
+      status: "PAS",
+    },
+  ]);
+  const [successMsg, setSuccessMsg] = useState(false);
+
+  useEffect(() => {
+    // Hitung total penjualan tunai dari sales
+    async function getCashSales() {
+      try {
+        const { data } = await supabase
+          .from("sales")
+          .select("total_amount, payment_method")
+          .eq("payment_method", "TUNAI");
+
+        if (data && data.length > 0) {
+          const total = data.reduce((acc, curr) => acc + (curr.total_amount || 0), 0);
+          setSystemCash(total);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    getCashSales();
+  }, []);
+
+  const handleCloseShift = (e: React.FormEvent) => {
+    e.preventDefault();
+    const actual = parseFloat(actualCashInput) || 0;
+    const diff = actual - systemCash;
+    const status: ShiftClosing["status"] = diff === 0 ? "PAS" : diff > 0 ? "LEBIH" : "KURANG";
+
+    const newClosing: ShiftClosing = {
+      id: `CLS-${Date.now()}`,
+      timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+      systemCash,
+      actualCash: actual,
+      difference: diff,
+      status,
+    };
+
+    setClosings([newClosing, ...closings]);
+    setSuccessMsg(true);
+    setTimeout(() => setSuccessMsg(false), 3000);
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Tutup Kas (Rekonsiliasi Shift)</h1>
         <p className="text-gray-500 mt-1">Lakukan rekonsiliasi uang fisik (Tunai) pada akhir shift Anda.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {successMsg && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-2xl text-sm font-bold shadow-sm">
+          Rekonsiliasi tutup kas shift berhasil disimpan dan dicatat!
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column: Form */}
-        <Card className="rounded-2xl border-gray-200 shadow-sm overflow-hidden border">
-          <div className="px-6 py-5">
+        <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900">Form Tutup Kas Shift</h2>
           </div>
-          <CardContent className="px-6 pb-6 space-y-6">
-            <div className="bg-[#f0f4ff] p-4 rounded-xl border border-transparent">
+          <CardContent className="px-6 py-6 space-y-6">
+            <div className="bg-[#f0f4ff] p-5 rounded-2xl border border-transparent">
               <label className="block text-sm font-semibold text-[#1c5ffb] mb-1">Saldo Tunai Seharusnya (Sistem)</label>
-              <div className="text-3xl font-black text-[#1c5ffb]">Rp 0</div>
+              <div className="text-3xl font-black text-[#1c5ffb]">Rp {systemCash.toLocaleString()}</div>
             </div>
             
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Total Uang Fisik (Tunai Aktual)</label>
-              <div className="relative">
-                <span className="absolute left-4 top-3 text-sm font-bold text-gray-400">Rp</span>
-                <input 
-                  type="text" 
-                  defaultValue="0"
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#1c5ffb] focus:ring-1 focus:ring-[#1c5ffb]"
-                />
+            <form onSubmit={handleCloseShift} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Total Uang Fisik (Tunai Aktual)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-3 text-sm font-bold text-gray-400">Rp</span>
+                  <input 
+                    type="number" 
+                    value={actualCashInput}
+                    onChange={(e) => setActualCashInput(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-base font-bold focus:outline-none focus:border-[#1c5ffb] focus:ring-1 focus:ring-[#1c5ffb]"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <Button className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
-              Kirim Tutup Kas
-            </Button>
+              {actualCashInput !== "" && (
+                <div className="p-3 bg-gray-50 rounded-xl flex justify-between text-xs font-bold text-gray-600">
+                  <span>Selisih:</span>
+                  <span className={parseFloat(actualCashInput) - systemCash === 0 ? "text-green-600" : "text-amber-600"}>
+                    {parseFloat(actualCashInput) - systemCash >= 0 ? "+" : ""}
+                    Rp {(parseFloat(actualCashInput) - systemCash).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              <Button type="submit" className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
+                Kirim Tutup Kas
+              </Button>
+            </form>
           </CardContent>
         </Card>
 
         {/* Right Column: Riwayat */}
-        <Card className="rounded-2xl border-gray-200 shadow-sm overflow-hidden border flex flex-col">
-          <div className="px-6 py-5 border-b border-gray-100">
+        <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border flex flex-col">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900">Riwayat Tutup Kas</h2>
           </div>
-          <CardContent className="p-0 flex-1 flex items-center justify-center min-h-[300px]">
-            <p className="text-gray-400 font-medium">Belum ada data rekonsiliasi shift.</p>
+          <CardContent className="p-0 flex-1">
+            {closings.length === 0 ? (
+              <div className="flex items-center justify-center p-12 text-gray-400 font-medium">
+                Belum ada data rekonsiliasi shift.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-gray-100 text-xs">
+                    <TableHead className="py-3 px-4">Waktu</TableHead>
+                    <TableHead className="py-3 px-4 text-right">Sistem</TableHead>
+                    <TableHead className="py-3 px-4 text-right">Fisik</TableHead>
+                    <TableHead className="py-3 px-4 text-center">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {closings.map((c) => (
+                    <TableRow key={c.id} className="border-b border-gray-50">
+                      <TableCell className="py-3.5 px-4 font-semibold text-xs text-gray-700">{c.timestamp}</TableCell>
+                      <TableCell className="py-3.5 px-4 text-right font-medium text-xs">Rp {c.systemCash.toLocaleString()}</TableCell>
+                      <TableCell className="py-3.5 px-4 text-right font-bold text-xs">Rp {c.actualCash.toLocaleString()}</TableCell>
+                      <TableCell className="py-3.5 px-4 text-center">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          c.status === "PAS" ? "bg-green-100 text-green-700" : c.status === "LEBIH" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"
+                        }`}>
+                          {c.status}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>

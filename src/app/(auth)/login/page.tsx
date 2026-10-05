@@ -57,16 +57,16 @@ export default function LoginPage() {
         if (signUpError) throw signUpError;
 
         if (signUpData.user) {
-          // Buat record profil di tabel profiles agar role dikenali
+          // Buat record profil di tabel profiles dengan status PENDING menunggu Super Admin
           await supabase.from("profiles").upsert({
             id: signUpData.user.id,
             full_name: fullName.trim() || "Owner",
             role: "OWNER",
-            status: "ACTIVE",
+            status: "PENDING",
           });
         }
 
-        setSuccess("Pendaftaran berhasil! Akun Anda telah dibuat. Silakan login.");
+        setSuccess("Pendaftaran berhasil! Akun Anda sedang menunggu konfirmasi/verifikasi dari Super Admin (vrimae23@gmail.com). Anda dapat login setelah disetujui.");
         setActiveTab("login");
       }
     } catch (err: any) {

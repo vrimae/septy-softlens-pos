@@ -1,27 +1,54 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Check, Moon, Sun } from "lucide-react";
 
 export default function StoreProfilePage() {
+  const [storeName, setStoreName] = useState("Septy Softlens");
+  const [address, setAddress] = useState("Jl. Contoh Alamat No 123");
+  const [phone, setPhone] = useState("081234567890");
+  const [footer, setFooter] = useState("Terima kasih atas kunjungan Anda");
+  const [qris, setQris] = useState("00020101021126670016COM.NOBUBANK.WWW011893600...");
+  const [darkMode, setDarkMode] = useState(false);
+  const [savedMessage, setSavedMessage] = useState(false);
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavedMessage(true);
+    setTimeout(() => setSavedMessage(false), 3000);
+  };
+
   return (
-    <div className="max-w-4xl space-y-8 pb-10">
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+    <div className="max-w-4xl space-y-8 pb-12">
+      {savedMessage && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3.5 rounded-2xl text-sm font-bold shadow-sm flex items-center gap-2">
+          <Check className="h-4 w-4 text-emerald-600" />
+          Perubahan profil toko berhasil disimpan!
+        </div>
+      )}
+
+      <form onSubmit={handleSave} className="bg-white border border-gray-200 rounded-3xl shadow-sm p-8 space-y-6">
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Nama Toko</label>
             <input 
               type="text" 
-              defaultValue="Septy Softlens"
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb]"
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
+              required
             />
           </div>
 
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Alamat Lengkap</label>
             <textarea 
-              defaultValue="Jl. Contoh Alamat No 123"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] resize-none"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] resize-none font-medium"
+              required
             />
           </div>
 
@@ -29,8 +56,10 @@ export default function StoreProfilePage() {
             <label className="block text-sm font-bold text-gray-700 mb-2">Nomor WhatsApp / Telp</label>
             <input 
               type="text" 
-              defaultValue="081234567890"
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb]"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
+              required
             />
           </div>
 
@@ -38,8 +67,10 @@ export default function StoreProfilePage() {
             <label className="block text-sm font-bold text-gray-700 mb-2">Pesan Penutup Struk (Footer)</label>
             <input 
               type="text" 
-              defaultValue="Terima kasih atas kunjungan Anda"
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb]"
+              value={footer}
+              onChange={(e) => setFooter(e.target.value)}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
+              required
             />
           </div>
 
@@ -47,32 +78,38 @@ export default function StoreProfilePage() {
             <label className="block text-sm font-bold text-gray-700 mb-2">Teks Kode QRIS (Raw String)</label>
             <input 
               type="text" 
-              defaultValue="00020101021126670016COM.NOBUBANK.WWW011893600..."
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] text-gray-500"
+              value={qris}
+              onChange={(e) => setQris(e.target.value)}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] text-gray-700 font-mono text-xs"
             />
             <p className="text-xs text-gray-400 mt-2 font-medium">Masukkan teks/kode RAW QRIS toko Anda. Sistem akan membuatkan gambar QR secara otomatis di kasir.</p>
           </div>
         </div>
 
-        <div className="mt-10 mb-6">
+        <div className="mt-10 mb-6 pt-4 border-t border-gray-100">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Pengaturan Tampilan</h2>
-          <div className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-[#fafafa]">
+          <div 
+            onClick={() => setDarkMode(!darkMode)}
+            className="border border-gray-200 rounded-2xl p-4 flex justify-between items-center bg-[#fafafa] cursor-pointer hover:bg-gray-100/60 transition-colors"
+          >
             <div>
               <h3 className="font-bold text-gray-700">Tema Gelap (Dark Mode)</h3>
               <p className="text-xs text-gray-500 mt-1">Ganti tampilan aplikasi ke mode gelap.</p>
             </div>
-            <div className="w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center">
-              {/* Sun icon placeholder */}
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <div className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-colors ${darkMode ? "bg-slate-800 text-yellow-300" : "bg-white text-gray-400"}`}>
+              {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </div>
           </div>
         </div>
 
-        <Button className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-12 shadow-sm flex items-center gap-2 mt-8">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <Button 
+          type="submit"
+          className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-12 shadow-sm flex items-center gap-2 mt-8"
+        >
+          <Check className="h-4 w-4" />
           Simpan Perubahan
         </Button>
-      </div>
+      </form>
     </div>
   );
 }
