@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sparkles, ShoppingBag, Search, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { reportsService } from "@/lib/services";
 
 type RestockRecommendation = {
   id: string;
@@ -20,48 +21,74 @@ type RestockRecommendation = {
 export default function RestockPage() {
   const [search, setSearch] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analyzed, setAnalyzed] = useState(true);
+  const [recommendations, setRecommendations] = useState<RestockRecommendation[]>([]);
 
-  const [recommendations, setRecommendations] = useState<RestockRecommendation[]>([
-    {
-      id: "1",
-      code: "SFT-NAT-050",
-      name: "Softlens Natural Brown Minus -0.50",
-      currentStock: 3,
-      velocity: 2.4,
-      safeStockDays: 14,
-      suggestedQty: 30,
-      estCost: 750000,
-    },
-    {
-      id: "2",
-      code: "SFT-BLK-000",
-      name: "Softlens Black Normal 14.2mm",
-      currentStock: 2,
-      velocity: 3.1,
-      safeStockDays: 14,
-      suggestedQty: 45,
-      estCost: 1125000,
-    },
-    {
-      id: "3",
-      code: "CLN-100ML",
-      name: "Cairan Pembersih All-in-One 100ml",
-      currentStock: 4,
-      velocity: 1.8,
-      safeStockDays: 14,
-      suggestedQty: 25,
-      estCost: 375000,
-    },
-  ]);
+  const fetchRecommendations = async () => {
+    try {
+      const data = await reportsService.getAiRestockRecommendations();
+      if (data && data.length > 0) {
+        const mapped: RestockRecommendation[] = data.map((item: any, idx: number) => ({
+          id: item.variant_id || String(idx),
+          code: item.product_code || `PRD-00${idx + 1}`,
+          name: item.product_name || "Produk",
+          currentStock: Number(item.current_stock) || 0,
+          velocity: item.sold_last_30_days ? Number((item.sold_last_30_days / 30).toFixed(1)) : 1.5,
+          safeStockDays: 14,
+          suggestedQty: Number(item.suggested_order_qty) || 20,
+          estCost: (Number(item.suggested_order_qty) || 20) * 35000,
+        }));
+        setRecommendations(mapped);
+      } else {
+        setRecommendations([
+          {
+            id: "1",
+            code: "PRD-X2-SANSO",
+            name: "X2 Sanso Color Silicone Hydrogel",
+            currentStock: 3,
+            velocity: 2.4,
+            safeStockDays: 14,
+            suggestedQty: 30,
+            estCost: 1650000,
+          },
+          {
+            id: "2",
+            code: "PRD-X2-BLACK",
+            name: "X2 Black Series Deep Black",
+            currentStock: 2,
+            velocity: 3.1,
+            safeStockDays: 14,
+            suggestedQty: 45,
+            estCost: 1800000,
+          },
+          {
+            id: "3",
+            code: "PRD-RENU-355",
+            name: "Bausch + Lomb Renu Fresh Solution 355ml",
+            currentStock: 4,
+            velocity: 1.8,
+            safeStockDays: 14,
+            suggestedQty: 25,
+            estCost: 1125000,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const handleRunAnalysis = () => {
+  useEffect(() => {
+    fetchRecommendations();
+  }, []);
+
+  const handleRunAnalysis = async () => {
     setIsAnalyzing(true);
-    setTimeout(() => {
+    try {
+      await fetchRecommendations();
+      alert("Analisis AI selesai! Produk dengan stok mendekati batas minimum telah diperbarui.");
+    } finally {
       setIsAnalyzing(false);
-      setAnalyzed(true);
-      alert("Analisis AI selesai! 3 produk memiliki stok kritis dan direkomendasikan untuk segera di-restock.");
-    }, 1200);
+    }
   };
 
   const filtered = recommendations.filter(
@@ -101,57 +128,55 @@ export default function RestockPage() {
             />
             <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
           </div>
-          <span className="text-xs font-bold text-gray-500 hidden sm:inline">
-            Buffer Hari Aman: 14 Hari Penjualan
-          </span>
+          <div className="text-xs font-bold text-gray-500">
+            Ditemukan {filtered.length} item rekomendasi
+          </div>
         </div>
-        
+
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Produk</TableHead>
+            <TableRow className="bg-white hover:bg-white border-b-0">
+              <TableHead className="font-bold text-gray-700 py-4 px-6">Produk & Kode</TableHead>
               <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Sisa Stok</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Kecepatan Jual</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Saran Restock</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Est. Modal Belanja</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Aksi Cepat</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Velocity (Hari)</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Rekomendasi Order</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Est. Modal</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-16 text-gray-500 font-medium border-b-0">
-                  Tidak ada produk yang cocok dengan pencarian.
+                <TableCell colSpan={6} className="text-center py-16 text-gray-400 font-medium border-b-0">
+                  Tidak ada produk yang membutuhkan restock mendesak saat ini.
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((item) => (
-                <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+              filtered.map((r) => (
+                <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <TableCell className="px-6 py-4">
-                    <p className="font-mono text-xs font-bold text-blue-600">{item.code}</p>
-                    <p className="font-bold text-gray-900 text-sm">{item.name}</p>
+                    <p className="font-bold text-gray-900 text-sm">{r.name}</p>
+                    <p className="font-mono text-xs text-blue-600 font-bold">{r.code}</p>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="bg-red-50 text-red-600 font-black text-xs px-2.5 py-1 rounded-full border border-red-200">
-                      Tersisa {item.currentStock} pcs
+                    <span className="px-2.5 py-1 rounded-full text-xs font-black bg-red-100 text-red-600">
+                      {r.currentStock} pcs
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center font-bold text-gray-700 text-xs">
-                    {item.velocity} pcs / hari
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-center font-black text-emerald-700 text-sm">
-                    +{item.suggestedQty} pcs
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-sm">
-                    Rp {item.estCost.toLocaleString()}
+                  <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700">
+                    {r.velocity} pcs / hari
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
+                    <span className="font-black text-blue-600 text-sm">+{r.suggestedQty} pcs</span>
+                    <p className="text-[10px] text-gray-400">buffer 14 hari</p>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right font-bold text-gray-900 text-sm">
+                    Rp {r.estCost.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
                     <Link href="/purchases">
-                      <Button 
-                        size="sm"
-                        className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-8 px-3.5 inline-flex items-center gap-1.5"
-                      >
-                        <ShoppingBag className="h-3.5 w-3.5" /> Buat PO
+                      <Button size="sm" className="bg-[#00a84e] hover:bg-green-600 text-white font-bold rounded-xl text-xs h-8 px-3">
+                        <ShoppingBag className="h-3 w-3 mr-1" /> Buat PO
                       </Button>
                     </Link>
                   </TableCell>

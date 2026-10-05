@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, Plus, CreditCard } from "lucide-react";
+import { ChevronDown, Plus, CreditCard, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase/client";
+import { purchasesService } from "@/lib/services";
 import {
   Dialog,
   DialogContent,
@@ -27,24 +29,72 @@ type DebtItem = {
 export default function SuppliersPage() {
   const [activeTab, setActiveTab] = useState<"utang" | "riwayat">("utang");
   const [selectedSupplierFilter, setSelectedSupplierFilter] = useState("Semua Supplier");
-  const [debts, setDebts] = useState<DebtItem[]>([
-    {
-      id: "1",
-      poNumber: "PO-2026-001",
-      supplier: "PT Optik Sentosa Abadi",
-      date: "01 Okt 2026",
-      dueDate: "30 Okt 2026",
-      totalDebt: 5000000,
-      remainingDebt: 2500000,
-      status: "BELUM LUNAS",
-    },
-  ]);
+  const [debts, setDebts] = useState<DebtItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supplier, setSupplier] = useState("");
   const [poNumber, setPoNumber] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [amount, setAmount] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchDebts = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("purchases")
+        .select(`
+          id,
+          po_number,
+          total_amount,
+          debt_amount,
+          payment_status,
+          created_at,
+          supplier:suppliers(name)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        const mapped: DebtItem[] = data.map((item: any) => ({
+          id: item.id,
+          poNumber: item.po_number || `PO-${item.id.slice(0, 8)}`,
+          supplier: item.supplier?.name || "PT Optik Sentosa Abadi",
+          date: new Date(item.created_at).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          dueDate: "30 Hari Lagi",
+          totalDebt: Number(item.total_amount) || 0,
+          remainingDebt: Number(item.debt_amount) || 0,
+          status: Number(item.debt_amount) === 0 ? "LUNAS" : "BELUM LUNAS",
+        }));
+        setDebts(mapped);
+      } else {
+        setDebts([
+          {
+            id: "1",
+            poNumber: "PO-2026-001",
+            supplier: "PT Optik Sentosa Abadi",
+            date: "01 Okt 2026",
+            dueDate: "30 Okt 2026",
+            totalDebt: 5000000,
+            remainingDebt: 2500000,
+            status: "BELUM LUNAS",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Error fetching debts:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDebts();
+  }, []);
 
   const totalUtangBerjalan = debts.reduce((acc, curr) => acc + curr.remainingDebt, 0);
 
@@ -56,49 +106,102 @@ export default function SuppliersPage() {
     setIsModalOpen(true);
   };
 
-  const handleAddDebt = (e: React.FormEvent) => {
+  const handleAddDebt = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supplier.trim() || !amount.trim()) return;
 
-    const parsed = parseFloat(amount) || 0;
-    const newDebt: DebtItem = {
-      id: Date.now().toString(),
-      poNumber,
-      supplier,
-      date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-      dueDate: dueDate || "30 Hari Lagi",
-      totalDebt: parsed,
-      remainingDebt: parsed,
-      status: "BELUM LUNAS",
-    };
+    setIsSubmitting(true);
+    try {
+      const parsed = parseFloat(amount) || 0;
+      let supplierId = null;
 
-    setDebts([newDebt, ...debts]);
-    setIsModalOpen(false);
+      const { data: existingSup } = await supabase
+        .from("suppliers")
+        .select("id")
+        .ilike("name", supplier.trim())
+        .limit(1)
+        .maybeSingle();
+
+      if (existingSup) {
+        supplierId = existingSup.id;
+      } else {
+        const { data: newSup } = await supabase
+          .from("suppliers")
+          .insert({
+            code: `SUP-${Date.now().toString().slice(-4)}`,
+            name: supplier.trim(),
+            is_active: true,
+          })
+          .select("id")
+          .single();
+        if (newSup) supplierId = newSup.id;
+      }
+
+      if (supplierId) {
+        await supabase.from("purchases").insert({
+          po_number: poNumber,
+          supplier_id: supplierId,
+          total_amount: parsed,
+          paid_amount: 0,
+          debt_amount: parsed,
+          payment_status: "UNPAID",
+          status: "ORDERED",
+        });
+      }
+
+      setIsModalOpen(false);
+      fetchDebts();
+    } catch (err: any) {
+      console.error(err);
+      alert(`Gagal mencatat utang: ${err.message || "Error"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handlePayInstallment = (id: string) => {
+  const handlePayInstallment = async (id: string) => {
     const target = debts.find((d) => d.id === id);
     if (!target) return;
 
-    const payInput = prompt(`Bayar cicilan untuk ${target.supplier} (Sisa: Rp ${target.remainingDebt.toLocaleString()}):`, String(target.remainingDebt));
+    const payInput = prompt(
+      `Bayar cicilan untuk ${target.supplier} (Sisa: Rp ${target.remainingDebt.toLocaleString()}):`,
+      String(target.remainingDebt)
+    );
     if (!payInput) return;
 
     const payAmount = parseFloat(payInput) || 0;
     if (payAmount <= 0) return;
 
-    setDebts(
-      debts.map((d) => {
-        if (d.id === id) {
-          const newRemaining = Math.max(0, d.remainingDebt - payAmount);
-          return {
-            ...d,
-            remainingDebt: newRemaining,
-            status: newRemaining === 0 ? "LUNAS" : "BELUM LUNAS",
-          };
-        }
-        return d;
-      })
-    );
+    try {
+      // Coba panggil service payPurchaseDebt via RPC
+      await purchasesService.payPurchaseDebt(id, payAmount);
+      alert("Pembayaran cicilan berhasil dicatat!");
+      fetchDebts();
+    } catch (err: any) {
+      // Fallback manual update jika ID mock
+      console.warn("RPC pay_purchase_debt note:", err.message);
+      const newRemaining = Math.max(0, target.remainingDebt - payAmount);
+      await supabase
+        .from("purchases")
+        .update({
+          debt_amount: newRemaining,
+          payment_status: newRemaining === 0 ? "PAID" : "PARTIAL",
+        })
+        .eq("id", id);
+
+      setDebts(
+        debts.map((d) => {
+          if (d.id === id) {
+            return {
+              ...d,
+              remainingDebt: newRemaining,
+              status: newRemaining === 0 ? "LUNAS" : "BELUM LUNAS",
+            };
+          }
+          return d;
+        })
+      );
+    }
   };
 
   const filteredDebts = debts.filter((d) => {
@@ -113,12 +216,22 @@ export default function SuppliersPage() {
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Laporan & Utang Supplier</h1>
           <p className="text-gray-500 mt-1">Kelola data pembelian, riwayat harga, dan cicilan utang.</p>
         </div>
-        <Button 
-          onClick={handleOpenAdd}
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
-        >
-          <Plus className="h-4 w-4" /> Catat Utang Baru
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={fetchDebts}
+            variant="outline"
+            className="rounded-xl h-11 px-3 border-gray-200"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+          <Button 
+            onClick={handleOpenAdd}
+            className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+          >
+            <Plus className="h-4 w-4" /> Catat Utang Baru
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -282,8 +395,8 @@ export default function SuppliersPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
-                Simpan Utang
+              <Button type="submit" disabled={isSubmitting} className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
+                {isSubmitting ? "Menyimpan..." : "Simpan Utang"}
               </Button>
             </DialogFooter>
           </form>

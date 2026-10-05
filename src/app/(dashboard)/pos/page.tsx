@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, ShoppingCart, Trash2, CheckCircle2, Plus, DollarSign, ScanLine, UserPlus } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { salesService, cashflowService, customersService } from "@/lib/services";
 import { useAuth } from "@/components/providers/auth-provider";
 import {
   Dialog,
@@ -125,22 +126,20 @@ export default function PosPage() {
     e.preventDefault();
     if (!newCustName.trim()) return;
     try {
-      const { data, error } = await supabase.from('customers').insert({
+      const data = await customersService.createCustomer({
         name: newCustName.trim(),
         phone: newCustPhone.trim() || "-",
-        customer_level: "REGULER",
-        points: 0
-      }).select('id').single();
+      });
 
-      if (!error && data) {
+      if (data?.id) {
         setSelectedCustomerId(data.id);
       }
       setIsCustomerModalOpen(false);
       setNewCustName("");
       setNewCustPhone("");
       fetchCustomers();
-    } catch (err) {
-      alert("Gagal menambahkan pelanggan.");
+    } catch (err: any) {
+      alert(`Gagal menambahkan pelanggan: ${err.message || 'Terjadi kesalahan'}`);
     }
   };
 
@@ -148,8 +147,7 @@ export default function PosPage() {
     e.preventDefault();
     if (!expenseAmount || !expenseDesc.trim()) return;
     try {
-      // Masukkan ke cash_flows
-      await supabase.from('cash_flows').insert({
+      await cashflowService.createCashFlow({
         flow_type: 'OUT',
         category: 'PENGELUARAN KASIR',
         amount: parseFloat(expenseAmount) || 0,
@@ -159,8 +157,8 @@ export default function PosPage() {
       setIsExpenseModalOpen(false);
       setExpenseAmount("");
       setExpenseDesc("");
-    } catch (err) {
-      alert("Gagal mencatat pengeluaran.");
+    } catch (err: any) {
+      alert(`Gagal mencatat pengeluaran: ${err.message || 'Terjadi kesalahan'}`);
     }
   };
 
@@ -175,38 +173,30 @@ export default function PosPage() {
     
     setIsProcessing(true);
     try {
-      const receiptNumber = `TRX-${Date.now()}`;
-      const { data: saleData, error: saleError } = await supabase.from('sales').insert({
-        receipt_number: receiptNumber,
+      const payments = [];
+      if (payTunai > 0) payments.push({ payment_method: 'TUNAI' as const, amount: payTunai });
+      if (payTransfer > 0) payments.push({ payment_method: 'TRANSFER' as const, amount: payTransfer });
+      if (payQris > 0) payments.push({ payment_method: 'QRIS' as const, amount: payQris });
+
+      const payload = {
         customer_id: selectedCustomerId,
         cashier_id: user?.id || null,
-        subtotal,
-        discount,
-        total_amount: totalAkhir,
-        payment_method: payTunai > 0 ? 'TUNAI' : (payQris > 0 ? 'QRIS' : 'TRANSFER'),
-        status: 'COMPLETED'
-      }).select('id').single();
-
-      if (saleError) throw saleError;
-      const saleId = saleData.id;
-
-      for (const item of cart) {
-        await supabase.from('sale_items').insert({
-          sale_id: saleId,
-          product_id: item.id,
+        sales_channel: salesChannel,
+        discount_amount: discount,
+        idempotency_key: `POS-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        items: cart.map(item => ({
+          variant_id: item.id,
           qty: item.qty,
-          price_at_sale: item.price_regular,
-          cost_at_sale: 0,
-          subtotal: item.price_regular * item.qty
-        });
+          price_at_sale: item.price_regular
+        })),
+        payments: payments.length > 0 ? payments : [{ payment_method: 'TUNAI' as const, amount: totalBayar }],
+        pay_amount: totalBayar,
+        payment_method: payTunai > 0 ? 'TUNAI' : (payQris > 0 ? 'QRIS' : 'TRANSFER')
+      };
 
-        const { error: rpcError } = await supabase.rpc('deduct_stock', { p_id: item.id, p_qty: item.qty });
-        if (rpcError) {
-          await supabase.from('products').update({ stock_global: item.stock_global - item.qty }).eq('id', item.id);
-        }
-      }
+      const result = await salesService.createSale(payload);
 
-      alert("Transaksi Berhasil Diselesaikan! Struk siap dicetak.");
+      alert(`Transaksi Berhasil Diselesaikan!\nNo Invoice: ${result.invoice_number || 'INV-BERHASIL'}\nTotal: Rp ${(result.total_amount || totalAkhir).toLocaleString()}\nKembalian: Rp ${(result.change_amount || 0).toLocaleString()}`);
       setCart([]);
       setDiscount(0);
       setPayTunai(0);
@@ -215,9 +205,9 @@ export default function PosPage() {
       setSelectedCustomerId("");
       fetchProducts();
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Terjadi kesalahan saat memproses transaksi.");
+      alert(`Gagal memproses transaksi: ${err.message || 'Terjadi kesalahan sistem'}`);
     } finally {
       setIsProcessing(false);
     }

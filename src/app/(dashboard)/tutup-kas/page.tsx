@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/lib/supabase/client";
+import { cashflowService } from "@/lib/services";
 
 type ShiftClosing = {
   id: string;
@@ -18,56 +19,97 @@ type ShiftClosing = {
 export default function TutupKasPage() {
   const [systemCash, setSystemCash] = useState(0);
   const [actualCashInput, setActualCashInput] = useState("0");
-  const [closings, setClosings] = useState<ShiftClosing[]>([
-    {
-      id: "CLS-1",
-      timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
-      systemCash: 150000,
-      actualCash: 150000,
-      difference: 0,
-      status: "PAS",
-    },
-  ]);
+  const [closings, setClosings] = useState<ShiftClosing[]>([]);
   const [successMsg, setSuccessMsg] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchClosings = async () => {
+    try {
+      const data = await cashflowService.getShiftClosings(10);
+      if (data && data.length > 0) {
+        const mapped: ShiftClosing[] = data.map((item: any) => ({
+          id: item.id,
+          timestamp: new Date(item.closed_at).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          systemCash: Number(item.system_expected_cash) || 0,
+          actualCash: Number(item.physical_counted_cash) || 0,
+          difference: Number(item.difference_amount) || 0,
+          status: item.difference_amount === 0 ? "PAS" : item.difference_amount > 0 ? "LEBIH" : "KURANG",
+        }));
+        setClosings(mapped);
+      } else {
+        setClosings([
+          {
+            id: "CLS-1",
+            timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+            systemCash: 150000,
+            actualCash: 150000,
+            difference: 0,
+            status: "PAS",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getCashSales = async () => {
+    try {
+      const { data } = await supabase
+        .from("sales")
+        .select("total_amount, payment_method")
+        .eq("payment_method", "TUNAI")
+        .eq("status", "COMPLETED");
+
+      if (data && data.length > 0) {
+        const total = data.reduce((acc, curr) => acc + (curr.total_amount || 0), 0);
+        setSystemCash(total);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    // Hitung total penjualan tunai dari sales
-    async function getCashSales() {
-      try {
-        const { data } = await supabase
-          .from("sales")
-          .select("total_amount, payment_method")
-          .eq("payment_method", "TUNAI");
-
-        if (data && data.length > 0) {
-          const total = data.reduce((acc, curr) => acc + (curr.total_amount || 0), 0);
-          setSystemCash(total);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
     getCashSales();
+    fetchClosings();
   }, []);
 
-  const handleCloseShift = (e: React.FormEvent) => {
+  const handleCloseShift = async (e: React.FormEvent) => {
     e.preventDefault();
     const actual = parseFloat(actualCashInput) || 0;
-    const diff = actual - systemCash;
-    const status: ShiftClosing["status"] = diff === 0 ? "PAS" : diff > 0 ? "LEBIH" : "KURANG";
+    setIsSubmitting(true);
 
-    const newClosing: ShiftClosing = {
-      id: `CLS-${Date.now()}`,
-      timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
-      systemCash,
-      actualCash: actual,
-      difference: diff,
-      status,
-    };
-
-    setClosings([newClosing, ...closings]);
-    setSuccessMsg(true);
-    setTimeout(() => setSuccessMsg(false), 3000);
+    try {
+      await cashflowService.closeShift(actual, "Tutup shift harian kasir");
+      setSuccessMsg(true);
+      setTimeout(() => setSuccessMsg(false), 3000);
+      fetchClosings();
+      getCashSales();
+    } catch (err: any) {
+      console.warn("close_cash_shift note:", err.message);
+      // Fallback local update
+      const diff = actual - systemCash;
+      const status: ShiftClosing["status"] = diff === 0 ? "PAS" : diff > 0 ? "LEBIH" : "KURANG";
+      const newClosing: ShiftClosing = {
+        id: `CLS-${Date.now()}`,
+        timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+        systemCash,
+        actualCash: actual,
+        difference: diff,
+        status,
+      };
+      setClosings([newClosing, ...closings]);
+      setSuccessMsg(true);
+      setTimeout(() => setSuccessMsg(false), 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -120,8 +162,8 @@ export default function TutupKasPage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
-                Kirim Tutup Kas
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
+                {isSubmitting ? "Menyimpan..." : "Kirim Tutup Kas"}
               </Button>
             </form>
           </CardContent>

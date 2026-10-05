@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, Filter, RefreshCw, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { reportsService } from "@/lib/services";
 import {
   Dialog,
   DialogContent,
@@ -30,31 +31,17 @@ export default function LaporanUtamaPage() {
   const fetchReportData = async () => {
     setLoading(true);
     try {
-      const [salesRes, itemsRes, kasRes] = await Promise.all([
-        supabase.from("sales").select("total_amount"),
-        supabase.from("sale_items").select("qty, price_at_sale, cost_at_sale"),
-        supabase.from("cash_registers").select("balance"),
-      ]);
-
-      if (salesRes.data) {
-        setJmlTransaksi(salesRes.data.length);
-        setOmzet(salesRes.data.reduce((acc, curr) => acc + (curr.total_amount || 0), 0));
+      const metrics = await reportsService.getDashboardMetrics();
+      if (metrics) {
+        setOmzet(metrics.gross_sales || 0);
+        setLabaKotor(metrics.gross_profit || 0);
+        setJmlTransaksi(metrics.total_transactions || 0);
+        setJmlPcs(metrics.total_items_sold || 0);
       }
 
-      if (itemsRes.data) {
-        const totalQty = itemsRes.data.reduce((acc, curr) => acc + (curr.qty || 0), 0);
-        setJmlPcs(totalQty);
-
-        const totalProfit = itemsRes.data.reduce((acc, curr) => {
-          const revenue = (curr.price_at_sale || 0) * (curr.qty || 0);
-          const hpp = (curr.cost_at_sale || 0) * (curr.qty || 0);
-          return acc + (revenue - hpp);
-        }, 0);
-        setLabaKotor(totalProfit);
-      }
-
-      if (kasRes.data) {
-        setSaldoKas(kasRes.data.reduce((acc, curr) => acc + (curr.balance || 0), 0));
+      const { data: kasRes } = await supabase.from("cash_registers").select("balance");
+      if (kasRes) {
+        setSaldoKas(kasRes.reduce((acc, curr) => acc + (Number(curr.balance) || 0), 0));
       }
     } catch (err) {
       console.error(err);

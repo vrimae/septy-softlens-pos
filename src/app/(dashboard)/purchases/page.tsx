@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -24,18 +25,8 @@ type PurchaseOrder = {
 };
 
 export default function PurchasesPage() {
-  const [purchases, setPurchases] = useState<PurchaseOrder[]>([
-    {
-      id: "1",
-      poNumber: "PO-2026-001",
-      supplier: "PT Optik Sentosa Abadi",
-      invoice: "INV-9921",
-      date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-      status: "LUNAS",
-      paymentMethod: "Transfer Bank",
-      totalCost: 12500000,
-    },
-  ]);
+  const [purchases, setPurchases] = useState<PurchaseOrder[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supplier, setSupplier] = useState("");
@@ -43,6 +34,65 @@ export default function PurchasesPage() {
   const [totalCost, setTotalCost] = useState("");
   const [status, setStatus] = useState<"LUNAS" | "UTANG" | "PENDING">("LUNAS");
   const [paymentMethod, setPaymentMethod] = useState("Transfer Bank");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchPurchases = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("purchases")
+        .select(`
+          id,
+          po_number,
+          total_amount,
+          debt_amount,
+          payment_status,
+          created_at,
+          supplier:suppliers(name)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        const mapped: PurchaseOrder[] = data.map((item: any) => ({
+          id: item.id,
+          poNumber: item.po_number || `PO-${item.id.slice(0, 8)}`,
+          supplier: item.supplier?.name || "Supplier Mitra",
+          invoice: item.po_number || "-",
+          date: new Date(item.created_at).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          status: item.debt_amount > 0 ? "UTANG" : "LUNAS",
+          paymentMethod: "Transfer Bank",
+          totalCost: Number(item.total_amount) || 0,
+        }));
+        setPurchases(mapped);
+      } else {
+        // Fallback demo data jika belum ada transaksi di DB
+        setPurchases([
+          {
+            id: "1",
+            poNumber: "PO-2026-001",
+            supplier: "PT Optik Sentosa Abadi",
+            invoice: "INV-9921",
+            date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+            status: "LUNAS",
+            paymentMethod: "Transfer Bank",
+            totalCost: 12500000,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Error fetching purchases:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPurchases();
+  }, []);
 
   const handleOpenAdd = () => {
     setSupplier("");
@@ -53,23 +103,59 @@ export default function PurchasesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supplier.trim() || !totalCost.trim()) return;
 
-    const newPO: PurchaseOrder = {
-      id: Date.now().toString(),
-      poNumber: `PO-${new Date().getFullYear()}-${String(purchases.length + 1).padStart(3, "0")}`,
-      supplier: supplier.trim(),
-      invoice: invoice.trim() || "-",
-      date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-      status,
-      paymentMethod,
-      totalCost: parseFloat(totalCost) || 0,
-    };
+    setIsSubmitting(true);
+    try {
+      const parsedCost = parseFloat(totalCost) || 0;
+      const poNum = `PO-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
 
-    setPurchases([newPO, ...purchases]);
-    setIsModalOpen(false);
+      // Cari atau buat supplier
+      let supplierId = null;
+      const { data: existingSup } = await supabase
+        .from("suppliers")
+        .select("id")
+        .ilike("name", supplier.trim())
+        .limit(1)
+        .maybeSingle();
+
+      if (existingSup) {
+        supplierId = existingSup.id;
+      } else {
+        const { data: newSup } = await supabase
+          .from("suppliers")
+          .insert({
+            code: `SUP-${Date.now().toString().slice(-4)}`,
+            name: supplier.trim(),
+            is_active: true,
+          })
+          .select("id")
+          .single();
+        if (newSup) supplierId = newSup.id;
+      }
+
+      if (supplierId) {
+        await supabase.from("purchases").insert({
+          po_number: poNum,
+          supplier_id: supplierId,
+          total_amount: parsedCost,
+          paid_amount: status === "LUNAS" ? parsedCost : 0,
+          debt_amount: status === "UTANG" ? parsedCost : 0,
+          payment_status: status === "LUNAS" ? "PAID" : "UNPAID",
+          status: "ORDERED",
+        });
+      }
+
+      setIsModalOpen(false);
+      fetchPurchases();
+    } catch (err: any) {
+      console.error(err);
+      alert(`Gagal menyimpan PO: ${err.message || "Error"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -79,12 +165,22 @@ export default function PurchasesPage() {
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Pembelian Barang (PO)</h1>
           <p className="text-gray-500 mt-1">Catat belanja stok dari supplier pabrik secara lengkap.</p>
         </div>
-        <Button 
-          onClick={handleOpenAdd}
-          className="bg-[#00a84e] hover:bg-green-600 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
-        >
-          <Plus className="h-4 w-4" /> Tambah Pembelian Baru
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={fetchPurchases}
+            variant="outline"
+            className="rounded-xl h-11 px-3 border-gray-200"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+          <Button 
+            onClick={handleOpenAdd}
+            className="bg-[#00a84e] hover:bg-green-600 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+          >
+            <Plus className="h-4 w-4" /> Tambah Pembelian Baru
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1 mt-4">
@@ -194,8 +290,8 @@ export default function PurchasesPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-[#00a84e] hover:bg-green-600 text-white font-bold">
-                Simpan Pembelian
+              <Button type="submit" disabled={isSubmitting} className="bg-[#00a84e] hover:bg-green-600 text-white font-bold">
+                {isSubmitting ? "Menyimpan..." : "Simpan Pembelian"}
               </Button>
             </DialogFooter>
           </form>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, AlertTriangle, Trash2, CheckCircle2 } from "lucide-react";
+import { Plus, Search, RefreshCw } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -24,26 +25,8 @@ type DamagedProduct = {
 };
 
 export default function WarehousePage() {
-  const [items, setItems] = useState<DamagedProduct[]>([
-    {
-      id: "1",
-      code: "SFT-GR-050",
-      name: "Softlens Gray Minus -0.50 (Kemasan Robek)",
-      category: "Softlens Warna",
-      qty: 3,
-      costPrice: 28000,
-      issue: "Kemasan blister bocor saat ekspedisi",
-    },
-    {
-      id: "2",
-      code: "CLN-60ML",
-      name: "Cairan Pembersih 60ml (Expired 1 Bulan)",
-      category: "Aksesoris",
-      qty: 5,
-      costPrice: 12000,
-      issue: "Melewati tanggal kedaluwarsa",
-    },
-  ]);
+  const [items, setItems] = useState<DamagedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,6 +36,67 @@ export default function WarehousePage() {
   const [qty, setQty] = useState("1");
   const [costPrice, setCostPrice] = useState("");
   const [issue, setIssue] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchDamagedGoods = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("damaged_goods")
+        .select(`
+          id,
+          qty,
+          cost_price,
+          reason,
+          status,
+          product:products(name, product_code)
+        `)
+        .eq("status", "PENDING")
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        const mapped: DamagedProduct[] = data.map((d: any) => ({
+          id: d.id,
+          code: d.product?.product_code || `DMG-${d.id.slice(0, 6)}`,
+          name: d.product?.name || "Barang Bermasalah",
+          category: "Softlens & Aksesoris",
+          qty: d.qty || 1,
+          costPrice: Number(d.cost_price) || 0,
+          issue: d.reason || "Kerusakan fisik",
+        }));
+        setItems(mapped);
+      } else {
+        setItems([
+          {
+            id: "1",
+            code: "SFT-GR-050",
+            name: "Softlens Gray Minus -0.50 (Kemasan Robek)",
+            category: "Softlens Warna",
+            qty: 3,
+            costPrice: 28000,
+            issue: "Kemasan blister bocor saat ekspedisi",
+          },
+          {
+            id: "2",
+            code: "CLN-60ML",
+            name: "Cairan Pembersih 60ml (Expired 1 Bulan)",
+            category: "Aksesoris",
+            qty: 5,
+            costPrice: 12000,
+            issue: "Melewati tanggal kedaluwarsa",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Error fetching damaged goods:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDamagedGoods();
+  }, []);
 
   const totalPcs = items.reduce((acc, curr) => acc + curr.qty, 0);
   const totalModal = items.reduce((acc, curr) => acc + curr.qty * curr.costPrice, 0);
@@ -67,27 +111,52 @@ export default function WarehousePage() {
     setIsModalOpen(true);
   };
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !code.trim()) return;
 
-    const newItem: DamagedProduct = {
-      id: Date.now().toString(),
-      code: code.trim(),
-      name: name.trim(),
-      category,
-      qty: parseInt(qty) || 1,
-      costPrice: parseFloat(costPrice) || 0,
-      issue: issue.trim() || "Kerusakan fisik",
-    };
+    setIsSubmitting(true);
+    try {
+      const parsedQty = parseInt(qty) || 1;
+      const parsedCost = parseFloat(costPrice) || 0;
 
-    setItems([...items, newItem]);
-    setIsModalOpen(false);
+      // Cari product
+      const { data: prod } = await supabase
+        .from("products")
+        .select("id")
+        .or(`product_code.eq.${code.trim()},name.ilike.%${name.trim()}%`)
+        .limit(1)
+        .maybeSingle();
+
+      await supabase.from("damaged_goods").insert({
+        product_id: prod?.id || null,
+        qty: parsedQty,
+        cost_price: parsedCost,
+        reason: `${issue.trim()} (${name.trim()})`,
+        status: "PENDING",
+      });
+
+      setIsModalOpen(false);
+      fetchDamagedGoods();
+    } catch (err: any) {
+      console.error(err);
+      alert(`Gagal mencatat barang bermasalah: ${err.message || "Error"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleResolve = (id: string, actionName: string) => {
+  const handleResolve = async (id: string, actionName: string) => {
     if (confirm(`Apakah Anda yakin ingin memproses aksi "${actionName}" untuk barang ini?`)) {
-      setItems(items.filter((item) => item.id !== id));
+      try {
+        await supabase
+          .from("damaged_goods")
+          .update({ status: "RESOLVED", resolved_at: new Date().toISOString() })
+          .eq("id", id);
+        fetchDamagedGoods();
+      } catch (err) {
+        setItems(items.filter((item) => item.id !== id));
+      }
     }
   };
 
@@ -105,12 +174,22 @@ export default function WarehousePage() {
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Produk Gudang Barang Bermasalah</h1>
           <p className="text-gray-500 mt-1">Status dan tempat untuk barang rusak, retur, expired, dll yang menunggu keputusan.</p>
         </div>
-        <Button 
-          onClick={handleOpenAdd}
-          className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
-        >
-          <Plus className="h-4 w-4" /> Catat Barang Bermasalah
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={fetchDamagedGoods}
+            variant="outline"
+            className="rounded-xl h-11 px-3 border-gray-200"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+          <Button 
+            onClick={handleOpenAdd}
+            className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+          >
+            <Plus className="h-4 w-4" /> Catat Barang Bermasalah
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,10 +218,10 @@ export default function WarehousePage() {
         <div className="p-4 border-b border-gray-100">
           <div className="relative max-w-md">
             <input 
-              type="text"
+              type="text" 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari kode atau nama barang bermasalah..."
+              placeholder="Cari kode atau nama barang bermasalah..." 
               className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -199,7 +278,7 @@ export default function WarehousePage() {
                         onClick={() => handleResolve(item.id, "Pemusnahan Barang")}
                         className="border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-7 px-2.5 rounded-lg"
                       >
-                        Musnahkan
+                        Pemusnahan
                       </Button>
                     </div>
                   </TableCell>
@@ -212,23 +291,34 @@ export default function WarehousePage() {
 
       {/* Modal Catat Barang Bermasalah */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[460px]">
+        <DialogContent className="sm:max-w-[440px]">
           <DialogHeader>
-            <DialogTitle>Catat Barang Bermasalah / Rusak</DialogTitle>
+            <DialogTitle>Catat Barang Bermasalah ke Gudang</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4 pt-3">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Kode Barang</label>
+              <input
+                type="text"
+                placeholder="Contoh: SFT-GR-050"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Produk</label>
+              <input
+                type="text"
+                placeholder="Contoh: Softlens Gray Minus -0.50"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                required
+              />
+            </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Kode Barang</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: SFT-01"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  required
-                />
-              </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Jumlah (Pcs)</label>
                 <input
@@ -240,37 +330,11 @@ export default function WarehousePage() {
                   required
                 />
               </div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Barang</label>
-              <input
-                type="text"
-                placeholder="Nama produk softlens..."
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Kategori</label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                >
-                  <option value="Softlens Warna">Softlens Warna</option>
-                  <option value="Softlens Bening">Softlens Bening</option>
-                  <option value="Aksesoris & Cairan">Aksesoris & Cairan</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">HPP / Modal Satuan (Rp)</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Harga Modal / Pcs</label>
                 <input
                   type="number"
-                  min="0"
-                  placeholder="25000"
+                  placeholder="28000"
                   value={costPrice}
                   onChange={(e) => setCostPrice(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -279,10 +343,10 @@ export default function WarehousePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Keterangan Masalah / Kerusakan</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Detail Kerusakan / Masalah</label>
               <input
                 type="text"
-                placeholder="Contoh: Kemasan sobek / segel rusak"
+                placeholder="Contoh: Kemasan blister sobek saat proses ekspedisi"
                 value={issue}
                 onChange={(e) => setIssue(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -293,8 +357,8 @@ export default function WarehousePage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white font-bold">
-                Simpan ke Gudang
+              <Button type="submit" disabled={isSubmitting} className="bg-red-600 hover:bg-red-700 text-white font-bold">
+                {isSubmitting ? "Menyimpan..." : "Simpan ke Gudang"}
               </Button>
             </DialogFooter>
           </form>

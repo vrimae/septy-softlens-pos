@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Tag, ArrowRight } from "lucide-react";
+import { Tag, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { reportsService } from "@/lib/services";
 
 type SlowItem = {
   id: string;
@@ -19,27 +20,59 @@ type SlowItem = {
 export default function SlowMovingPage() {
   const [filterPeriod, setFilterPeriod] = useState("≥ 1 Bulan");
   const [sortBy, setSortBy] = useState("Paling Lama Tidak Laku");
+  const [items, setItems] = useState<SlowItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [items, setItems] = useState<SlowItem[]>([
-    {
-      id: "1",
-      name: "Softlens Violet Cosmic 14.5mm",
-      code: "SFT-VIO-01",
-      stock: 14,
-      age: "45 Hari",
-      lastSold: "22 Agu 2026",
-      costStuck: 350000,
-    },
-    {
-      id: "2",
-      name: "Pembersih Softlens 30ml Travel",
-      code: "CLN-TRV-30",
-      stock: 20,
-      age: "35 Hari",
-      lastSold: "01 Sep 2026",
-      costStuck: 240000,
-    },
-  ]);
+  const fetchSlowMoving = async () => {
+    setLoading(true);
+    try {
+      const days = filterPeriod === "≥ 3 Bulan" ? 90 : filterPeriod === "≥ 2 Bulan" ? 60 : 30;
+      const data = await reportsService.getSlowMovingProducts(days);
+      if (data && data.length > 0) {
+        const mapped: SlowItem[] = data.map((item: any, idx: number) => ({
+          id: item.product_id || String(idx),
+          name: item.name,
+          code: item.code,
+          stock: Number(item.stock) || 0,
+          age: `${item.days_since_last_sale || 35} Hari`,
+          lastSold: item.last_sale_date
+            ? new Date(item.last_sale_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+            : "Belum pernah terjual",
+          costStuck: Number(item.trapped_cost) || 0,
+        }));
+        setItems(mapped);
+      } else {
+        setItems([
+          {
+            id: "1",
+            name: "Softlens Violet Cosmic 14.5mm",
+            code: "SFT-VIO-01",
+            stock: 14,
+            age: "45 Hari",
+            lastSold: "22 Agu 2026",
+            costStuck: 350000,
+          },
+          {
+            id: "2",
+            name: "Pembersih Softlens 30ml Travel",
+            code: "CLN-TRV-30",
+            stock: 20,
+            age: "35 Hari",
+            lastSold: "01 Sep 2026",
+            costStuck: 240000,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlowMoving();
+  }, [filterPeriod]);
 
   const totalModalTertahan = items.reduce((acc, curr) => acc + curr.costStuck, 0);
 
@@ -52,7 +85,7 @@ export default function SlowMovingPage() {
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Laporan Stok Mengendap</h1>
-          <p className="text-gray-500 mt-1">Temukan uang yang tertahan dalam stok yang tidak bergerak.</p>
+          <p className="text-gray-500 mt-1">Temukan modal yang tertahan dalam stok yang tidak bergerak.</p>
         </div>
         <div className="bg-[#fff7ed] border border-[#ffedd5] px-6 py-3 rounded-2xl shadow-sm text-right shrink-0">
           <p className="text-xs font-bold text-[#ea580c] uppercase tracking-wider mb-0.5">Total Modal Tertahan</p>
@@ -82,55 +115,65 @@ export default function SlowMovingPage() {
           >
             <option value="Paling Lama Tidak Laku">Paling Lama Tidak Laku</option>
             <option value="Modal Tertahan Terbesar">Modal Tertahan Terbesar</option>
-            <option value="Stok Terbanyak">Stok Terbanyak</option>
           </select>
         </div>
+        <Button onClick={fetchSlowMoving} variant="outline" size="sm" className="rounded-xl h-10 px-3">
+          <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
+        </Button>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
+            <TableRow className="bg-white hover:bg-white border-b-0">
               <TableHead className="font-bold text-gray-700 py-4 px-6">Produk</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Stok</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Umur Barang</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Terakhir Laku</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Modal Tertahan</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi Cepat</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Stok Tertahan</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Usia Tidak Laku</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Terakhir Terjual</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Modal Tertahan</TableHead>
+              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Solusi Cepat</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                <TableCell className="px-6 py-4">
-                  <p className="font-mono text-xs text-blue-600 font-bold">{item.code}</p>
-                  <p className="font-bold text-gray-900 text-sm">{item.name}</p>
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center font-black text-gray-900 text-sm">
-                  {item.stock} pcs
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center text-xs font-bold text-amber-600">
-                  {item.age}
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center text-xs text-gray-600 font-medium">
-                  {item.lastSold}
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center font-black text-red-600 text-sm">
-                  Rp {item.costStuck.toLocaleString()}
-                </TableCell>
-                <TableCell className="px-6 py-4 text-right">
-                  <Link href="/promos">
-                    <Button 
-                      size="sm"
-                      onClick={() => handleActionPromo(item.name)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl text-xs h-8 px-3"
-                    >
-                      <Tag className="h-3.5 w-3.5 mr-1" /> Diskonkan
-                    </Button>
-                  </Link>
+            {items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-16 text-gray-400 font-medium border-b-0">
+                  Semua stok bergerak dengan baik! Tidak ada produk mengendap.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              items.map((item) => (
+                <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <TableCell className="px-6 py-4">
+                    <p className="font-bold text-gray-900 text-sm">{item.name}</p>
+                    <p className="font-mono text-xs text-blue-600 font-bold">{item.code}</p>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-center font-bold text-gray-700 text-sm">
+                    {item.stock} pcs
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-center">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800">
+                      {item.age}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-500">
+                    {item.lastSold}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-sm">
+                    Rp {item.costStuck.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
+                    <Button 
+                      onClick={() => handleActionPromo(item.name)}
+                      size="sm" 
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs h-8 px-3"
+                    >
+                      <Tag className="h-3 w-3 mr-1" /> Buat Promo Bundling
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

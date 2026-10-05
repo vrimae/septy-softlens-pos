@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, PackageSearch, Wallet, AlertTriangle, Truck, ArrowUpRight } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { reportsService } from "@/lib/services";
 
 export default function OwnerDashboardPage() {
   const [totalOmzet, setTotalOmzet] = useState(0);
@@ -17,10 +18,10 @@ export default function OwnerDashboardPage() {
 
   const fetchMetrics = async () => {
     try {
-      // Omzet
-      const { data: salesData } = await supabase.from('sales').select('total_amount');
-      if (salesData) {
-        setTotalOmzet(salesData.reduce((acc, curr) => acc + (curr.total_amount || 0), 0));
+      const metrics = await reportsService.getDashboardMetrics();
+      if (metrics) {
+        setTotalOmzet(metrics.gross_sales || 0);
+        setTotalLaba(metrics.gross_profit || 0);
       }
 
       // HPP Stok
@@ -32,20 +33,8 @@ export default function OwnerDashboardPage() {
       // Saldo Kas Utama
       const { data: kasData } = await supabase.from('cash_registers').select('balance');
       if (kasData) {
-        setSaldoKas(kasData.reduce((acc, curr) => acc + (curr.balance || 0), 0));
+        setSaldoKas(kasData.reduce((acc, curr) => acc + (Number(curr.balance) || 0), 0));
       }
-
-      // Laba = Omzet - HPP barang terjual
-      const { data: saleItemsData } = await supabase.from('sale_items').select('price_at_sale, cost_at_sale, qty');
-      if (saleItemsData) {
-        const laba = saleItemsData.reduce((acc, curr) => {
-          const revenue = (curr.price_at_sale || 0) * (curr.qty || 0);
-          const hpp = (curr.cost_at_sale || 0) * (curr.qty || 0);
-          return acc + (revenue - hpp);
-        }, 0);
-        setTotalLaba(laba);
-      }
-
     } catch (err) {
       console.error(err);
     }
