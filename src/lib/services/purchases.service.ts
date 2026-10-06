@@ -1,3 +1,4 @@
+import { auditService } from "./audit.service";
 // ==============================================================================
 // FILE: src/lib/services/purchases.service.ts
 // DESCRIPTION: Purchases & Supplier Debt Management Service Layer

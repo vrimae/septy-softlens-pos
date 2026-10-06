@@ -1,3 +1,4 @@
+import { auditService } from "./audit.service";
 // ==============================================================================
 // FILE: src/lib/services/cashflow.service.ts
 // DESCRIPTION: Cash Registers, Cash Transactions & Shift Closings Service Layer

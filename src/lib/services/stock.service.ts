@@ -1,3 +1,4 @@
+import { auditService } from "./audit.service";
 // ==============================================================================
 // FILE: src/lib/services/stock.service.ts
 // DESCRIPTION: Stock Management & Inventory Ledger Service Layer
