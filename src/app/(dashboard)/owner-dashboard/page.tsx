@@ -5,8 +5,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, PackageSearch, Wallet, AlertTriangle, Truck, ArrowUpRight } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { reportsService } from "@/lib/services";
+import { useAuth } from "@/components/providers/auth-provider";
+import { useRouter } from "next/navigation";
 
 export default function OwnerDashboardPage() {
+  const { role, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && role && role !== "owner") router.push("/pos");
+  }, [role, loading, router]);
+
   const [totalOmzet, setTotalOmzet] = useState(0);
   const [totalLaba, setTotalLaba] = useState(0);
   const [asetStok, setAsetStok] = useState(0);
@@ -39,6 +48,8 @@ export default function OwnerDashboardPage() {
       console.error(err);
     }
   };
+
+  if (role !== "owner") return null;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">

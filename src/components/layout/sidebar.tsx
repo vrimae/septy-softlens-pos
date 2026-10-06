@@ -186,39 +186,41 @@ export function Sidebar() {
         </div>
 
         {/* Menu Utama */}
-        <div className="mb-6">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">MENU UTAMA</p>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                href="/owner-dashboard"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-                  pathname === '/owner-dashboard' ? "bg-[#f0f4ff] text-slate-900" : "text-gray-600 hover:bg-gray-50"
-                )}
-              >
-                <div className={cn("p-1.5 rounded-md", pathname === '/owner-dashboard' ? "bg-slate-900 text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
-                  <ShieldCheck className="h-4 w-4" />
-                </div>
-                Dashboard Eksekutif
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-                  pathname === '/' ? "bg-[#f0f4ff] text-slate-900" : "text-gray-600 hover:bg-gray-50"
-                )}
-              >
-                <div className={cn("p-1.5 rounded-md", pathname === '/' ? "bg-slate-900 text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
-                  <MonitorPlay className="h-4 w-4" />
-                </div>
-                Dashboard Kasir
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {role === 'owner' && (
+          <div className="mb-6">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">MENU UTAMA</p>
+            <ul className="space-y-1">
+              <li>
+                <Link
+                  href="/owner-dashboard"
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
+                    pathname === '/owner-dashboard' ? "bg-[#f0f4ff] text-slate-900" : "text-gray-600 hover:bg-gray-50"
+                  )}
+                >
+                  <div className={cn("p-1.5 rounded-md", pathname === '/owner-dashboard' ? "bg-slate-900 text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  Dashboard Eksekutif
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/"
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
+                    pathname === '/' ? "bg-[#f0f4ff] text-slate-900" : "text-gray-600 hover:bg-gray-50"
+                  )}
+                >
+                  <div className={cn("p-1.5 rounded-md", pathname === '/' ? "bg-slate-900 text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
+                    <MonitorPlay className="h-4 w-4" />
+                  </div>
+                  Dashboard Utama
+                </Link>
+              </li>
+            </ul>
+          </div>
+        )}
 
         {/* Kategori Menu Berantai */}
         <div>

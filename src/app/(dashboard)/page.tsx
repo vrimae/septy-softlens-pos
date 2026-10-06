@@ -4,10 +4,21 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardPage() {
-  const { role, activeProfile } = useAuth();
+  const { role, activeProfile, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && role && role !== 'owner') {
+      router.push('/pos');
+    }
+  }, [role, loading, router]);
   
+  if (role !== 'owner') return null;
+
   return (
     <div className="space-y-8 max-w-6xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
