@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import { supabase } from '@/lib/supabase/client';
+import { auditService } from './audit.service';
 import { Profile } from './types';
 
 export const usersService = {
@@ -62,6 +63,7 @@ export const usersService = {
       .single();
 
     if (error) throw new Error(error.message);
+    auditService.log("UPDATE_USER", { tableName: "profiles", recordId: data.id, after: data, reason: "Perubahan User Profile/Role" }).catch(console.error);
     return data as Profile;
   },
 
@@ -77,6 +79,7 @@ export const usersService = {
       .single();
 
     if (error) throw new Error(error.message);
+    auditService.log("UPDATE_USER", { tableName: "profiles", recordId: data.id, after: data, reason: "Perubahan User Profile/Role" }).catch(console.error);
     return data as Profile;
   },
 
@@ -95,12 +98,14 @@ export const usersService = {
       .single();
       
     if (error) throw new Error(error.message);
+    auditService.log("UPDATE_USER", { tableName: "profiles", recordId: data.id, after: data, reason: "Perubahan User Profile/Role" }).catch(console.error);
     return data as Profile;
   },
 
   async deleteUser(userId: string) {
     const { error } = await supabase.from('profiles').delete().eq('id', userId);
     if (error) throw new Error(error.message);
+    auditService.log("HAPUS_USER", { tableName: "profiles", recordId: userId, reason: "Penghapusan User" }).catch(console.error);
     return true;
   }
 };

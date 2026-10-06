@@ -64,6 +64,7 @@ export const productsService = {
       .single();
 
     if (error) throw new Error(error.message);
+    await auditService.log("TAMBAH_PRODUK", { tableName: "products", recordId: data.id, after: data, reason: "Penambahan Master Barang" });
     return data as Product;
   },
 
@@ -167,6 +168,7 @@ export const productsService = {
       .eq('id', id);
 
     if (error) throw new Error(error.message);
+    await auditService.log("HAPUS_PRODUK", { tableName: "products", recordId: id, reason: "Penghapusan Data Barang" });
     return true;
   },
 

@@ -191,7 +191,7 @@ export default function UsersPage() {
                     <TableCell>
                     <button
                         onClick={() => handleToggleStatus(emp)}
-                        className={\px-2.5 py-1 text-xs font-bold rounded-lg \\}
+                        className={`px-2.5 py-1 text-xs font-bold rounded-lg ${emp.is_active ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100" : "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"}`}
                     >
                         {emp.is_active ? "AKTIF" : "NONAKTIF"}
                     </button>

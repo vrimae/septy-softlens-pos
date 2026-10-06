@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { usersService } from "@/lib/services/users.service";
 import { Loader2 } from "lucide-react";
+import { auditService } from "@/lib/services/audit.service";
 
 export default function SelectProfilePage() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function SelectProfilePage() {
   const handleSelectProfile = (profile: any) => {
     // Store in localStorage
     localStorage.setItem("septy_active_profile", JSON.stringify(profile));
+    auditService.log("LOGIN_SISTEM", { reason: "Login perangkat kasir: " + profile.full_name });
     
     // Redirect to dashboard
     router.push("/");
@@ -77,7 +79,7 @@ export default function SelectProfilePage() {
             onClick={() => handleSelectProfile(profile)}
             className="flex flex-col items-center group cursor-pointer"
           >
-            <div className={\w-28 h-28 md:w-32 md:h-32 rounded-3xl flex items-center justify-center shadow-lg transition-transform duration-300 transform group-hover:scale-105 group-hover:ring-4 group-hover:ring-white/20 \\}>
+            <div className={`w-28 h-28 md:w-32 md:h-32 rounded-3xl flex items-center justify-center shadow-lg transition-transform duration-300 transform group-hover:scale-105 group-hover:ring-4 group-hover:ring-white/20 ${getProfileColor(profile.role)}`}>
               <span className="text-4xl md:text-5xl font-bold text-white shadow-sm">
                 {profile.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
               </span>
