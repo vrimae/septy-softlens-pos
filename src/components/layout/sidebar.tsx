@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
@@ -278,10 +279,13 @@ export function Sidebar() {
       </div>
 
       <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 shrink-0 space-y-2">
-        <Link href="/store-profile" className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors rounded-lg">
-          <Settings className="h-4 w-4 text-gray-400" />
-          Profil Toko
-        </Link>
+        <div className="flex items-center justify-between mb-4 px-1">
+          <Link href="/store-profile" className="flex items-center gap-3 py-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors rounded-lg">
+            <Settings className="h-4 w-4 text-gray-400" />
+            Profil Toko
+          </Link>
+          <ThemeToggle />
+        </div>
         <div 
           onClick={handleLogout}
           className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800/50 shadow-sm cursor-pointer hover:bg-red-50/50 hover:border-red-100 transition-colors"
