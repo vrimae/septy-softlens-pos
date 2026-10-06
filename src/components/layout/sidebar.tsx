@@ -28,9 +28,9 @@ import { useAuth } from "@/components/providers/auth-provider";
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { activeProfile, role } = useAuth();
+  const { activeProfile, role, branches, activeBranch, setActiveBranch } = useAuth();
   const [searchMenu, setSearchMenu] = useState("");
-  const [selectedBranch, setSelectedBranch] = useState("Semua Cabang (Global)");
+  
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
   
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
@@ -157,28 +157,28 @@ export function Sidebar() {
           >
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 truncate">
               <Building className="h-4 w-4 text-[#64748b] shrink-0" />
-              <span className="truncate">{selectedBranch}</span>
+              <span className="truncate">{activeBranch?.name || "Pilih Cabang"}</span>
             </div>
             <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isBranchDropdownOpen ? "rotate-180" : ""}`} />
           </div>
 
           {isBranchDropdownOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 p-1.5 space-y-1">
-              {branchList.map((branch) => (
+              {branches?.map((branch) => (
                 <div
                   key={branch}
                   onClick={() => {
-                    setSelectedBranch(branch);
+                    setActiveBranch(branch);
                     setIsBranchDropdownOpen(false);
                   }}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                    selectedBranch === branch 
+                    activeBranch?.id === branch.id 
                       ? "bg-slate-100 text-slate-900" 
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <span>{branch}</span>
-                  {selectedBranch === branch && <Check className="h-3.5 w-3.5" />}
+                  <span>{branch.name}</span>
+                  {activeBranch?.id === branch.id && <Check className="h-3.5 w-3.5" />}
                 </div>
               ))}
             </div>

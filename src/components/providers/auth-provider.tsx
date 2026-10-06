@@ -10,6 +10,9 @@ type AuthContextType = {
   activeProfile: any | null;
   role: string | null;
   loading: boolean;
+  branches: any[];
+  activeBranch: any | null;
+  setActiveBranch: (branch: any) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,6 +20,9 @@ const AuthContext = createContext<AuthContextType>({
   activeProfile: null,
   role: null,
   loading: true,
+  branches: [],
+  activeBranch: null,
+  setActiveBranch: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -24,6 +30,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [activeProfile, setActiveProfile] = useState<any | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  const [branches, setBranches] = useState<any[]>([]);
+  const [activeBranch, setActiveBranchState] = useState<any | null>(null);
+
+  const setActiveBranch = (branch: any) => {
+    setActiveBranchState(branch);
+    if (branch) {
+      localStorage.setItem('septy_active_branch', JSON.stringify(branch));
+    } else {
+      localStorage.removeItem('septy_active_branch');
+    }
+    // Force reload to refresh all data in the SPA for the new branch
+    if (typeof window !== 'undefined' && branch) {
+      // Small timeout to allow state to save
+      setTimeout(() => window.location.reload(), 100);
+    }
+  };
   
   const pathname = usePathname();
   const router = useRouter();
@@ -34,6 +57,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function getSession() {
       const { data: { session } } = await supabase.auth.getSession();
       
+      // Fetch branches
+      const { data: branchData } = await supabase.from('branches').select('*').eq('is_active', true);
+      if (branchData && mounted) {
+        setBranches(branchData);
+        
+        // Load active branch
+        const savedBranch = localStorage.getItem('septy_active_branch');
+        if (savedBranch) {
+          try { setActiveBranchState(JSON.parse(savedBranch)); } catch(e) {}
+        } else if (branchData.length > 0) {
+          setActiveBranchState(branchData[0]);
+          localStorage.setItem('septy_active_branch', JSON.stringify(branchData[0]));
+        }
+      }
+
       if (session?.user && mounted) {
         setUser(session.user);
         
@@ -92,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, activeProfile, loading, pathname, router]);
 
   return (
-    <AuthContext.Provider value={{ user, activeProfile, role, loading }}>
+    <AuthContext.Provider value={{ user, activeProfile, role, loading, branches, activeBranch, setActiveBranch }}>
       {children}
     </AuthContext.Provider>
   );
