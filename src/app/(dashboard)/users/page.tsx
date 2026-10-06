@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, UserCheck, UserX, Plus, Edit2, Trash2 } from "lucide-react";
@@ -11,217 +11,220 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { usersService } from "@/lib/services";
 
-type Employee = {
+type Profile = {
   id: string;
-  name: string;
+  full_name: string;
   email: string;
-  branch: string;
   role: string;
-  access: string;
-  status: "ACTIVE" | "INACTIVE";
+  is_active: boolean;
 };
 
 export default function UsersPage() {
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: "1",
-      name: "Owner",
-      email: "vrimae23@gmail.com",
-      branch: "Pusat",
-      role: "OWNER",
-      access: "all",
-      status: "ACTIVE",
-    },
-    {
-      id: "2",
-      name: "Siti Rahmawati (SP Kasir)",
-      email: "kasir1@septy.com",
-      branch: "Cabang 1",
-      role: "KASIR",
-      access: "pos, pelanggan",
-      status: "ACTIVE",
-    },
-  ]);
-
+  const [employees, setEmployees] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // Form states
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [branch, setBranch] = useState("Pusat");
   const [role, setRole] = useState("KASIR");
-  const [access, setAccess] = useState("pos");
-  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE">("ACTIVE");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await usersService.getAllUsers();
+      setEmployees(data || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const totalEmployees = employees.length;
-  const activeEmployees = employees.filter((e) => e.status === "ACTIVE").length;
-  const inactiveEmployees = employees.filter((e) => e.status === "INACTIVE").length;
+  const activeEmployees = employees.filter((e) => e.is_active).length;
+  const inactiveEmployees = employees.filter((e) => !e.is_active).length;
 
   const handleOpenAdd = () => {
     setEditingId(null);
     setName("");
     setEmail("");
-    setBranch("Pusat");
     setRole("KASIR");
-    setAccess("pos, pelanggan");
-    setStatus("ACTIVE");
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (emp: Employee) => {
+  const handleOpenEdit = (emp: Profile) => {
     setEditingId(emp.id);
-    setName(emp.name);
-    setEmail(emp.email);
-    setBranch(emp.branch);
-    setRole(emp.role);
-    setAccess(emp.access);
-    setStatus(emp.status);
+    setName(emp.full_name || "");
+    setEmail(emp.email || "");
+    setRole(emp.role || "KASIR");
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus karyawan ini?")) {
-      setEmployees(employees.filter((e) => e.id !== id));
+  const handleDelete = async (id: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus user ini?")) {
+      try {
+        await usersService.deleteUser(id);
+        fetchUsers();
+      } catch (e: any) {
+        alert(e.message);
+      }
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) return;
 
-    if (editingId) {
-      setEmployees(
-        employees.map((e) =>
-          e.id === editingId
-            ? { ...e, name, email, branch, role, access, status }
-            : e
-        )
-      );
-    } else {
-      const newEmp: Employee = {
-        id: Date.now().toString(),
-        name,
-        email,
-        branch,
-        role,
-        access,
-        status,
-      };
-      setEmployees([...employees, newEmp]);
+    setIsSubmitting(true);
+    try {
+      if (editingId) {
+        // Implement update if needed, for now just update role
+        await usersService.updateUserRole(editingId, role as 'owner'|'admin'|'kasir'|'warehouse');
+      } else {
+        await usersService.createUser({
+          full_name: name,
+          email: email,
+          role: role
+        });
+      }
+      setIsModalOpen(false);
+      fetchUsers();
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsModalOpen(false);
   };
+
+  const handleToggleStatus = async (emp: Profile) => {
+      try {
+          await usersService.toggleUserActive(emp.id, !emp.is_active);
+          fetchUsers();
+      } catch (e: any) {
+          alert(e.message);
+      }
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Manajemen Karyawan</h1>
-          <p className="text-gray-500 mt-1">Atur wewenang karyawan sesuai kebijakan toko.</p>
-        </div>
-        <Button 
-          onClick={handleOpenAdd}
-          className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
-        >
-          <Plus className="h-4 w-4" /> Tambah Karyawan Baru
-        </Button>
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-800 tracking-normal">Manajemen Pengguna</h1>
+        <p className="text-gray-500 mt-1">Kelola staf, kasir, dan hak akses aplikasi.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex justify-between items-center">
-          <div>
-            <p className="text-sm font-bold text-gray-600 mb-1">Total pegawai</p>
-            <div className="text-4xl font-semibold text-gray-900">{totalEmployees}</div>
-          </div>
-          <div className="w-14 h-14 bg-[#f0f4ff] rounded-xl flex items-center justify-center text-slate-900">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-slate-50 text-slate-900 rounded-lg flex items-center justify-center shrink-0">
             <Users className="h-6 w-6" />
           </div>
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex justify-between items-center">
           <div>
-            <p className="text-sm font-bold text-gray-600 mb-1">Aktif</p>
-            <div className="text-4xl font-semibold text-gray-900">{activeEmployees}</div>
+            <p className="text-sm font-semibold text-gray-500">Total Karyawan</p>
+            <p className="text-2xl font-bold text-gray-900">{totalEmployees}</p>
           </div>
-          <div className="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center text-green-500">
+        </div>
+        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
             <UserCheck className="h-6 w-6" />
           </div>
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex justify-between items-center">
           <div>
-            <p className="text-sm font-bold text-gray-600 mb-1">Tidak aktif</p>
-            <div className="text-4xl font-semibold text-gray-900">{inactiveEmployees}</div>
+            <p className="text-sm font-semibold text-gray-500">Aktif</p>
+            <p className="text-2xl font-bold text-gray-900">{activeEmployees}</p>
           </div>
-          <div className="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
+        </div>
+        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center shrink-0">
             <UserX className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-500">Nonaktif</p>
+            <p className="text-2xl font-bold text-gray-900">{inactiveEmployees}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <h2 className="font-semibold text-gray-800">Daftar Pengguna</h2>
+          <Button 
+            onClick={handleOpenAdd}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg px-4 h-10 shadow-sm"
+          >
+            <Plus className="h-4 w-4 mr-2" /> Tambah User
+          </Button>
+        </div>
         <Table>
-          <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Info User</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Cabang</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Jabatan (Role)</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Hak Akses Sementara</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
+          <TableHeader className="bg-gray-50/50">
+            <TableRow>
+              <TableHead className="font-semibold text-gray-600">NAMA & EMAIL</TableHead>
+              <TableHead className="font-semibold text-gray-600">ROLE</TableHead>
+              <TableHead className="font-semibold text-gray-600">STATUS</TableHead>
+              <TableHead className="font-semibold text-gray-600 text-right">AKSI</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.map((emp) => (
-              <TableRow key={emp.id} className="border-b border-gray-100 hover:bg-gray-50/50">
-                <TableCell className="px-6 py-4">
-                  <p className="font-bold text-gray-900 text-base">{emp.name}</p>
-                  <p className="text-sm text-gray-400">{emp.email}</p>
-                </TableCell>
-                <TableCell className="px-6 py-4 font-bold text-gray-700">{emp.branch}</TableCell>
-                <TableCell className="px-6 py-4 text-center">
-                  <span className={`font-semibold text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full ${
-                    emp.role === "OWNER" 
-                      ? "bg-purple-100 text-purple-600" 
-                      : emp.role === "ADMIN" 
-                      ? "bg-blue-100 text-slate-900" 
-                      : "bg-emerald-100 text-emerald-700"
-                  }`}>
-                    {emp.role}
-                  </span>
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center">
-                  <span className="bg-gray-100 text-gray-600 font-bold text-xs px-3 py-1 rounded-full">
-                    {emp.access}
-                  </span>
-                </TableCell>
-                <TableCell className="px-6 py-4 text-right">
-                  <button 
-                    onClick={() => handleOpenEdit(emp)}
-                    className="text-slate-900 font-bold text-sm mr-4 hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(emp.id)}
-                    className="text-red-500 font-bold text-sm hover:underline"
-                  >
-                    Hapus
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {employees.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={4} className="text-center py-10 text-gray-500">Belum ada user.</TableCell>
+                </TableRow>
+            ) : (
+                employees.map((emp) => (
+                <TableRow key={emp.id} className="hover:bg-gray-50 transition-colors">
+                    <TableCell className="py-4">
+                    <div>
+                        <p className="font-bold text-gray-900">{emp.full_name}</p>
+                        <p className="text-xs text-gray-500">{emp.email}</p>
+                    </div>
+                    </TableCell>
+                    <TableCell>
+                    <span className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg border border-gray-200">
+                        {emp.role}
+                    </span>
+                    </TableCell>
+                    <TableCell>
+                    <button
+                        onClick={() => handleToggleStatus(emp)}
+                        className={\px-2.5 py-1 text-xs font-bold rounded-lg \\}
+                    >
+                        {emp.is_active ? "AKTIF" : "NONAKTIF"}
+                    </button>
+                    </TableCell>
+                    <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                        <button 
+                        onClick={() => handleOpenEdit(emp)}
+                        className="p-2 text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                        title="Edit Role"
+                        >
+                        <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button 
+                        onClick={() => handleDelete(emp.id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Hapus"
+                        >
+                        <Trash2 className="h-4 w-4" />
+                        </button>
+                    </div>
+                    </TableCell>
+                </TableRow>
+                ))
+            )}
           </TableBody>
         </Table>
       </div>
 
-      {/* Modal Tambah / Edit Karyawan */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Karyawan" : "Tambah Karyawan Baru"}</DialogTitle>
+            <DialogTitle>{editingId ? "Edit Role User" : "Tambah User Baru"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div>
@@ -230,8 +233,9 @@ export default function UsersPage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                disabled={!!editingId}
                 placeholder="Contoh: Rina Anggraini"
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
                 required
               />
             </div>
@@ -241,64 +245,31 @@ export default function UsersPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={!!editingId}
                 placeholder="email@toko.com"
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Cabang Penempatan</label>
-                <select
-                  value={branch}
-                  onChange={(e) => setBranch(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                >
-                  <option value="Pusat">Pusat</option>
-                  <option value="Cabang 1">Cabang 1</option>
-                  <option value="Cabang 2">Cabang 2</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Jabatan (Role)</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                >
-                  <option value="KASIR">KASIR</option>
-                  <option value="ADMIN">ADMIN</option>
-                  <option value="OWNER">OWNER</option>
-                </select>
-              </div>
-            </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Hak Akses Sementara</label>
-              <input
-                type="text"
-                value={access}
-                onChange={(e) => setAccess(e.target.value)}
-                placeholder="Contoh: pos, riwayat, pelanggan"
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Status Keaktifan</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Role / Jabatan</label>
               <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as "ACTIVE" | "INACTIVE")}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
               >
-                <option value="ACTIVE">Aktif</option>
-                <option value="INACTIVE">Tidak Aktif</option>
+                <option value="KASIR">Kasir / SP</option>
+                <option value="ADMIN">Admin Gudang</option>
+                <option value="OWNER">Owner</option>
               </select>
             </div>
-            <DialogFooter className="pt-4 border-t">
+
+            <DialogFooter className="pt-4 border-t mt-6">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white font-bold">
-                {editingId ? "Perbarui Karyawan" : "Simpan Karyawan"}
+              <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white font-bold" disabled={isSubmitting}>
+                {isSubmitting ? "Menyimpan..." : "Simpan Data"}
               </Button>
             </DialogFooter>
           </form>

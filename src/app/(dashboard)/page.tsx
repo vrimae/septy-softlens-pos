@@ -6,13 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CheckCircle2 } from "lucide-react";
 
 export default function DashboardPage() {
-  const { role } = useAuth();
+  const { role, activeProfile } = useAuth();
   
   return (
     <div className="space-y-8 max-w-6xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Halo, {role === 'owner' ? 'Owner' : 'Kasir'}!</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Halo, {activeProfile?.full_name || (role === 'owner' ? 'Owner' : 'Kasir')}!</h1>
           <p className="text-gray-500 mt-1">Ringkasan aktivitas dan performa sistem.</p>
         </div>
         

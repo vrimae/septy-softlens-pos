@@ -78,5 +78,29 @@ export const usersService = {
 
     if (error) throw new Error(error.message);
     return data as Profile;
+  },
+
+  async createUser(payload: { full_name: string; email: string; role: string; branch_id?: string | null }) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert({
+        id: crypto.randomUUID(),
+        full_name: payload.full_name,
+        email: payload.email,
+        role: payload.role,
+        branch_id: payload.branch_id || null,
+        is_active: true
+      })
+      .select()
+      .single();
+      
+    if (error) throw new Error(error.message);
+    return data as Profile;
+  },
+
+  async deleteUser(userId: string) {
+    const { error } = await supabase.from('profiles').delete().eq('id', userId);
+    if (error) throw new Error(error.message);
+    return true;
   }
 };

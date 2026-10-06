@@ -7,7 +7,7 @@ import { LogOut, Menu, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Topbar() {
-  const { user, role } = useAuth();
+  const { activeProfile, role } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -31,11 +31,11 @@ export function Topbar() {
       <div className="flex items-center gap-4">
         <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
           <UserCircle className="h-5 w-5" />
-          <span>{user?.email} ({role || 'Loading...'})</span>
+          <span>{activeProfile?.full_name || "POS User"} ({role?.toUpperCase() || "KASIR"})</span>
         </div>
-        <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
-          <LogOut className="h-4 w-4 mr-2" />
-          Keluar
+        <Button variant="outline" size="sm" onClick={() => router.push("/select-profile")} className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+          <UserCircle className="h-4 w-4 mr-2" />
+          Ganti Profil
         </Button>
       </div>
     </header>

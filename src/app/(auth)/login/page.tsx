@@ -31,7 +31,7 @@ export default function LoginPage() {
         });
         if (signInError) throw signInError;
         if (data.session) {
-          router.push("/");
+          router.push("/select-profile");
           router.refresh();
         }
       } else {
