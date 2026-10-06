@@ -1,3 +1,4 @@
+import { auditService } from "./audit.service";
 // ==============================================================================
 // FILE: src/lib/services/products.service.ts
 // DESCRIPTION: Products, Variants, Categories & Brands Service Layer
