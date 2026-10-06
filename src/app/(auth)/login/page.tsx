@@ -62,11 +62,11 @@ export default function LoginPage() {
             id: signUpData.user.id,
             full_name: fullName.trim() || "Owner",
             role: "OWNER",
-            status: "PENDING",
+            status: "ACTIVE",
           });
         }
 
-        setSuccess("Pendaftaran berhasil! Akun Anda sedang menunggu konfirmasi/verifikasi dari Super Admin (vrimae23@gmail.com). Anda dapat login setelah disetujui.");
+        setSuccess("Pendaftaran berhasil! Silakan login menggunakan email dan password yang baru saja Anda buat.");
         setActiveTab("login");
       }
     } catch (err: any) {
