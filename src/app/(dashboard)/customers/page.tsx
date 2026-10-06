@@ -108,15 +108,15 @@ export default function CustomersPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Database Pelanggan</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Database Pelanggan</h1>
           <p className="text-gray-500 mt-1">Kelola data member dan reward poin loyalitas.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
+        <Button onClick={handleOpenAdd} className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
           <Plus className="h-4 w-4 mr-2" /> Daftarkan Member Baru
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b border-gray-100">
@@ -145,9 +145,9 @@ export default function CustomersPage() {
                     </span>
                   </TableCell>
                   <TableCell className="px-6 text-center text-gray-600 py-4">{c.phone || '-'}</TableCell>
-                  <TableCell className="px-6 text-center font-bold text-blue-600 py-4">{c.points}</TableCell>
+                  <TableCell className="px-6 text-center font-bold text-slate-900 py-4">{c.points}</TableCell>
                   <TableCell className="px-6 text-right py-4 space-x-2">
-                    <button onClick={() => handleOpenEdit(c)} className="text-blue-500 hover:text-blue-700"><Edit2 className="h-4 w-4" /></button>
+                    <button onClick={() => handleOpenEdit(c)} className="text-slate-600 hover:text-slate-700"><Edit2 className="h-4 w-4" /></button>
                     <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
                   </TableCell>
                 </TableRow>
@@ -185,7 +185,7 @@ export default function CustomersPage() {
             </div>
             <DialogFooter className="pt-4 border-t">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white" disabled={isSubmitting}>Simpan</Button>
+              <Button type="submit" className="bg-blue-600 hover:bg-slate-800 text-white" disabled={isSubmitting}>Simpan</Button>
             </DialogFooter>
           </form>
         </DialogContent>

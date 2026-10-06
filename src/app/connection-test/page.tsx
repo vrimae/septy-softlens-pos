@@ -29,7 +29,7 @@ export default function ConnectionStatusPage() {
         <h1 className="text-2xl font-bold mb-4">Status Koneksi Supabase</h1>
         
         {status === "checking" && (
-          <p className="text-blue-500 font-medium">Memeriksa koneksi...</p>
+          <p className="text-slate-600 font-medium">Memeriksa koneksi...</p>
         )}
         
         {status === "connected" && (

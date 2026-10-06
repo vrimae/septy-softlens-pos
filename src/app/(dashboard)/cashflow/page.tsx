@@ -130,7 +130,7 @@ export default function CashflowPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Buku Kas & Kantong Kas</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Buku Kas & Kantong Kas</h1>
           <p className="text-gray-500 mt-1">Pantau pergerakan uang antar rekening dan laci kasir.</p>
         </div>
         <div className="flex gap-3">
@@ -145,13 +145,13 @@ export default function CashflowPage() {
 
       <div className="flex gap-6 overflow-x-auto pb-2">
         {registers.length === 0 && !loading && (
-          <div className="text-gray-400 py-10 w-full text-center border-2 border-dashed border-gray-200 rounded-2xl">
+          <div className="text-gray-400 py-10 w-full text-center border-2 border-dashed border-gray-200 rounded-xl">
             Belum ada kantong kas. Buat kantong baru terlebih dahulu.
           </div>
         )}
         
         {registers.map(reg => (
-          <Card key={reg.id} className="min-w-[300px] rounded-2xl border border-green-200 shadow-sm overflow-hidden relative">
+          <Card key={reg.id} className="min-w-[300px] rounded-xl border border-green-200 shadow-sm overflow-hidden relative">
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-bold text-gray-900">{reg.name}</h3>
@@ -159,13 +159,13 @@ export default function CashflowPage() {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <div className="text-3xl font-black text-gray-900 mb-6">Rp {reg.balance.toLocaleString()}</div>
+              <div className="text-2xl font-semibold text-gray-900 mb-6">Rp {reg.balance.toLocaleString()}</div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mt-6">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mt-6">
         <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
           <h2 className="text-lg font-bold text-gray-900">Histori Transaksi Kas</h2>
         </div>
@@ -195,7 +195,7 @@ export default function CashflowPage() {
                     <span className="text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded">{f.category}</span>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center text-gray-600">{f.description}</TableCell>
-                  <TableCell className={`px-6 py-4 text-right font-black ${f.flow_type === 'IN' ? 'text-green-500' : 'text-red-500'}`}>
+                  <TableCell className={`px-6 py-4 text-right font-semibold ${f.flow_type === 'IN' ? 'text-green-500' : 'text-red-500'}`}>
                     {f.flow_type === 'IN' ? '+' : '-'} Rp {f.amount.toLocaleString()}
                   </TableCell>
                 </TableRow>
@@ -251,7 +251,7 @@ export default function CashflowPage() {
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Nominal (Rp)</label>
-              <input required type="number" min="1" value={flowAmount} onChange={e => setFlowAmount(e.target.value)} className="w-full px-3 py-2 border rounded-lg font-black text-lg text-blue-600" />
+              <input required type="number" min="1" value={flowAmount} onChange={e => setFlowAmount(e.target.value)} className="w-full px-3 py-2 border rounded-lg font-semibold text-lg text-slate-900" />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Keterangan Tambahan</label>

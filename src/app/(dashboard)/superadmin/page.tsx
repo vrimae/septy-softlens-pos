@@ -190,7 +190,7 @@ $$;`;
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-2">
-          <RefreshCw className="h-8 w-8 animate-spin text-[#1c5ffb] mx-auto" />
+          <RefreshCw className="h-8 w-8 animate-spin text-slate-900 mx-auto" />
           <p className="text-sm font-semibold text-gray-500">Memeriksa hak akses Super Admin...</p>
         </div>
       </div>
@@ -201,12 +201,12 @@ $$;`;
   if (!isSuperAdmin) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4">
-        <div className="bg-white border border-red-200 rounded-3xl p-8 text-center shadow-lg space-y-5">
-          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white border border-red-200 rounded-xl p-8 text-center shadow-lg space-y-5">
+          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mx-auto">
             <ShieldAlert className="h-8 w-8" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">
               Akses Dibatasi (Restricted Area)
             </h1>
             <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">
@@ -227,7 +227,7 @@ $$;`;
 
           <div className="pt-4 flex justify-center gap-3">
             <Link href="/login">
-              <Button className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-5">
+              <Button className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-5">
                 Login dengan {SUPER_ADMIN_EMAIL}
               </Button>
             </Link>
@@ -251,12 +251,12 @@ $$;`;
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Header Banner Super Admin */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white rounded-xl p-8 shadow-xl relative overflow-hidden">
         <div className="relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 text-blue-300 px-3.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase">
+          <div className="inline-flex items-center gap-2 bg-slate-1000/20 border border-blue-400/30 text-blue-300 px-3.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase">
             <ShieldCheck className="h-4 w-4" /> Root Authority: Super Admin
           </div>
-          <h1 className="text-3xl font-black tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-normal">
             Super Admin Control Center
           </h1>
           <p className="text-blue-200/80 text-sm max-w-2xl leading-relaxed">
@@ -277,7 +277,7 @@ $$;`;
       {/* Alert Notifikasi */}
       {message && (
         <div
-          className={`p-4 rounded-2xl text-sm font-bold flex items-center justify-between shadow-sm ${
+          className={`p-4 rounded-xl text-sm font-bold flex items-center justify-between shadow-sm ${
             message.type === "success"
               ? "bg-green-50 border border-green-200 text-green-700"
               : "bg-red-50 border border-red-200 text-red-600"
@@ -294,9 +294,9 @@ $$;`;
       )}
 
       {/* Quick Tool: Konfirmasi Email Manual */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1c5ffb] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-900 flex items-center justify-center">
             <MailCheck className="h-5 w-5" />
           </div>
           <div>
@@ -327,7 +327,7 @@ $$;`;
           <Button
             type="submit"
             disabled={actionLoading}
-            className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-12 shadow-sm shrink-0"
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 h-12 shadow-sm shrink-0"
           >
             {actionLoading ? "Memproses..." : "Konfirmasi Akun Sekarang"}
           </Button>
@@ -335,10 +335,10 @@ $$;`;
       </div>
 
       {/* Tabel Pengguna & Status Konfirmasi */}
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-6 space-y-5">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-gray-900 tracking-normal flex items-center gap-2">
               <Users className="h-5 w-5 text-gray-700" /> Daftar Pengguna & Toko Terdaftar
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -366,7 +366,7 @@ $$;`;
           </div>
         </div>
 
-        <div className="border border-gray-100 rounded-2xl overflow-hidden">
+        <div className="border border-gray-100 rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50/80 text-gray-500 text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
               <tr>
@@ -381,7 +381,7 @@ $$;`;
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-gray-400">
-                    <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-blue-500" />
+                    <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-slate-600" />
                     Memuat data pengguna...
                   </td>
                 </tr>
@@ -401,7 +401,7 @@ $$;`;
                         <div className="text-xs text-gray-500 font-mono mt-0.5">{u.email}</div>
                       </td>
                       <td className="py-4 px-4 text-center">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
                           u.role === 'OWNER' ? 'bg-purple-100 text-purple-700' :
                           u.role === 'ADMIN' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
                         }`}>
@@ -452,7 +452,7 @@ $$;`;
       </div>
 
       {/* Script SQL Helper untuk Super Admin */}
-      <div className="bg-slate-900 text-slate-100 rounded-3xl p-6 shadow-md space-y-4">
+      <div className="bg-slate-900 text-slate-100 rounded-xl p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Terminal className="h-5 w-5 text-blue-400" />

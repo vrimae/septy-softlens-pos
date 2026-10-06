@@ -84,16 +84,16 @@ export default function SlowMovingPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Laporan Stok Mengendap</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Laporan Stok Mengendap</h1>
           <p className="text-gray-500 mt-1">Temukan modal yang tertahan dalam stok yang tidak bergerak.</p>
         </div>
-        <div className="bg-[#fff7ed] border border-[#ffedd5] px-6 py-3 rounded-2xl shadow-sm text-right shrink-0">
+        <div className="bg-[#fff7ed] border border-[#ffedd5] px-6 py-3 rounded-xl shadow-sm text-right shrink-0">
           <p className="text-xs font-bold text-[#ea580c] uppercase tracking-wider mb-0.5">Total Modal Tertahan</p>
-          <p className="text-2xl font-black text-[#ea580c]">Rp {totalModalTertahan.toLocaleString()}</p>
+          <p className="text-2xl font-semibold text-[#ea580c]">Rp {totalModalTertahan.toLocaleString()}</p>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 flex flex-wrap gap-6 items-center">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-wrap gap-6 items-center">
         <div className="flex items-center gap-3">
           <label className="text-sm font-bold text-gray-700">Filter Tidak Laku:</label>
           <select 
@@ -122,7 +122,7 @@ export default function SlowMovingPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b-0">
@@ -146,20 +146,20 @@ export default function SlowMovingPage() {
                 <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <TableCell className="px-6 py-4">
                     <p className="font-bold text-gray-900 text-sm">{item.name}</p>
-                    <p className="font-mono text-xs text-blue-600 font-bold">{item.code}</p>
+                    <p className="font-mono text-xs text-slate-900 font-bold">{item.code}</p>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center font-bold text-gray-700 text-sm">
                     {item.stock} pcs
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
                       {item.age}
                     </span>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-500">
                     {item.lastSold}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-sm">
+                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">
                     Rp {item.costStuck.toLocaleString()}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">

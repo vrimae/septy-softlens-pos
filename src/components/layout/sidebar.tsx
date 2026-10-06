@@ -102,7 +102,7 @@ export function Sidebar() {
         { title: 'Utang Supplier', href: '/suppliers' },
         { title: 'Stok Mengendap', href: '/slow-moving' },
         { title: 'Barang Bermasa...', href: '/warehouse' },
-        { title: 'AI Restock', href: '/restock' },
+        { title: 'Sistem Restock', href: '/restock' },
       ]
     },
     { 
@@ -131,7 +131,7 @@ export function Sidebar() {
         <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold italic text-xs shadow-sm">
           Septy
         </div>
-        <span className="font-extrabold text-xl tracking-tight text-gray-900">Septy Softlens</span>
+        <span className="font-semibold text-xl tracking-normal text-gray-900">Septy Softlens</span>
       </div>
 
       <div className="px-6 pb-4 shrink-0">
@@ -173,7 +173,7 @@ export function Sidebar() {
                   }}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
                     selectedBranch === branch 
-                      ? "bg-blue-50 text-[#1c5ffb]" 
+                      ? "bg-slate-100 text-slate-900" 
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
@@ -194,10 +194,10 @@ export function Sidebar() {
                 href="/owner-dashboard"
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-                  pathname === '/owner-dashboard' ? "bg-[#f0f4ff] text-[#1c5ffb]" : "text-gray-600 hover:bg-gray-50"
+                  pathname === '/owner-dashboard' ? "bg-[#f0f4ff] text-slate-900" : "text-gray-600 hover:bg-gray-50"
                 )}
               >
-                <div className={cn("p-1.5 rounded-md", pathname === '/owner-dashboard' ? "bg-[#1c5ffb] text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
+                <div className={cn("p-1.5 rounded-md", pathname === '/owner-dashboard' ? "bg-slate-900 text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 Dashboard Eksekutif
@@ -208,10 +208,10 @@ export function Sidebar() {
                 href="/"
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-                  pathname === '/' ? "bg-[#f0f4ff] text-[#1c5ffb]" : "text-gray-600 hover:bg-gray-50"
+                  pathname === '/' ? "bg-[#f0f4ff] text-slate-900" : "text-gray-600 hover:bg-gray-50"
                 )}
               >
-                <div className={cn("p-1.5 rounded-md", pathname === '/' ? "bg-[#1c5ffb] text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
+                <div className={cn("p-1.5 rounded-md", pathname === '/' ? "bg-slate-900 text-white shadow-sm" : "bg-gray-50 text-gray-500")}>
                   <MonitorPlay className="h-4 w-4" />
                 </div>
                 Dashboard Kasir
@@ -256,7 +256,7 @@ export function Sidebar() {
                             href={child.href} 
                             className={cn(
                               "block py-2 text-sm font-semibold transition-colors px-3 -ml-3 rounded-md",
-                              pathname === child.href ? "text-[#1c5ffb] bg-[#f0f4ff]" : "text-gray-500 hover:text-gray-900"
+                              pathname === child.href ? "text-slate-900 bg-[#f0f4ff]" : "text-gray-500 hover:text-gray-900"
                             )}
                           >
                             <div className="flex items-center gap-2">
@@ -286,7 +286,7 @@ export function Sidebar() {
           title="Klik untuk Logout"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#1c5ffb] text-white flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold">
               <User className="h-5 w-5" />
             </div>
             <div>

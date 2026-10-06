@@ -85,7 +85,7 @@ export default function RestockPage() {
     setIsAnalyzing(true);
     try {
       await fetchRecommendations();
-      alert("Analisis AI selesai! Produk dengan stok mendekati batas minimum telah diperbarui.");
+      alert("Kalkulasi selesai! Produk dengan stok mendekati batas minimum telah diperbarui.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -101,22 +101,22 @@ export default function RestockPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-            <Sparkles className="h-7 w-7 text-blue-600" /> AI Restock & Min. Stock
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal flex items-center gap-2.5">
+             Sistem Restock & Min. Stock
           </h1>
           <p className="text-gray-500 mt-1">Rekomendasi belanja cerdas berdasarkan kecepatan penjualan (sales velocity) 30 hari terakhir.</p>
         </div>
         <Button 
           onClick={handleRunAnalysis}
           disabled={isAnalyzing}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl px-5 h-11 flex items-center gap-2 shadow-sm shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-5 h-11 flex items-center gap-2 shadow-sm shrink-0"
         >
-          <Sparkles className={`h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
-          {isAnalyzing ? "Menganalisis Data..." : "Jalankan Analisis AI Restock"}
+          
+          {isAnalyzing ? "Menganalisis Data..." : "Jalankan Kalkulasi Restock"}
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <div className="p-4 border-b border-gray-100 flex items-center justify-between">
           <div className="relative max-w-md w-full">
             <input 
@@ -156,10 +156,10 @@ export default function RestockPage() {
                 <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <TableCell className="px-6 py-4">
                     <p className="font-bold text-gray-900 text-sm">{r.name}</p>
-                    <p className="font-mono text-xs text-blue-600 font-bold">{r.code}</p>
+                    <p className="font-mono text-xs text-slate-900 font-bold">{r.code}</p>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-black bg-red-100 text-red-600">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
                       {r.currentStock} pcs
                     </span>
                   </TableCell>
@@ -167,7 +167,7 @@ export default function RestockPage() {
                     {r.velocity} pcs / hari
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="font-black text-blue-600 text-sm">+{r.suggestedQty} pcs</span>
+                    <span className="font-semibold text-slate-900 text-sm">+{r.suggestedQty} pcs</span>
                     <p className="text-[10px] text-gray-400">buffer 14 hari</p>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right font-bold text-gray-900 text-sm">
@@ -175,7 +175,7 @@ export default function RestockPage() {
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
                     <Link href="/purchases">
-                      <Button size="sm" className="bg-[#00a84e] hover:bg-green-600 text-white font-bold rounded-xl text-xs h-8 px-3">
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs h-8 px-3">
                         <ShoppingBag className="h-3 w-3 mr-1" /> Buat PO
                       </Button>
                     </Link>

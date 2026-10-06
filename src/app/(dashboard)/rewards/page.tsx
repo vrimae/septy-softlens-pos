@@ -64,19 +64,19 @@ export default function RewardsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Master Reward & Poin</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Master Reward & Poin</h1>
         <p className="text-gray-500 mt-1">Kelola hadiah dan konfigurasi poin transaksi.</p>
       </div>
 
       {savedSuccess && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-2xl text-sm font-bold shadow-sm flex items-center gap-2">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2">
           <Check className="h-4 w-4 text-emerald-600" /> Pengaturan poin transaksi berhasil disimpan!
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column: Konfigurasi */}
-        <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border">
+        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border">
           <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900">Konfigurasi Poin Transaksi</h2>
           </div>
@@ -88,7 +88,7 @@ export default function RewardsPage() {
                   type="number" 
                   value={pointMultiple}
                   onChange={(e) => setPointMultiple(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1c5ffb] focus:ring-1 focus:ring-[#1c5ffb] font-bold"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] font-bold"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-2 leading-relaxed">
@@ -102,7 +102,7 @@ export default function RewardsPage() {
                   type="number" 
                   value={pointExpiry}
                   onChange={(e) => setPointExpiry(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1c5ffb] focus:ring-1 focus:ring-[#1c5ffb] font-bold"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] font-bold"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-2 leading-relaxed">
@@ -110,7 +110,7 @@ export default function RewardsPage() {
                 </p>
               </div>
 
-              <Button type="submit" className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl h-12 shadow-sm">
+              <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl h-12 shadow-sm">
                 Simpan Pengaturan
               </Button>
             </form>
@@ -118,12 +118,12 @@ export default function RewardsPage() {
         </Card>
 
         {/* Right Column: Daftar Reward */}
-        <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border">
+        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border">
           <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
             <h2 className="text-lg font-bold text-gray-900">Daftar Reward / Hadiah</h2>
             <Button 
               onClick={() => setIsModalOpen(true)}
-              className="bg-[#00a84e] hover:bg-green-600 text-white rounded-xl px-4 font-semibold shadow-sm h-10 text-xs flex items-center gap-1.5"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-4 font-semibold shadow-sm h-10 text-xs flex items-center gap-1.5"
             >
               <Plus className="h-3.5 w-3.5" /> Tambah Reward
             </Button>
@@ -153,7 +153,7 @@ export default function RewardsPage() {
                           <span>{r.name}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="px-6 py-4 text-center font-black text-blue-600 text-sm">
+                      <TableCell className="px-6 py-4 text-center font-semibold text-slate-900 text-sm">
                         {r.points} Poin
                       </TableCell>
                       <TableCell className="px-6 py-4 text-right">
@@ -208,7 +208,7 @@ export default function RewardsPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-[#00a84e] hover:bg-green-600 text-white font-bold">
+              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
                 Simpan Reward
               </Button>
             </DialogFooter>

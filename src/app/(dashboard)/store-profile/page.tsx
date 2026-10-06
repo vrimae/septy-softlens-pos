@@ -22,13 +22,13 @@ export default function StoreProfilePage() {
   return (
     <div className="max-w-4xl space-y-8 pb-12">
       {savedMessage && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3.5 rounded-2xl text-sm font-bold shadow-sm flex items-center gap-2">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2">
           <Check className="h-4 w-4 text-emerald-600" />
           Perubahan profil toko berhasil disimpan!
         </div>
       )}
 
-      <form onSubmit={handleSave} className="bg-white border border-gray-200 rounded-3xl shadow-sm p-8 space-y-6">
+      <form onSubmit={handleSave} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6">
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Nama Toko</label>
@@ -90,7 +90,7 @@ export default function StoreProfilePage() {
           <h2 className="text-lg font-bold text-gray-900 mb-4">Pengaturan Tampilan</h2>
           <div 
             onClick={() => setDarkMode(!darkMode)}
-            className="border border-gray-200 rounded-2xl p-4 flex justify-between items-center bg-[#fafafa] cursor-pointer hover:bg-gray-100/60 transition-colors"
+            className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-[#fafafa] cursor-pointer hover:bg-gray-100/60 transition-colors"
           >
             <div>
               <h3 className="font-bold text-gray-700">Tema Gelap (Dark Mode)</h3>
@@ -104,7 +104,7 @@ export default function StoreProfilePage() {
 
         <Button 
           type="submit"
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-12 shadow-sm flex items-center gap-2 mt-8"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 h-12 shadow-sm flex items-center gap-2 mt-8"
         >
           <Check className="h-4 w-4" />
           Simpan Perubahan

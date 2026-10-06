@@ -213,7 +213,7 @@ export default function SuppliersPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Laporan & Utang Supplier</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Laporan & Utang Supplier</h1>
           <p className="text-gray-500 mt-1">Kelola data pembelian, riwayat harga, dan cicilan utang.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function SuppliersPage() {
           </Button>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+            className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" /> Catat Utang Baru
           </Button>
@@ -235,16 +235,16 @@ export default function SuppliersPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="rounded-2xl border-red-100 shadow-sm bg-red-50/50">
+        <Card className="rounded-xl border-red-100 shadow-sm bg-red-50/50">
           <CardContent className="p-6">
             <h3 className="text-sm font-bold text-red-500 mb-2">Total Utang Berjalan</h3>
-            <div className="text-3xl font-black text-red-500">
+            <div className="text-2xl font-semibold text-red-500">
               Rp {totalUtangBerjalan.toLocaleString()}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-gray-200 shadow-sm bg-white">
+        <Card className="rounded-xl border-gray-200 shadow-sm bg-white">
           <CardContent className="p-6">
             <h3 className="text-sm font-bold text-gray-500 mb-2">Filter Supplier</h3>
             <div className="relative">
@@ -264,7 +264,7 @@ export default function SuppliersPage() {
         </Card>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div className="flex border-b border-gray-100 px-4">
           <button 
             onClick={() => setActiveTab("utang")}
@@ -280,7 +280,7 @@ export default function SuppliersPage() {
             onClick={() => setActiveTab("riwayat")}
             className={`px-6 py-4 text-sm font-bold transition-all border-b-2 ${
               activeTab === "riwayat"
-                ? "text-blue-600 border-blue-600 bg-blue-50/30"
+                ? "text-slate-900 border-blue-600 bg-slate-100/30"
                 : "text-gray-400 hover:text-gray-600 border-transparent"
             }`}
           >
@@ -311,7 +311,7 @@ export default function SuppliersPage() {
                 filteredDebts.map((d) => (
                   <TableRow key={d.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <TableCell className="px-6 py-4">
-                      <p className="font-mono text-xs font-bold text-blue-600">{d.poNumber}</p>
+                      <p className="font-mono text-xs font-bold text-slate-900">{d.poNumber}</p>
                       <p className="font-bold text-gray-900 text-sm">{d.supplier}</p>
                     </TableCell>
                     <TableCell className="px-6 py-4 text-center">
@@ -321,11 +321,11 @@ export default function SuppliersPage() {
                     <TableCell className="px-6 py-4 text-center text-sm font-semibold text-gray-800">
                       Rp {d.totalDebt.toLocaleString()}
                     </TableCell>
-                    <TableCell className="px-6 py-4 text-center text-sm font-black text-red-600">
+                    <TableCell className="px-6 py-4 text-center text-sm font-semibold text-red-600">
                       Rp {d.remainingDebt.toLocaleString()}
                     </TableCell>
                     <TableCell className="px-6 py-4 text-center">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase ${
                         d.status === "LUNAS" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                       }`}>
                         {d.status}
@@ -335,7 +335,7 @@ export default function SuppliersPage() {
                       {d.remainingDebt > 0 ? (
                         <button
                           onClick={() => handlePayInstallment(d.id)}
-                          className="bg-blue-50 hover:bg-blue-100 text-[#1c5ffb] text-xs font-bold px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5"
+                          className="bg-slate-100 hover:bg-blue-100 text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5"
                         >
                           <CreditCard className="h-3.5 w-3.5" /> Bayar Cicilan
                         </button>
@@ -395,7 +395,7 @@ export default function SuppliersPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
+              <Button type="submit" disabled={isSubmitting} className="bg-slate-900 hover:bg-slate-800 text-white font-bold">
                 {isSubmitting ? "Menyimpan..." : "Simpan Utang"}
               </Button>
             </DialogFooter>

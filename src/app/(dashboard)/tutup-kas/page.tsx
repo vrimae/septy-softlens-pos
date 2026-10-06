@@ -115,26 +115,26 @@ export default function TutupKasPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Tutup Kas (Rekonsiliasi Shift)</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Tutup Kas (Rekonsiliasi Shift)</h1>
         <p className="text-gray-500 mt-1">Lakukan rekonsiliasi uang fisik (Tunai) pada akhir shift Anda.</p>
       </div>
 
       {successMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-2xl text-sm font-bold shadow-sm">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-bold shadow-sm">
           Rekonsiliasi tutup kas shift berhasil disimpan dan dicatat!
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column: Form */}
-        <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border">
+        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border">
           <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900">Form Tutup Kas Shift</h2>
           </div>
           <CardContent className="px-6 py-6 space-y-6">
-            <div className="bg-[#f0f4ff] p-5 rounded-2xl border border-transparent">
-              <label className="block text-sm font-semibold text-[#1c5ffb] mb-1">Saldo Tunai Seharusnya (Sistem)</label>
-              <div className="text-3xl font-black text-[#1c5ffb]">Rp {systemCash.toLocaleString()}</div>
+            <div className="bg-[#f0f4ff] p-5 rounded-xl border border-transparent">
+              <label className="block text-sm font-semibold text-slate-900 mb-1">Saldo Tunai Seharusnya (Sistem)</label>
+              <div className="text-2xl font-semibold text-slate-900">Rp {systemCash.toLocaleString()}</div>
             </div>
             
             <form onSubmit={handleCloseShift} className="space-y-4">
@@ -146,7 +146,7 @@ export default function TutupKasPage() {
                     type="number" 
                     value={actualCashInput}
                     onChange={(e) => setActualCashInput(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-base font-bold focus:outline-none focus:border-[#1c5ffb] focus:ring-1 focus:ring-[#1c5ffb]"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-base font-bold focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb]"
                     required
                   />
                 </div>
@@ -162,7 +162,7 @@ export default function TutupKasPage() {
                 </div>
               )}
 
-              <Button type="submit" disabled={isSubmitting} className="w-full bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
                 {isSubmitting ? "Menyimpan..." : "Kirim Tutup Kas"}
               </Button>
             </form>
@@ -170,7 +170,7 @@ export default function TutupKasPage() {
         </Card>
 
         {/* Right Column: Riwayat */}
-        <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border flex flex-col">
+        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border flex flex-col">
           <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
             <h2 className="text-lg font-bold text-gray-900">Riwayat Tutup Kas</h2>
           </div>

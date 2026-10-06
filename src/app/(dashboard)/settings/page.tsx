@@ -44,7 +44,7 @@ export default function SettingsPage() {
     "Laporan Stok Mengendap": false,
     "Gudang Barang Bermasalah": false,
     "Retur / Tukar Barang": false,
-    "AI Restock": false,
+    "Sistem Restock": false,
     "Manajemen User": false,
     "Pengaturan Akses": false,
     "Aksi: Ubah Harga Saat Transaksi": false,
@@ -64,7 +64,7 @@ export default function SettingsPage() {
     "Laporan Stok Mengendap": false,
     "Gudang Barang Bermasalah": false,
     "Retur / Tukar Barang": true,
-    "AI Restock": false,
+    "Sistem Restock": false,
     "Manajemen User": false,
     "Pengaturan Akses": false,
     "Aksi: Ubah Harga Saat Transaksi": false,
@@ -168,12 +168,12 @@ export default function SettingsPage() {
     <div className="space-y-10 max-w-7xl mx-auto pb-12">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Pengaturan Sistem & Akses</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Pengaturan Sistem & Akses</h1>
           <p className="text-gray-500 mt-1">Atur konfigurasi toko dan menu apa saja yang bisa dilihat oleh setiap jabatan.</p>
         </div>
         <Button 
           onClick={() => showNotification("Seluruh pengaturan berhasil disimpan!")}
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-5 shadow-sm"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-5 shadow-sm"
         >
           Simpan Semua Pengaturan
         </Button>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
       )}
 
       {/* Manajemen Cabang */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-2">Manajemen Cabang (Multi-Branch)</h2>
         <p className="text-sm text-gray-500 mb-4">Kelola cabang toko Anda (Maksimal 3 cabang). Stok gudang akan otomatis tergabung, namun transaksi dan omzet terpisah.</p>
         
@@ -197,11 +197,11 @@ export default function SettingsPage() {
             onChange={(e) => setNewBranch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddBranch()}
             placeholder="Nama Cabang Baru..." 
-            className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1c5ffb] focus:ring-1 focus:ring-[#1c5ffb]"
+            className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb]"
           />
           <Button 
             onClick={handleAddBranch}
-            className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-auto shadow-sm"
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 h-auto shadow-sm"
           >
             <Plus className="h-4 w-4 mr-1.5" /> Tambah Cabang
           </Button>
@@ -222,27 +222,27 @@ export default function SettingsPage() {
       </section>
 
       {/* Backup & Export */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-2">Backup & Export Database</h2>
         <p className="text-sm text-gray-500 mb-4">Download seluruh data ERP (Barang, Transaksi, Audit, dll) sebagai file Backup JSON untuk keamanan data, atau jika Anda ingin pindah perangkat/restore.</p>
         <Button 
           onClick={handleDownloadBackup}
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-6 shadow-sm flex items-center gap-2"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 shadow-sm flex items-center gap-2"
         >
           <Download className="h-4 w-4" /> Download Full Backup (.json)
         </Button>
       </section>
 
       {/* Hardware */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <div className="flex items-center gap-2 mb-6">
-          <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-[#1c5ffb]" />
+          <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-slate-900" />
           <h2 className="text-xl font-bold text-gray-900">Hardware & Integrasi (Smartcom)</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border border-gray-100 bg-gray-50/50 rounded-2xl p-6 text-center">
-            <div className="w-12 h-12 bg-blue-100 text-[#1c5ffb] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="border border-gray-100 bg-gray-50/50 rounded-xl p-6 text-center">
+            <div className="w-12 h-12 bg-blue-100 text-slate-900 rounded-full flex items-center justify-center mx-auto mb-4">
               <Printer className="h-6 w-6" />
             </div>
             <h3 className="font-bold text-gray-900 mb-1">Printer Thermal</h3>
@@ -253,7 +253,7 @@ export default function SettingsPage() {
               className={`w-full font-bold rounded-xl transition-all ${
                 printerSynced 
                   ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
-                  : "bg-[#1c5ffb] hover:bg-blue-700 text-white"
+                  : "bg-slate-900 hover:bg-slate-800 text-white"
               }`}
             >
               <Printer className="h-4 w-4 mr-2" /> 
@@ -261,7 +261,7 @@ export default function SettingsPage() {
             </Button>
           </div>
 
-          <div className="border border-gray-100 bg-gray-50/50 rounded-2xl p-6 text-center">
+          <div className="border border-gray-100 bg-gray-50/50 rounded-xl p-6 text-center">
             <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <ScanLine className="h-6 w-6" />
             </div>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
               className={`w-full font-bold rounded-xl transition-all ${
                 scannerSynced 
                   ? "bg-emerald-700 hover:bg-emerald-800 text-white" 
-                  : "bg-[#00a84e] hover:bg-green-600 text-white"
+                  : "bg-emerald-600 hover:bg-emerald-700 text-white"
               }`}
             >
               <ScanLine className="h-4 w-4 mr-2" /> 
@@ -284,11 +284,11 @@ export default function SettingsPage() {
       </section>
 
       {/* Pengaturan Harga Transaksi */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Pengaturan Harga Transaksi (Global)</h2>
         <div className="flex items-start gap-4 cursor-pointer" onClick={() => setAllowPriceChange(!allowPriceChange)}>
-          <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors ${allowPriceChange ? "bg-[#1c5ffb]" : "bg-gray-200"}`}>
-            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${allowPriceChange ? "translate-x-5" : ""}`} />
+          <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors ${allowPriceChange ? "bg-slate-900" : "bg-gray-200"}`}>
+            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${allowPriceChange ? "translate-x-5" : ""}`} />
           </div>
           <div>
             <h3 className="font-bold text-gray-900">Izinkan Perubahan Harga di Kasir</h3>
@@ -300,7 +300,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Target Kinerja */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Target Kinerja Kasir (SP)</h2>
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -311,7 +311,7 @@ export default function SettingsPage() {
             type="number" 
             value={upsellingTarget}
             onChange={(e) => setUpsellingTarget(e.target.value)}
-            className="w-24 px-4 py-2 bg-white border border-gray-200 rounded-lg text-center font-bold focus:border-[#1c5ffb] outline-none" 
+            className="w-24 px-4 py-2 bg-white border border-gray-200 rounded-lg text-center font-bold focus:border-slate-900 outline-none" 
           />
         </div>
 
@@ -323,12 +323,12 @@ export default function SettingsPage() {
               placeholder="Ketik nama produk target..."
               value={selectedProductTarget}
               onChange={(e) => setSelectedProductTarget(e.target.value)}
-              className="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-[#1c5ffb]"
+              className="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-slate-900"
             />
             <Button 
               onClick={handleAddTargetProduct}
               variant="outline" 
-              className="text-[#1c5ffb] border-blue-200 font-bold hover:bg-blue-50"
+              className="text-slate-900 border-slate-200 font-bold hover:bg-slate-100"
             >
               + Tambah
             </Button>
@@ -337,7 +337,7 @@ export default function SettingsPage() {
           {targetProducts.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
               {targetProducts.map((p, idx) => (
-                <span key={idx} className="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+                <span key={idx} className="bg-slate-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
                   {p}
                   <button onClick={() => setTargetProducts(targetProducts.filter((_, i) => i !== idx))} className="hover:text-red-600">×</button>
                 </span>
@@ -348,14 +348,14 @@ export default function SettingsPage() {
       </section>
 
       {/* Pengaturan Insentif */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Pengaturan Insentif SP</h2>
         <div className="flex items-start gap-4 mb-6 cursor-pointer" onClick={() => setIncentiveActive(!incentiveActive)}>
-          <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors ${incentiveActive ? "bg-[#1c5ffb]" : "bg-gray-200"}`}>
-            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${incentiveActive ? "translate-x-5" : ""}`} />
+          <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors ${incentiveActive ? "bg-slate-900" : "bg-gray-200"}`}>
+            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${incentiveActive ? "translate-x-5" : ""}`} />
           </div>
           <div>
-            <h3 className={`font-bold ${incentiveActive ? "text-[#1c5ffb]" : "text-gray-700"}`}>Aktifkan Insentif Kasir (SP)</h3>
+            <h3 className={`font-bold ${incentiveActive ? "text-slate-900" : "text-gray-700"}`}>Aktifkan Insentif Kasir (SP)</h3>
             <p className="text-sm text-gray-500 mt-1 leading-relaxed">
               Jika aktif, sistem akan menghitung bonus/insentif berdasarkan penjualan & upselling. Jika nonaktif, data terekam tanpa insentif.
             </p>
@@ -369,7 +369,7 @@ export default function SettingsPage() {
               type="number" 
               value={incentivePerItem} 
               onChange={(e) => setIncentivePerItem(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1c5ffb]" 
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900" 
             />
           </div>
           <div>
@@ -378,14 +378,14 @@ export default function SettingsPage() {
               type="number" 
               value={incentiveUpselling} 
               onChange={(e) => setIncentiveUpselling(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1c5ffb]" 
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900" 
             />
           </div>
         </div>
       </section>
 
       {/* Pengaturan Notifikasi Expired & Grid Hak Akses */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Pengaturan Notifikasi Expired Date</h2>
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -396,7 +396,7 @@ export default function SettingsPage() {
             <select 
               value={expiredNotificationMonth}
               onChange={(e) => setExpiredNotificationMonth(e.target.value)}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold focus:outline-none focus:border-[#1c5ffb]"
+              className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold focus:outline-none focus:border-slate-900"
             >
               <option value="3 Bulan">3 Bulan</option>
               <option value="6 Bulan">6 Bulan</option>
@@ -407,13 +407,13 @@ export default function SettingsPage() {
         </div>
 
         {/* Tab Hak Akses */}
-        <div className="mt-8 border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="mt-8 border border-gray-200 rounded-xl overflow-hidden">
           <div className="flex border-b border-gray-200 bg-white">
             <button 
               onClick={() => setActiveTab("admin")}
               className={`flex-1 py-4 text-sm font-bold transition-all ${
                 activeTab === "admin" 
-                  ? "text-[#1c5ffb] border-b-2 border-[#1c5ffb]" 
+                  ? "text-slate-900 border-b-2 border-slate-900" 
                   : "text-gray-500 hover:bg-gray-50"
               }`}
             >
@@ -423,7 +423,7 @@ export default function SettingsPage() {
               onClick={() => setActiveTab("kasir")}
               className={`flex-1 py-4 text-sm font-bold transition-all ${
                 activeTab === "kasir" 
-                  ? "text-[#1c5ffb] border-b-2 border-[#1c5ffb]" 
+                  ? "text-slate-900 border-b-2 border-slate-900" 
                   : "text-gray-500 hover:bg-gray-50"
               }`}
             >
@@ -431,7 +431,7 @@ export default function SettingsPage() {
             </button>
           </div>
           <div className="p-6 bg-white">
-            <div className="bg-[#f0f4ff] p-4 text-sm font-bold text-[#1c5ffb] rounded-xl mb-6">
+            <div className="bg-[#f0f4ff] p-4 text-sm font-bold text-slate-900 rounded-xl mb-6">
               Pilih menu-menu di bawah ini untuk mengizinkan akses bagi pengguna dengan role {activeTab.toUpperCase()}. Klik untuk toggle switch.
             </div>
 
@@ -441,14 +441,14 @@ export default function SettingsPage() {
                   key={menuName}
                   onClick={() => toggleAccess(menuName)}
                   className={`flex items-center justify-between border rounded-xl p-4 cursor-pointer transition-all ${
-                    isActive ? "border-[#1c5ffb] bg-blue-50/20" : "border-gray-200 bg-white hover:bg-gray-50"
+                    isActive ? "border-slate-900 bg-slate-50" : "border-gray-200 bg-white hover:bg-gray-50"
                   }`}
                 >
-                  <span className={`text-sm font-bold select-none ${isActive ? "text-[#1c5ffb]" : "text-gray-600"}`}>
+                  <span className={`text-sm font-bold select-none ${isActive ? "text-slate-900" : "text-gray-600"}`}>
                     {menuName}
                   </span>
-                  <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors ${isActive ? "bg-[#1c5ffb]" : "bg-gray-200"}`}>
-                    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${isActive ? "translate-x-5" : ""}`} />
+                  <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors ${isActive ? "bg-slate-900" : "bg-gray-200"}`}>
+                    <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${isActive ? "translate-x-5" : ""}`} />
                   </div>
                 </div>
               ))}

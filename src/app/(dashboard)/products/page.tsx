@@ -127,23 +127,23 @@ export default function ProductsPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Master Barang</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Master Barang</h1>
           <p className="text-gray-500 mt-1">Kelola data stok dan harga produk softlens.</p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={handleOpenAddModal} className="bg-[#00a84e] hover:bg-green-600 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
+          <Button onClick={handleOpenAddModal} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
             <Plus className="h-4 w-4 mr-2" /> Tambah Produk Baru
           </Button>
           <Button 
             onClick={() => alert("Fitur Upload Excel sedang dalam antrean pembaruan berikutnya. Terima kasih atas kesabarannya!")}
-            className="bg-[#2662fa] hover:bg-blue-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11"
+            className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-5 font-semibold shadow-sm h-11"
           >
             <UploadCloud className="h-4 w-4 mr-2" /> Upload Excel
           </Button>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <div className="p-4 border-b border-gray-100 flex items-center justify-between">
           <div className="relative w-full max-w-sm">
             <input 
@@ -182,9 +182,9 @@ export default function ProductsPage() {
                       <div>V: <span className="font-semibold text-gray-900">Rp {p.price_vip.toLocaleString()}</span></div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-6 text-right font-black text-gray-900">{p.stock_global}</TableCell>
+                  <TableCell className="px-6 text-right font-semibold text-gray-900">{p.stock_global}</TableCell>
                   <TableCell className="px-6 text-center space-x-2">
-                    <button onClick={() => handleOpenEditModal(p)} className="text-[#1c5ffb] hover:bg-blue-50 p-2 rounded-lg"><Edit2 className="h-4 w-4" /></button>
+                    <button onClick={() => handleOpenEditModal(p)} className="text-slate-900 hover:bg-slate-100 p-2 rounded-lg"><Edit2 className="h-4 w-4" /></button>
                     <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg"><Trash2 className="h-4 w-4" /></button>
                   </TableCell>
                 </TableRow>
@@ -221,7 +221,7 @@ export default function ProductsPage() {
             <div className="grid grid-cols-3 gap-4 pt-2 border-t">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Harga Reguler</label>
-                <input required type="number" value={priceRegular} onChange={(e) => setPriceRegular(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-blue-200" />
+                <input required type="number" value={priceRegular} onChange={(e) => setPriceRegular(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-slate-200" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Harga Gold</label>
@@ -235,7 +235,7 @@ export default function ProductsPage() {
             
             <DialogFooter className="pt-4 mt-4 border-t">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-[#1c5ffb] hover:bg-blue-700 text-white" disabled={isSubmitting}>
+              <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white" disabled={isSubmitting}>
                 {isSubmitting ? "Menyimpan..." : "Simpan Barang"}
               </Button>
             </DialogFooter>

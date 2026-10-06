@@ -85,7 +85,7 @@ export default function LaporanUtamaPage() {
     <div className="space-y-8 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Laporan Utama</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Laporan Utama</h1>
           <p className="text-gray-500 mt-1">Ringkasan komprehensif bisnis Anda.</p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -98,7 +98,7 @@ export default function LaporanUtamaPage() {
           </Button>
           <Button 
             onClick={handleExportCSV}
-            className="bg-[#00a84e] hover:bg-green-600 text-white font-bold shadow-sm h-11 px-5 rounded-xl flex items-center gap-2"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm h-11 px-5 rounded-xl flex items-center gap-2"
           >
             <Download className="h-4 w-4" /> Export CSV
           </Button>
@@ -107,7 +107,7 @@ export default function LaporanUtamaPage() {
 
       <div className="space-y-6">
         {/* 1. Penjualan */}
-        <section className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
+        <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">1. Penjualan</h2>
             <button onClick={fetchReportData} className="text-gray-400 hover:text-gray-600 p-1">
@@ -115,40 +115,40 @@ export default function LaporanUtamaPage() {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-[#f0f4ff] rounded-2xl p-5 border border-transparent">
-              <p className="text-sm font-bold text-[#1c5ffb] mb-1">Omzet</p>
-              <div className="text-3xl font-black text-[#1c5ffb]">Rp {omzet.toLocaleString()}</div>
+            <div className="bg-[#f0f4ff] rounded-xl p-5 border border-transparent">
+              <p className="text-sm font-bold text-slate-900 mb-1">Omzet</p>
+              <div className="text-2xl font-semibold text-slate-900">Rp {omzet.toLocaleString()}</div>
             </div>
-            <div className="bg-green-50 rounded-2xl p-5 border border-transparent">
+            <div className="bg-green-50 rounded-xl p-5 border border-transparent">
               <p className="text-sm font-bold text-green-600 mb-1">Laba Kotor</p>
-              <div className="text-3xl font-black text-green-600">Rp {labaKotor.toLocaleString()}</div>
+              <div className="text-2xl font-semibold text-green-600">Rp {labaKotor.toLocaleString()}</div>
             </div>
-            <div className="bg-[#f0f4ff] rounded-2xl p-5 border border-transparent">
-              <p className="text-sm font-bold text-[#1c5ffb] mb-1">Jml Transaksi</p>
-              <div className="text-3xl font-black text-[#1c5ffb]">{jmlTransaksi} <span className="text-base font-bold">struk</span></div>
+            <div className="bg-[#f0f4ff] rounded-xl p-5 border border-transparent">
+              <p className="text-sm font-bold text-slate-900 mb-1">Jml Transaksi</p>
+              <div className="text-2xl font-semibold text-slate-900">{jmlTransaksi} <span className="text-base font-bold">struk</span></div>
             </div>
-            <div className="bg-[#fff7ed] rounded-2xl p-5 border border-transparent">
+            <div className="bg-[#fff7ed] rounded-xl p-5 border border-transparent">
               <p className="text-sm font-bold text-[#ea580c] mb-1">Jml Pcs Terjual</p>
-              <div className="text-3xl font-black text-[#ea580c]">{jmlPcs} <span className="text-base font-bold">pcs</span></div>
+              <div className="text-2xl font-semibold text-[#ea580c]">{jmlPcs} <span className="text-base font-bold">pcs</span></div>
             </div>
           </div>
         </section>
 
         {/* 2. Kas & Keuangan */}
-        <section className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
+        <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">2. Kas & Keuangan</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="border border-gray-200 rounded-2xl p-5">
+            <div className="border border-gray-200 rounded-xl p-5">
               <p className="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Kas Masuk (Penjualan)</p>
-              <div className="text-2xl font-black text-green-600">Rp {omzet.toLocaleString()}</div>
+              <div className="text-2xl font-semibold text-green-600">Rp {omzet.toLocaleString()}</div>
             </div>
-            <div className="border border-gray-200 rounded-2xl p-5 bg-[#f0f4ff]">
-              <p className="text-xs font-bold text-[#1c5ffb] mb-1 uppercase tracking-wider">Total Saldo Kas (Realtime)</p>
-              <div className="text-2xl font-black text-[#1c5ffb]">Rp {saldoKas.toLocaleString()}</div>
+            <div className="border border-gray-200 rounded-xl p-5 bg-[#f0f4ff]">
+              <p className="text-xs font-bold text-slate-900 mb-1 uppercase tracking-wider">Total Saldo Kas (Realtime)</p>
+              <div className="text-2xl font-semibold text-slate-900">Rp {saldoKas.toLocaleString()}</div>
             </div>
-            <div className="border border-gray-200 rounded-2xl p-5">
+            <div className="border border-gray-200 rounded-xl p-5">
               <p className="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Laba Bersih Toko</p>
-              <div className="text-2xl font-black text-emerald-700">Rp {labaKotor.toLocaleString()}</div>
+              <div className="text-2xl font-semibold text-emerald-700">Rp {labaKotor.toLocaleString()}</div>
             </div>
           </div>
         </section>
@@ -197,7 +197,7 @@ export default function LaporanUtamaPage() {
               <Button type="button" variant="outline" onClick={() => setIsFilterModalOpen(false)}>
                 Batal
               </Button>
-              <Button onClick={handleApplyFilter} className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
+              <Button onClick={handleApplyFilter} className="bg-slate-900 hover:bg-slate-800 text-white font-bold">
                 Terapkan Filter
               </Button>
             </DialogFooter>

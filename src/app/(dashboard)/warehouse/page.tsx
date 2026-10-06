@@ -171,7 +171,7 @@ export default function WarehousePage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Produk Gudang Barang Bermasalah</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Produk Gudang Barang Bermasalah</h1>
           <p className="text-gray-500 mt-1">Status dan tempat untuk barang rusak, retur, expired, dll yang menunggu keputusan.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -193,28 +193,28 @@ export default function WarehousePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="rounded-3xl border-gray-200 shadow-sm border p-6 flex items-center gap-4 bg-white">
-          <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center font-black text-2xl">
+        <Card className="rounded-xl border-gray-200 shadow-sm border p-6 flex items-center gap-4 bg-white">
+          <div className="w-14 h-14 rounded-xl bg-red-50 text-red-500 flex items-center justify-center font-semibold text-2xl">
             {totalPcs}
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Pcs di Gudang</p>
-            <p className="text-2xl font-black text-gray-900">Menunggu Keputusan Owner</p>
+            <p className="text-2xl font-semibold text-gray-900">Menunggu Keputusan Owner</p>
           </div>
         </Card>
 
-        <Card className="rounded-3xl border-gray-200 shadow-sm border p-6 flex items-center gap-4 bg-white">
-          <div className="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center font-black text-xl">
+        <Card className="rounded-xl border-gray-200 shadow-sm border p-6 flex items-center gap-4 bg-white">
+          <div className="w-14 h-14 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center font-semibold text-xl">
             Rp
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Nilai Modal Tertahan</p>
-            <p className="text-2xl font-black text-gray-900">Rp {totalModal.toLocaleString()}</p>
+            <p className="text-2xl font-semibold text-gray-900">Rp {totalModal.toLocaleString()}</p>
           </div>
         </Card>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <div className="p-4 border-b border-gray-100">
           <div className="relative max-w-md">
             <input 
@@ -249,7 +249,7 @@ export default function WarehousePage() {
             ) : (
               filtered.map((item) => (
                 <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                  <TableCell className="px-6 py-4 font-mono font-bold text-xs text-blue-600">{item.code}</TableCell>
+                  <TableCell className="px-6 py-4 font-mono font-bold text-xs text-slate-900">{item.code}</TableCell>
                   <TableCell className="px-6 py-4">
                     <p className="font-bold text-gray-900 text-sm">{item.name}</p>
                     <p className="text-xs text-red-500 font-medium mt-0.5">{item.issue}</p>
@@ -259,8 +259,8 @@ export default function WarehousePage() {
                       {item.category}
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center font-black text-gray-900 text-sm">{item.qty} pcs</TableCell>
-                  <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-sm">
+                  <TableCell className="px-6 py-4 text-center font-semibold text-gray-900 text-sm">{item.qty} pcs</TableCell>
+                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">
                     Rp {(item.qty * item.costPrice).toLocaleString()}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
@@ -268,7 +268,7 @@ export default function WarehousePage() {
                       <Button
                         size="sm"
                         onClick={() => handleResolve(item.id, "Klaim Retur Pabrik")}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-7 px-2.5 rounded-lg"
+                        className="bg-blue-600 hover:bg-slate-800 text-white font-bold text-xs h-7 px-2.5 rounded-lg"
                       >
                         Klaim Pabrik
                       </Button>

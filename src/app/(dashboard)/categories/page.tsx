@@ -134,18 +134,18 @@ export default function CategoriesPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen Kategori</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Manajemen Kategori</h1>
           <p className="text-gray-500 mt-1">Atur kategori barang dan target margin profit Anda.</p>
         </div>
         <Button 
           onClick={handleOpenAddModal}
-          className="bg-[#1f5ffe] hover:bg-blue-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11"
+          className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-5 font-semibold shadow-sm h-11"
         >
           <Plus className="h-4 w-4 mr-2" /> Tambah Kategori
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b border-gray-100">
@@ -183,7 +183,7 @@ export default function CategoriesPage() {
                   <TableCell className="text-right px-6 py-4">
                     <button 
                       onClick={() => handleOpenEditModal(cat)}
-                      className="text-[#1c5ffb] hover:text-blue-700 transition-colors p-2"
+                      className="text-slate-900 hover:text-slate-700 transition-colors p-2"
                       title="Edit"
                     >
                       <Edit2 className="h-4 w-4" />
@@ -238,7 +238,7 @@ export default function CategoriesPage() {
                 id="use-expired" 
                 checked={useExpired}
                 onChange={(e) => setUseExpired(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded"
+                className="w-4 h-4 text-slate-900 rounded"
               />
               <label htmlFor="use-expired" className="text-sm font-bold text-gray-700 cursor-pointer">
                 Lacak Tanggal Kadaluwarsa (Expired Date)
@@ -256,7 +256,7 @@ export default function CategoriesPage() {
               </Button>
               <Button 
                 type="submit" 
-                className="bg-[#1c5ffb] hover:bg-blue-700 text-white"
+                className="bg-slate-900 hover:bg-slate-800 text-white"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Menyimpan..." : "Simpan Kategori"}

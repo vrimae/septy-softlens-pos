@@ -151,7 +151,7 @@ export default function ReturnsPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Retur / Tukar Barang</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Retur / Tukar Barang</h1>
           <p className="text-gray-500 mt-1">Kebijakan retur fleksibel. Hanya melayani tukar barang.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -165,14 +165,14 @@ export default function ReturnsPage() {
           </Button>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+            className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" /> Proses Retur / Tukar
           </Button>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1 mt-4">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1 mt-4">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
@@ -187,7 +187,7 @@ export default function ReturnsPage() {
           <TableBody>
             {returnsList.map((r) => (
               <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                <TableCell className="px-6 py-4 font-mono font-bold text-blue-600 text-xs">{r.id}</TableCell>
+                <TableCell className="px-6 py-4 font-mono font-bold text-slate-900 text-xs">{r.id}</TableCell>
                 <TableCell className="px-6 py-4 text-xs font-medium text-gray-600">{r.date}</TableCell>
                 <TableCell className="px-6 py-4 text-center">
                   <span className="font-mono text-xs font-bold bg-gray-100 px-2 py-1 rounded text-gray-700">
@@ -202,7 +202,7 @@ export default function ReturnsPage() {
                   <p className="font-bold text-emerald-600 text-xs">{r.exchangeWith}</p>
                   <p className="text-[10px] text-gray-400">Menuju: {r.destination}</p>
                 </TableCell>
-                <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-sm">
+                <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">
                   {r.difference === 0 ? "Rp 0 (Pas)" : `Rp ${r.difference.toLocaleString()}`}
                 </TableCell>
               </TableRow>
@@ -303,7 +303,7 @@ export default function ReturnsPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
+              <Button type="submit" disabled={isSubmitting} className="bg-slate-900 hover:bg-slate-800 text-white font-bold">
                 {isSubmitting ? "Menyimpan..." : "Simpan Retur"}
               </Button>
             </DialogFooter>

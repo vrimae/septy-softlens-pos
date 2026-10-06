@@ -119,50 +119,50 @@ export default function UsersPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen Karyawan</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Manajemen Karyawan</h1>
           <p className="text-gray-500 mt-1">Atur wewenang karyawan sesuai kebijakan toko.</p>
         </div>
         <Button 
           onClick={handleOpenAdd}
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
         >
           <Plus className="h-4 w-4" /> Tambah Karyawan Baru
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex justify-between items-center">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex justify-between items-center">
           <div>
             <p className="text-sm font-bold text-gray-600 mb-1">Total pegawai</p>
-            <div className="text-4xl font-black text-gray-900">{totalEmployees}</div>
+            <div className="text-4xl font-semibold text-gray-900">{totalEmployees}</div>
           </div>
-          <div className="w-14 h-14 bg-[#f0f4ff] rounded-2xl flex items-center justify-center text-[#1c5ffb]">
+          <div className="w-14 h-14 bg-[#f0f4ff] rounded-xl flex items-center justify-center text-slate-900">
             <Users className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex justify-between items-center">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex justify-between items-center">
           <div>
             <p className="text-sm font-bold text-gray-600 mb-1">Aktif</p>
-            <div className="text-4xl font-black text-gray-900">{activeEmployees}</div>
+            <div className="text-4xl font-semibold text-gray-900">{activeEmployees}</div>
           </div>
-          <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-500">
+          <div className="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center text-green-500">
             <UserCheck className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex justify-between items-center">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex justify-between items-center">
           <div>
             <p className="text-sm font-bold text-gray-600 mb-1">Tidak aktif</p>
-            <div className="text-4xl font-black text-gray-900">{inactiveEmployees}</div>
+            <div className="text-4xl font-semibold text-gray-900">{inactiveEmployees}</div>
           </div>
-          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500">
+          <div className="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
             <UserX className="h-6 w-6" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
@@ -182,11 +182,11 @@ export default function UsersPage() {
                 </TableCell>
                 <TableCell className="px-6 py-4 font-bold text-gray-700">{emp.branch}</TableCell>
                 <TableCell className="px-6 py-4 text-center">
-                  <span className={`font-black text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full ${
+                  <span className={`font-semibold text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full ${
                     emp.role === "OWNER" 
                       ? "bg-purple-100 text-purple-600" 
                       : emp.role === "ADMIN" 
-                      ? "bg-blue-100 text-blue-600" 
+                      ? "bg-blue-100 text-slate-900" 
                       : "bg-emerald-100 text-emerald-700"
                   }`}>
                     {emp.role}
@@ -200,7 +200,7 @@ export default function UsersPage() {
                 <TableCell className="px-6 py-4 text-right">
                   <button 
                     onClick={() => handleOpenEdit(emp)}
-                    className="text-[#1c5ffb] font-bold text-sm mr-4 hover:underline"
+                    className="text-slate-900 font-bold text-sm mr-4 hover:underline"
                   >
                     Edit
                   </button>
@@ -297,7 +297,7 @@ export default function UsersPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
+              <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white font-bold">
                 {editingId ? "Perbarui Karyawan" : "Simpan Karyawan"}
               </Button>
             </DialogFooter>

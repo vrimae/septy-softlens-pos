@@ -12,7 +12,7 @@ export default function DashboardPage() {
     <div className="space-y-8 max-w-6xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Halo, {role === 'owner' ? 'Owner' : 'Kasir'}!</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Halo, {role === 'owner' ? 'Owner' : 'Kasir'}!</h1>
           <p className="text-gray-500 mt-1">Ringkasan aktivitas dan performa sistem.</p>
         </div>
         
@@ -24,49 +24,49 @@ export default function DashboardPage() {
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="rounded-2xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 shadow-sm">
           <CardContent className="p-6 space-y-4">
-            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-500 font-medium text-xs rounded-lg">Omzet</span>
+            <span className="inline-block px-3 py-1 bg-slate-100 text-slate-600 font-medium text-xs rounded-lg">Omzet</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">TOTAL OMZET BULAN INI</p>
-              <div className="text-3xl font-black text-gray-900">Rp 0</div>
+              <div className="text-2xl font-semibold text-gray-900">Rp 0</div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="rounded-2xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <span className="inline-block px-3 py-1 bg-green-50 text-green-500 font-medium text-xs rounded-lg">Laba</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">LABA KOTOR BULAN INI</p>
-              <div className="text-3xl font-black text-gray-900">Rp 0</div>
+              <div className="text-2xl font-semibold text-gray-900">Rp 0</div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="rounded-2xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <span className="inline-block px-3 py-1 bg-purple-50 text-purple-500 font-medium text-xs rounded-lg">Transaksi</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">TOTAL TRANSAKSI</p>
-              <div className="text-3xl font-black text-gray-900">0 <span className="text-xl">Trx</span></div>
+              <div className="text-2xl font-semibold text-gray-900">0 <span className="text-xl">Trx</span></div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <span className="inline-block px-3 py-1 bg-orange-50 text-orange-500 font-medium text-xs rounded-lg">Upselling</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">TOTAL UPSELLING</p>
-              <div className="text-3xl font-black text-gray-900">0 <span className="text-xl">Transaksi</span></div>
+              <div className="text-2xl font-semibold text-gray-900">0 <span className="text-xl">Transaksi</span></div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Line Chart Placeholder */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h3 className="text-lg font-bold text-gray-800 mb-6">Grafik Laba Kotor Harian (Bulan Ini)</h3>
         <div className="h-64 border-l border-b border-gray-300 relative w-full flex items-end">
           {/* Y Axis labels */}
@@ -101,7 +101,7 @@ export default function DashboardPage() {
       </div>
 
       {/* SP Ranking Table */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div className="bg-[#ff4f20] px-6 py-4 text-white font-bold text-lg">
           Papan Peringkat SP (Bulan Ini)
         </div>

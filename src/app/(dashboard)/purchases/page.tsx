@@ -162,7 +162,7 @@ export default function PurchasesPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Pembelian Barang (PO)</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Pembelian Barang (PO)</h1>
           <p className="text-gray-500 mt-1">Catat belanja stok dari supplier pabrik secara lengkap.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -176,14 +176,14 @@ export default function PurchasesPage() {
           </Button>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-[#00a84e] hover:bg-green-600 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" /> Tambah Pembelian Baru
           </Button>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1 mt-4">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1 mt-4">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
@@ -197,21 +197,21 @@ export default function PurchasesPage() {
           <TableBody>
             {purchases.map((p) => (
               <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                <TableCell className="px-6 py-4 font-bold text-blue-600 font-mono text-sm">{p.poNumber}</TableCell>
+                <TableCell className="px-6 py-4 font-bold text-slate-900 font-mono text-sm">{p.poNumber}</TableCell>
                 <TableCell className="px-6 py-4 text-center">
                   <p className="font-bold text-gray-900 text-sm">{p.supplier}</p>
                   <p className="text-xs text-gray-400">Inv: {p.invoice}</p>
                 </TableCell>
                 <TableCell className="px-6 py-4 text-center text-xs text-gray-600 font-medium">{p.date}</TableCell>
                 <TableCell className="px-6 py-4 text-center">
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
                     p.status === "LUNAS" ? "bg-green-100 text-green-700" : p.status === "UTANG" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"
                   }`}>
                     {p.status}
                   </span>
                   <p className="text-[11px] text-gray-400 mt-1">{p.paymentMethod}</p>
                 </TableCell>
-                <TableCell className="px-6 py-4 text-right font-black text-gray-900 text-base">
+                <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-base">
                   Rp {p.totalCost.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -290,7 +290,7 @@ export default function PurchasesPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-[#00a84e] hover:bg-green-600 text-white font-bold">
+              <Button type="submit" disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
                 {isSubmitting ? "Menyimpan..." : "Simpan Pembelian"}
               </Button>
             </DialogFooter>

@@ -76,7 +76,7 @@ export default function RiwayatTransaksiPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Riwayat Transaksi</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Riwayat Transaksi</h1>
           <p className="text-gray-500 mt-1">Pantau seluruh riwayat penjualan dan cetak ulang struk.</p>
         </div>
         <button
@@ -87,7 +87,7 @@ export default function RiwayatTransaksiPage() {
         </button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full max-w-md">
             <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
@@ -120,7 +120,7 @@ export default function RiwayatTransaksiPage() {
             {loading ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-16 text-gray-400">
-                  <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-blue-500" />
+                  <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-slate-600" />
                   Memuat riwayat transaksi...
                 </TableCell>
               </TableRow>
@@ -149,11 +149,11 @@ export default function RiwayatTransaksiPage() {
                     {t.customers?.name || "Umum / Regular"}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md">
+                    <span className="bg-slate-100 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md">
                       {t.payment_method}
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-right font-black text-gray-900">
+                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900">
                     Rp {t.total_amount?.toLocaleString()}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
@@ -165,7 +165,7 @@ export default function RiwayatTransaksiPage() {
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => setSelectedTrx(t)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                         title="Lihat Detail Struk"
                       >
                         <Eye className="h-4 w-4" />
@@ -195,7 +195,7 @@ export default function RiwayatTransaksiPage() {
           {selectedTrx && (
             <div className="space-y-4 pt-2 text-sm">
               <div className="border-b pb-3 text-center">
-                <h3 className="font-extrabold text-base">Septy Softlens</h3>
+                <h3 className="font-semibold text-base">Septy Softlens</h3>
                 <p className="text-xs text-gray-400">Jl. Contoh Alamat No 123</p>
                 <p className="text-xs font-mono font-bold mt-1 text-gray-700">{selectedTrx.receipt_number}</p>
                 <p className="text-[11px] text-gray-400">
@@ -227,9 +227,9 @@ export default function RiwayatTransaksiPage() {
                 ))}
               </div>
 
-              <div className="flex justify-between font-black text-base pt-1">
+              <div className="flex justify-between font-semibold text-base pt-1">
                 <span>Total Akhir:</span>
-                <span className="text-[#1c5ffb]">Rp {selectedTrx.total_amount?.toLocaleString()}</span>
+                <span className="text-slate-900">Rp {selectedTrx.total_amount?.toLocaleString()}</span>
               </div>
 
               <DialogFooter className="pt-2">
@@ -238,7 +238,7 @@ export default function RiwayatTransaksiPage() {
                 </Button>
                 <Button 
                   onClick={() => window.print()}
-                  className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold flex items-center gap-2"
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center gap-2"
                 >
                   <Printer className="h-4 w-4" /> Cetak Struk
                 </Button>

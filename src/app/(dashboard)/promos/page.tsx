@@ -82,18 +82,18 @@ export default function PromosPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Master Promo</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Master Promo</h1>
           <p className="text-gray-500 mt-1">Kelola daftar promo diskon, harga khusus, dan Beli X Gratis Y.</p>
         </div>
         <Button 
           onClick={handleOpenAdd}
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
         >
           <Plus className="h-4 w-4" /> Tambah Promo
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
             <TableRow className="bg-white hover:bg-white border-b border-gray-100">
@@ -116,7 +116,7 @@ export default function PromosPage() {
               promos.map((p) => (
                 <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <TableCell className="px-6 py-4">
-                    <span className="bg-green-100 text-green-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full">
+                    <span className="bg-green-100 text-green-700 text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full">
                       {p.status}
                     </span>
                   </TableCell>
@@ -126,7 +126,7 @@ export default function PromosPage() {
                   <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-600">
                     {p.type}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs text-blue-600 font-bold">
+                  <TableCell className="px-6 py-4 text-center text-xs text-slate-900 font-bold">
                     {p.target}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center text-xs text-gray-500 font-medium">
@@ -204,7 +204,7 @@ export default function PromosPage() {
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold">
+              <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white font-bold">
                 Simpan Promo
               </Button>
             </DialogFooter>

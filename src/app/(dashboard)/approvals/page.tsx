@@ -47,20 +47,20 @@ export default function ApprovalsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6 mb-8">
-        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">Pusat Approval Owner</h1>
+      <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 tracking-normal mb-1">Pusat Approval Owner</h1>
         <p className="text-gray-500 text-sm">Persetujuan untuk tindakan administratif yang membutuhkan wewenang Owner.</p>
       </div>
 
       <div className="space-y-4">
         {/* Card A: Harga di bawah Target Margin */}
-        <Card className="rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
+        <Card className="rounded-xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
           <div 
             onClick={() => setExpandedCat(expandedCat === "price" ? null : "price")}
             className="flex justify-between items-center cursor-pointer select-none"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center font-black text-sm">A</div>
+              <div className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center font-semibold text-sm">A</div>
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Harga di bawah Target Margin</h2>
                 <p className="text-xs text-gray-400">Pengajuan potongan harga oleh kasir</p>
@@ -77,7 +77,7 @@ export default function ApprovalsPage() {
           {expandedCat === "price" && (
             <div className="mt-5 pt-4 border-t border-gray-100 space-y-3">
               {items.filter(it => it.category === "price").map(item => (
-                <div key={item.id} className="p-4 bg-gray-50 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div key={item.id} className="p-4 bg-gray-50 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-gray-900 text-sm">{item.title}</span>
@@ -118,13 +118,13 @@ export default function ApprovalsPage() {
         </Card>
 
         {/* Card ! : Notifikasi Pengeluaran Kasir */}
-        <Card className="rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
+        <Card className="rounded-xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
           <div 
             onClick={() => setExpandedCat(expandedCat === "expense" ? null : "expense")}
             className="flex justify-between items-center cursor-pointer select-none"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-sm">!</div>
+              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-semibold text-sm">!</div>
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Notifikasi Pengeluaran Kasir</h2>
                 <p className="text-xs text-gray-400">Persetujuan biaya operasional mendadak</p>
@@ -141,7 +141,7 @@ export default function ApprovalsPage() {
           {expandedCat === "expense" && (
             <div className="mt-5 pt-4 border-t border-gray-100 space-y-3">
               {items.filter(it => it.category === "expense").map(item => (
-                <div key={item.id} className="p-4 bg-gray-50 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div key={item.id} className="p-4 bg-gray-50 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div>
                     <span className="font-bold text-gray-900 text-sm">{item.title}</span>
                     <p className="text-xs text-gray-600 mt-1">{item.details}</p>
@@ -179,10 +179,10 @@ export default function ApprovalsPage() {
         </Card>
 
         {/* Card B: Selisih Kas (Tutup Shift) */}
-        <Card className="rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
+        <Card className="rounded-xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
           <div className="flex justify-between items-center cursor-pointer select-none">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center font-black text-sm">B</div>
+              <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center font-semibold text-sm">B</div>
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Selisih Kas (Tutup Shift)</h2>
                 <p className="text-xs text-gray-400">Pemeriksaan selisih kas fisik vs sistem</p>
@@ -195,10 +195,10 @@ export default function ApprovalsPage() {
         </Card>
 
         {/* Card C: Gudang Barang Bermasalah */}
-        <Card className="rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
+        <Card className="rounded-xl border border-gray-200 shadow-sm overflow-hidden p-6 transition-colors">
           <div className="flex justify-between items-center cursor-pointer select-none">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center font-black text-sm">C</div>
+              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center font-semibold text-sm">C</div>
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Gudang (Barang Bermasalah)</h2>
                 <p className="text-xs text-gray-400">Persetujuan pemusnahan atau klaim retur pabrik</p>

@@ -90,18 +90,18 @@ export default function AuditTrailPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Audit Trail</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Audit Trail</h1>
           <p className="text-gray-500 mt-1">Catatan seluruh aktivitas penting dalam sistem. Data ini tidak dapat dihapus oleh siapa pun.</p>
         </div>
         <Button 
           onClick={handleAddSampleAudit}
-          className="bg-[#1c5ffb] hover:bg-blue-700 text-white font-bold rounded-xl px-5 h-11 flex items-center gap-2 shadow-sm shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-5 h-11 flex items-center gap-2 shadow-sm shrink-0"
         >
           <Plus className="h-4 w-4" /> Catat Aktivitas Sistem
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-2">Cari</label>
@@ -173,7 +173,7 @@ export default function AuditTrailPage() {
           Menampilkan <span className="font-bold text-gray-900">{filteredLogs.length}</span> dari <span className="font-bold text-gray-900">{logs.length}</span> catatan audit.
         </p>
         
-        <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden p-1">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
           <Table>
             <TableHeader>
               <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
@@ -200,7 +200,7 @@ export default function AuditTrailPage() {
                     <TableCell className="px-6 py-4 text-center font-mono text-xs text-gray-500">{log.time}</TableCell>
                     <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700">{log.user}</TableCell>
                     <TableCell className="px-6 py-4 text-center">
-                      <span className="bg-blue-50 text-blue-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full">
+                      <span className="bg-slate-100 text-blue-700 text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full">
                         {log.activity}
                       </span>
                     </TableCell>

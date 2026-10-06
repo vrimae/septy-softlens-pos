@@ -72,18 +72,18 @@ export default function RegisterPage() {
         
         {/* Header Gradient */}
         <div className="bg-gradient-to-b from-[#1b62fc] to-[#3a3beb] pt-9 pb-8 text-center text-white relative">
-          <div className="w-[74px] h-[74px] bg-white rounded-full mx-auto flex flex-col items-center justify-center mb-3.5 shadow-md">
-            <span className="text-[#f45b78] font-bold text-2xl tracking-tight leading-none italic font-serif">
+          <div className="w-[74px] h-[74px] bg-white rounded-full mx-auto flex flex-col items-center justify-center mb-3.5 shadow-sm">
+            <span className="text-[#f45b78] font-bold text-2xl tracking-normal leading-none italic font-serif">
               Septy
             </span>
             <span className="text-[#f45b78] text-[9px] font-semibold tracking-wider uppercase leading-tight mt-0.5 opacity-80">
               softlens
             </span>
           </div>
-          <h1 className="text-[23px] font-black tracking-tight text-white">
+          <h1 className="text-[23px] font-semibold tracking-normal text-white">
             Septy Softlens
           </h1>
-          <p className="text-blue-100/90 text-[12px] font-medium tracking-wide mt-0.5">
+          <p className="text-slate-300/90 text-[12px] font-medium tracking-wide mt-0.5">
             Otentikasi Mesin Kasir (Device Login)
           </p>
         </div>
