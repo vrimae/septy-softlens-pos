@@ -28,7 +28,7 @@ import { useAuth } from "@/components/providers/auth-provider";
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, role } = useAuth();
+  const { activeProfile, role } = useAuth();
   const [searchMenu, setSearchMenu] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("Semua Cabang (Global)");
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
@@ -63,7 +63,7 @@ export function Sidebar() {
     setOpenMenus(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async () => { router.push("/select-profile"); return; 
     await supabase.auth.signOut();
     router.push("/login");
   };
@@ -291,10 +291,10 @@ export function Sidebar() {
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 capitalize truncate max-w-[130px]">
-                {user?.email?.split('@')[0] || role || 'Owner'}
+                {activeProfile?.full_name || 'POS User'}
               </p>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                {role || 'OWNER'}
+                {role?.toUpperCase() || 'KASIR'}
               </p>
             </div>
           </div>
