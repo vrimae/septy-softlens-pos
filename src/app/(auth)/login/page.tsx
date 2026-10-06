@@ -63,6 +63,7 @@ export default function LoginPage() {
             full_name: fullName.trim() || "Owner",
             role: "OWNER",
             status: "ACTIVE",
+            email: email.trim(),
           });
         }
 
