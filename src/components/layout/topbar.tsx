@@ -18,7 +18,12 @@ export function Topbar() {
   return (
     <header className="h-16 bg-white border-b flex items-center justify-between px-4 md:px-6 z-10">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="md:hidden"
+          onClick={() => alert("Versi mobile dari dashboard saat ini sedang dioptimalkan. Silakan gunakan perangkat Desktop/Tablet untuk pengalaman terbaik.")}
+        >
           <Menu className="h-5 w-5" />
         </Button>
       </div>

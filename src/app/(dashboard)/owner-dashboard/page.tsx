@@ -47,7 +47,10 @@ export default function OwnerDashboardPage() {
         <div className="relative z-10">
           <h1 className="text-3xl font-extrabold mb-2 tracking-tight">Executive Dashboard (Owner)</h1>
           <p className="text-blue-100 font-medium mb-6">Pusat kendali komprehensif aset, arus kas, dan performa cabang.</p>
-          <button className="bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-bold px-4 py-2.5 rounded-lg backdrop-blur-sm">
+          <button 
+            onClick={() => alert("Menampilkan data Real Time dari semua cabang aktif...")}
+            className="bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-bold px-4 py-2.5 rounded-lg backdrop-blur-sm"
+          >
             Menampilkan Data: Semua Cabang (REAL TIME)
           </button>
         </div>

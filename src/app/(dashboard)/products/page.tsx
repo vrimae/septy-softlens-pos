@@ -134,7 +134,10 @@ export default function ProductsPage() {
           <Button onClick={handleOpenAddModal} className="bg-[#00a84e] hover:bg-green-600 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
             <Plus className="h-4 w-4 mr-2" /> Tambah Produk Baru
           </Button>
-          <Button className="bg-[#2662fa] hover:bg-blue-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
+          <Button 
+            onClick={() => alert("Fitur Upload Excel sedang dalam antrean pembaruan berikutnya. Terima kasih atas kesabarannya!")}
+            className="bg-[#2662fa] hover:bg-blue-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11"
+          >
             <UploadCloud className="h-4 w-4 mr-2" /> Upload Excel
           </Button>
         </div>
