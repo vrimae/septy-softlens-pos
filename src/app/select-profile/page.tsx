@@ -24,7 +24,7 @@ export default function SelectProfilePage() {
       try {
         const data = await usersService.getAllUsers();
         // Only show active profiles
-        setProfiles(data.filter((p: any) => p.is_active));
+        setProfiles(data.filter((p: any) => p.is_active !== false && p.status !== 'INACTIVE'));
       } catch (err) {
         console.error("Failed to load profiles:", err);
       } finally {
@@ -37,10 +37,14 @@ export default function SelectProfilePage() {
   const handleSelectProfile = (profile: any) => {
     // Store in localStorage
     localStorage.setItem("septy_active_profile", JSON.stringify(profile));
-    auditService.log("LOGIN_SISTEM", { reason: "Login perangkat kasir: " + profile.full_name });
+    auditService.log("LOGIN_SISTEM", { reason: "Login perangkat kasir: " + profile.full_name }).catch(console.error);
     
-    // Redirect to dashboard
-    router.push("/");
+    // Redirect directly based on role to avoid flashes or errors
+    if (profile.role?.toUpperCase() === 'OWNER') {
+      router.push("/");
+    } else {
+      router.push("/pos");
+    }
   };
 
   const handleLogoutMesin = async () => {
