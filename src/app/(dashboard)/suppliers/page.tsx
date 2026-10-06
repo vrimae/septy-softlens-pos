@@ -213,14 +213,14 @@ export default function SuppliersPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Laporan & Utang Supplier</h1>
-          <p className="text-gray-500 mt-1">Kelola data pembelian, riwayat harga, dan cicilan utang.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Laporan & Utang Supplier</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola data pembelian, riwayat harga, dan cicilan utang.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={fetchDebts}
             variant="outline"
-            className="rounded-xl h-11 px-3 border-gray-200"
+            className="rounded-xl h-11 px-3 border-gray-200 dark:border-gray-800"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -244,14 +244,14 @@ export default function SuppliersPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-gray-200 shadow-sm bg-white">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm bg-white dark:bg-[#13151a]">
           <CardContent className="p-6">
-            <h3 className="text-sm font-bold text-gray-500 mb-2">Filter Supplier</h3>
+            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">Filter Supplier</h3>
             <div className="relative">
               <select 
                 value={selectedSupplierFilter}
                 onChange={(e) => setSelectedSupplierFilter(e.target.value)}
-                className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-700 font-semibold text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full appearance-none bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 pr-10 text-gray-700 dark:text-gray-300 font-semibold text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option value="Semua Supplier">Semua Supplier</option>
                 {Array.from(new Set(debts.map((d) => d.supplier))).map((sup) => (
@@ -264,14 +264,14 @@ export default function SuppliersPage() {
         </Card>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex border-b border-gray-100 px-4">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+        <div className="flex border-b border-gray-100 dark:border-gray-800/50 px-4">
           <button 
             onClick={() => setActiveTab("utang")}
             className={`px-6 py-4 text-sm font-bold transition-all border-b-2 ${
               activeTab === "utang"
                 ? "text-red-500 border-red-500 bg-red-50/30"
-                : "text-gray-400 hover:text-gray-600 border-transparent"
+                : "text-gray-400 hover:text-gray-600 dark:text-gray-400 border-transparent"
             }`}
           >
             Tagihan & Utang
@@ -280,8 +280,8 @@ export default function SuppliersPage() {
             onClick={() => setActiveTab("riwayat")}
             className={`px-6 py-4 text-sm font-bold transition-all border-b-2 ${
               activeTab === "riwayat"
-                ? "text-slate-900 border-blue-600 bg-slate-100/30"
-                : "text-gray-400 hover:text-gray-600 border-transparent"
+                ? "text-slate-900 dark:text-slate-100 border-blue-600 bg-slate-100 dark:bg-[#2a303c]/30"
+                : "text-gray-400 hover:text-gray-600 dark:text-gray-400 border-transparent"
             }`}
           >
             Laporan Riwayat Pembelian
@@ -291,13 +291,13 @@ export default function SuppliersPage() {
         <div className="p-1">
           <Table>
             <TableHeader>
-              <TableRow className="bg-white hover:bg-white border-b-0">
-                <TableHead className="font-bold text-gray-700 py-4 px-6">PO / Supplier</TableHead>
-                <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Tanggal & Jatuh Tempo</TableHead>
-                <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Total Utang</TableHead>
-                <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Sisa Utang</TableHead>
-                <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Status</TableHead>
-                <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
+              <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0">
+                <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">PO / Supplier</TableHead>
+                <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Tanggal & Jatuh Tempo</TableHead>
+                <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Total Utang</TableHead>
+                <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Sisa Utang</TableHead>
+                <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Status</TableHead>
+                <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -309,16 +309,16 @@ export default function SuppliersPage() {
                 </TableRow>
               ) : (
                 filteredDebts.map((d) => (
-                  <TableRow key={d.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <TableRow key={d.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
                     <TableCell className="px-6 py-4">
-                      <p className="font-mono text-xs font-bold text-slate-900">{d.poNumber}</p>
-                      <p className="font-bold text-gray-900 text-sm">{d.supplier}</p>
+                      <p className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">{d.poNumber}</p>
+                      <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{d.supplier}</p>
                     </TableCell>
                     <TableCell className="px-6 py-4 text-center">
-                      <p className="text-xs text-gray-700 font-medium">{d.date}</p>
+                      <p className="text-xs text-gray-700 dark:text-gray-300 font-medium">{d.date}</p>
                       <p className="text-[11px] text-red-500 font-bold mt-0.5">Tempo: {d.dueDate}</p>
                     </TableCell>
-                    <TableCell className="px-6 py-4 text-center text-sm font-semibold text-gray-800">
+                    <TableCell className="px-6 py-4 text-center text-sm font-semibold text-gray-800 dark:text-gray-200">
                       Rp {d.totalDebt.toLocaleString()}
                     </TableCell>
                     <TableCell className="px-6 py-4 text-center text-sm font-semibold text-red-600">
@@ -335,7 +335,7 @@ export default function SuppliersPage() {
                       {d.remainingDebt > 0 ? (
                         <button
                           onClick={() => handlePayInstallment(d.id)}
-                          className="bg-slate-100 hover:bg-blue-100 text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5"
+                          className="bg-slate-100 dark:bg-[#2a303c] hover:bg-blue-100 text-slate-900 dark:text-slate-100 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5"
                         >
                           <CreditCard className="h-3.5 w-3.5" /> Bayar Cicilan
                         </button>
@@ -359,36 +359,36 @@ export default function SuppliersPage() {
           </DialogHeader>
           <form onSubmit={handleAddDebt} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Supplier</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Supplier</label>
               <input
                 type="text"
                 placeholder="Contoh: PT Optik Sentosa Abadi"
                 value={supplier}
                 onChange={(e) => setSupplier(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Total Utang (Rp)</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Total Utang (Rp)</label>
               <input
                 type="number"
                 min="1"
                 placeholder="Contoh: 3000000"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Jatuh Tempo</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Jatuh Tempo</label>
               <input
                 type="text"
                 placeholder="Contoh: 30 Hari Lagi / 15 Nov 2026"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <DialogFooter className="pt-3 border-t">

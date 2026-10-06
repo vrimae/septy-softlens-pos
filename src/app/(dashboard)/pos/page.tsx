@@ -237,8 +237,8 @@ export default function PosPage() {
       <div className="flex-1 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Mesin Kasir (POS)</h1>
-            <p className="text-gray-500 text-sm mt-1">Klik produk untuk menambah ke keranjang belanja.</p>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Mesin Kasir (POS)</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Klik produk untuk menambah ke keranjang belanja.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
             <Button 
@@ -255,7 +255,7 @@ export default function PosPage() {
                 value={barcodeScan}
                 onChange={(e) => setBarcodeScan(e.target.value)}
                 placeholder="Scan Barcode & Enter..." 
-                className="pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[210px]"
+                className="pl-9 pr-4 py-2.5 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[210px]"
               />
               <ScanLine className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             </form>
@@ -270,7 +270,7 @@ export default function PosPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Cari nama atau kode produk..." 
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
         
@@ -280,14 +280,14 @@ export default function PosPage() {
             <div 
               key={product.id} 
               onClick={() => addToCart(product)}
-              className="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-slate-900 hover:shadow-sm transition-all flex flex-col justify-between min-h-[130px]"
+              className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl p-4 cursor-pointer hover:border-slate-900 hover:shadow-sm transition-all flex flex-col justify-between min-h-[130px]"
             >
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{product.product_code}</span>
-                <h3 className="font-bold text-gray-900 text-sm mt-1 line-clamp-2">{product.name}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm mt-1 line-clamp-2">{product.name}</h3>
               </div>
               <div className="mt-3 flex justify-between items-end">
-                <span className="font-semibold text-slate-900 text-sm">Rp {product.price_regular.toLocaleString()}</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm">Rp {product.price_regular.toLocaleString()}</span>
                 <span className={`text-xs font-bold ${product.stock_global > 0 ? 'text-green-500' : 'text-red-500'}`}>
                   Stok: {product.stock_global}
                 </span>
@@ -295,7 +295,7 @@ export default function PosPage() {
             </div>
           ))}
           {filteredProducts.length === 0 && (
-            <div className="col-span-full py-20 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">
+            <div className="col-span-full py-20 text-center text-gray-400 bg-white dark:bg-[#13151a] rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
               Tidak ada produk ditemukan.
             </div>
           )}
@@ -304,12 +304,12 @@ export default function PosPage() {
 
       {/* Right Area (Cart) */}
       <div className="w-full lg:w-[400px] shrink-0">
-        <div className="bg-[#f8fafc] rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-6rem)] sticky top-6">
+        <div className="bg-[#f8fafc] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-6rem)] sticky top-6">
           {/* Cart Header */}
-          <div className="px-5 py-4 border-b border-gray-200 bg-white flex justify-between items-center">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#13151a] flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5 text-gray-700" />
-              <h2 className="font-bold text-gray-900 text-lg">Keranjang Belanja</h2>
+              <ShoppingCart className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <h2 className="font-bold text-gray-900 dark:text-gray-100 text-lg">Keranjang Belanja</h2>
             </div>
             <div className="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full">
               {cart.reduce((a, b) => a + b.qty, 0)} item
@@ -317,7 +317,7 @@ export default function PosPage() {
           </div>
           
           {/* Cart Items Area */}
-          <div className="flex-1 overflow-y-auto p-5 bg-white space-y-3">
+          <div className="flex-1 overflow-y-auto p-5 bg-white dark:bg-[#13151a] space-y-3">
             {cart.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-400 font-medium text-sm">Belum ada barang di keranjang</p>
@@ -326,13 +326,13 @@ export default function PosPage() {
               cart.map(item => (
                 <div key={item.id} className="flex justify-between items-center pb-3 border-b border-gray-50 last:border-0">
                   <div className="flex-1 pr-4">
-                    <p className="font-bold text-sm text-gray-900 leading-tight">{item.name}</p>
-                    <p className="text-xs text-slate-900 font-bold mt-1">Rp {item.price_regular.toLocaleString()}</p>
+                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100 leading-tight">{item.name}</p>
+                    <p className="text-xs text-slate-900 dark:text-slate-100 font-bold mt-1">Rp {item.price_regular.toLocaleString()}</p>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 border border-gray-100">
-                    <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 font-bold">-</button>
+                  <div className="flex items-center gap-2 bg-gray-50 dark:bg-[#1e2329] rounded-lg p-1 border border-gray-100 dark:border-gray-800/50">
+                    <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center bg-white dark:bg-[#13151a] rounded shadow-sm text-gray-600 dark:text-gray-400 font-bold">-</button>
                     <span className="w-6 text-center text-xs font-bold">{item.qty}</span>
-                    <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 font-bold">+</button>
+                    <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center bg-white dark:bg-[#13151a] rounded shadow-sm text-gray-600 dark:text-gray-400 font-bold">+</button>
                   </div>
                 </div>
               ))
@@ -340,32 +340,32 @@ export default function PosPage() {
           </div>
 
           {/* Cart Summary & Actions */}
-          <div className="bg-[#f8fafc] border-t border-gray-200 p-5 space-y-4">
-            <div className="flex justify-between items-center text-sm font-semibold text-gray-600">
+          <div className="bg-[#f8fafc] border-t border-gray-200 dark:border-gray-800 p-5 space-y-4">
+            <div className="flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-gray-400">
               <span>Subtotal</span>
               <span>Rp {subtotal.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between items-center text-sm font-semibold text-gray-600">
+            <div className="flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-gray-400">
               <span>Diskon (Rp)</span>
               <input 
                 type="number" 
                 value={discount || ""}
                 onChange={e => setDiscount(Number(e.target.value))}
-                className="w-24 px-3 py-1.5 text-right border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold text-xs" 
+                className="w-24 px-3 py-1.5 text-right border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold text-xs" 
               />
             </div>
-            <div className="flex justify-between items-center text-lg font-semibold text-slate-900 pt-2 border-t border-gray-200">
+            <div className="flex justify-between items-center text-lg font-semibold text-slate-900 dark:text-slate-100 pt-2 border-t border-gray-200 dark:border-gray-800">
               <span>Total Akhir</span>
               <span>Rp {totalAkhir.toLocaleString()}</span>
             </div>
 
             <div className="pt-2">
               <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold text-gray-700">Pelanggan</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">Pelanggan</label>
                 <button 
                   type="button"
                   onClick={() => setIsCustomerModalOpen(true)}
-                  className="text-xs text-slate-900 hover:underline font-bold flex items-center gap-1"
+                  className="text-xs text-slate-900 dark:text-slate-100 hover:underline font-bold flex items-center gap-1"
                 >
                   <UserPlus className="h-3 w-3" /> Pelanggan Baru
                 </button>
@@ -373,7 +373,7 @@ export default function PosPage() {
               <select 
                 value={selectedCustomerId}
                 onChange={e => setSelectedCustomerId(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 font-medium"
+                className="w-full px-3 py-2 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:border-blue-500 font-medium"
               >
                 <option value="">-- Pilih Pelanggan --</option>
                 {customers.map(c => (
@@ -383,7 +383,7 @@ export default function PosPage() {
             </div>
 
             <div className="pt-1">
-              <label className="block text-xs font-bold text-gray-700 mb-2">Channel Penjualan</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Channel Penjualan</label>
               <div className="flex bg-gray-200 rounded-xl p-1 gap-1">
                 {(["Toko", "WhatsApp", "Marketplace"] as const).map((channel) => (
                   <button
@@ -393,7 +393,7 @@ export default function PosPage() {
                     className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${
                       salesChannel === channel 
                         ? "bg-slate-900 text-white shadow-sm" 
-                        : "bg-transparent text-gray-600 hover:bg-white"
+                        : "bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white dark:bg-[#13151a]"
                     }`}
                   >
                     {channel}
@@ -403,38 +403,38 @@ export default function PosPage() {
             </div>
 
             <div className="pt-2">
-              <label className="block text-xs font-bold text-gray-700 mb-2">Pembayaran (Split)</label>
-              <div className="bg-white border border-gray-200 rounded-xl p-3 space-y-2.5">
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Pembayaran (Split)</label>
+              <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl p-3 space-y-2.5">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-gray-600 w-16">Tunai</span>
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-400 w-16">Tunai</span>
                   <div className="relative flex-1">
-                    <input type="number" value={payTunai || ""} onChange={e => setPayTunai(Number(e.target.value))} className="w-full pl-3 pr-8 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold" />
+                    <input type="number" value={payTunai || ""} onChange={e => setPayTunai(Number(e.target.value))} className="w-full pl-3 pr-8 py-1.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold" />
                     <span className="absolute right-3 top-2 text-xs text-gray-400 font-bold">Rp</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-gray-600 w-16">Transfer</span>
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-400 w-16">Transfer</span>
                   <div className="relative flex-1">
-                    <input type="number" value={payTransfer || ""} onChange={e => setPayTransfer(Number(e.target.value))} className="w-full pl-3 pr-8 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold" />
+                    <input type="number" value={payTransfer || ""} onChange={e => setPayTransfer(Number(e.target.value))} className="w-full pl-3 pr-8 py-1.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold" />
                     <span className="absolute right-3 top-2 text-xs text-gray-400 font-bold">Rp</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-gray-600 w-16">QRIS</span>
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-400 w-16">QRIS</span>
                   <div className="relative flex-1">
-                    <input type="number" value={payQris || ""} onChange={e => setPayQris(Number(e.target.value))} className="w-full pl-3 pr-8 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold" />
+                    <input type="number" value={payQris || ""} onChange={e => setPayQris(Number(e.target.value))} className="w-full pl-3 pr-8 py-1.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold" />
                     <span className="absolute right-3 top-2 text-xs text-gray-400 font-bold">Rp</span>
                   </div>
                 </div>
                 
-                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                  <span className="text-xs font-bold text-gray-600">Total Bayar:</span>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-800/50">
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-400">Total Bayar:</span>
                   <span className={`text-sm font-semibold ${totalBayar >= totalAkhir ? 'text-[#00a84e]' : 'text-red-500'}`}>
                     Rp {totalBayar.toLocaleString()}
                   </span>
                 </div>
                 {totalBayar > totalAkhir && (
-                  <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                  <div className="flex justify-between items-center text-xs font-bold text-gray-500 dark:text-gray-400">
                     <span>Kembalian:</span>
                     <span>Rp {(totalBayar - totalAkhir).toLocaleString()}</span>
                   </div>
@@ -461,25 +461,25 @@ export default function PosPage() {
           </DialogHeader>
           <form onSubmit={handleRecordExpense} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nominal (Rp)</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nominal (Rp)</label>
               <input
                 type="number"
                 min="1"
                 placeholder="Contoh: 50000"
                 value={expenseAmount}
                 onChange={(e) => setExpenseAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Keterangan / Keperluan</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Keterangan / Keperluan</label>
               <input
                 type="text"
                 placeholder="Contoh: Beli bensin kurir / galon air"
                 value={expenseDesc}
                 onChange={(e) => setExpenseDesc(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
@@ -503,24 +503,24 @@ export default function PosPage() {
           </DialogHeader>
           <form onSubmit={handleCreateCustomer} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label>
               <input
                 type="text"
                 placeholder="Nama pelanggan..."
                 value={newCustName}
                 onChange={(e) => setNewCustName(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nomor WhatsApp</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nomor WhatsApp</label>
               <input
                 type="text"
                 placeholder="0812xxxx"
                 value={newCustPhone}
                 onChange={(e) => setNewCustPhone(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <DialogFooter className="pt-3 border-t">

@@ -64,8 +64,8 @@ export default function RewardsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Master Reward & Poin</h1>
-        <p className="text-gray-500 mt-1">Kelola hadiah dan konfigurasi poin transaksi.</p>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Master Reward & Poin</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola hadiah dan konfigurasi poin transaksi.</p>
       </div>
 
       {savedSuccess && (
@@ -76,36 +76,36 @@ export default function RewardsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column: Konfigurasi */}
-        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
-            <h2 className="text-lg font-bold text-gray-900">Konfigurasi Poin Transaksi</h2>
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden border">
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#1e2329]/50">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Konfigurasi Poin Transaksi</h2>
           </div>
           <CardContent className="p-6 space-y-6">
             <form onSubmit={handleSaveConfig} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Setiap Transaksi Kelipatan Rp</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Setiap Transaksi Kelipatan Rp</label>
                 <input 
                   type="number" 
                   value={pointMultiple}
                   onChange={(e) => setPointMultiple(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] font-bold"
+                  className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] font-bold"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
                   Sistem akan memberi 1 Poin setiap kelipatan nominal di atas.
                 </p>
               </div>
               
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Umur Poin (Bulan)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Umur Poin (Bulan)</label>
                 <input 
                   type="number" 
                   value={pointExpiry}
                   onChange={(e) => setPointExpiry(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] font-bold"
+                  className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] font-bold"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
                   Poin akan hangus secara bertahap jika melewati umur ini sejak tanggal perolehan.
                 </p>
               </div>
@@ -118,9 +118,9 @@ export default function RewardsPage() {
         </Card>
 
         {/* Right Column: Daftar Reward */}
-        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-900">Daftar Reward / Hadiah</h2>
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden border">
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#1e2329]/50 flex justify-between items-center">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Daftar Reward / Hadiah</h2>
             <Button 
               onClick={() => setIsModalOpen(true)}
               className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-4 font-semibold shadow-sm h-10 text-xs flex items-center gap-1.5"
@@ -131,29 +131,29 @@ export default function RewardsPage() {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100">
-                  <TableHead className="font-bold text-gray-700 py-3.5 px-6">Nama Reward</TableHead>
-                  <TableHead className="font-bold text-gray-700 py-3.5 px-6 text-center">Poin Dibutuhkan</TableHead>
-                  <TableHead className="font-bold text-gray-700 py-3.5 px-6 text-right">Aksi</TableHead>
+                <TableRow className="bg-gray-50 dark:bg-[#1e2329]/50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50 border-b border-gray-100 dark:border-gray-800/50">
+                  <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-3.5 px-6">Nama Reward</TableHead>
+                  <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-3.5 px-6 text-center">Poin Dibutuhkan</TableHead>
+                  <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-3.5 px-6 text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rewards.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-16 text-gray-500 font-medium border-b-0">
+                    <TableCell colSpan={3} className="text-center py-16 text-gray-500 dark:text-gray-400 font-medium border-b-0">
                       Belum ada reward terdaftar.
                     </TableCell>
                   </TableRow>
                 ) : (
                   rewards.map((r) => (
-                    <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                      <TableCell className="px-6 py-4 font-bold text-gray-900 text-sm">
+                    <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
+                      <TableCell className="px-6 py-4 font-bold text-gray-900 dark:text-gray-100 text-sm">
                         <div className="flex items-center gap-2">
                           <Gift className="h-4 w-4 text-pink-500" />
                           <span>{r.name}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="px-6 py-4 text-center font-semibold text-slate-900 text-sm">
+                      <TableCell className="px-6 py-4 text-center font-semibold text-slate-900 dark:text-slate-100 text-sm">
                         {r.points} Poin
                       </TableCell>
                       <TableCell className="px-6 py-4 text-right">
@@ -182,25 +182,25 @@ export default function RewardsPage() {
           </DialogHeader>
           <form onSubmit={handleCreateReward} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Hadiah</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Hadiah</label>
               <input
                 type="text"
                 placeholder="Contoh: Dompet Softlens Travel"
                 value={rewardName}
                 onChange={(e) => setRewardName(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Poin yang Dibutuhkan</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Poin yang Dibutuhkan</label>
               <input
                 type="number"
                 min="1"
                 placeholder="Contoh: 30"
                 value={pointsRequired}
                 onChange={(e) => setPointsRequired(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                 required
               />
             </div>

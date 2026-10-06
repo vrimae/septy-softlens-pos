@@ -108,44 +108,44 @@ export default function CustomersPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Database Pelanggan</h1>
-          <p className="text-gray-500 mt-1">Kelola data member dan reward poin loyalitas.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Database Pelanggan</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola data member dan reward poin loyalitas.</p>
         </div>
         <Button onClick={handleOpenAdd} className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
           <Plus className="h-4 w-4 mr-2" /> Daftarkan Member Baru
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Nama Member</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Level</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Nomor WhatsApp</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Total Poin</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b border-gray-100 dark:border-gray-800/50">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Nama Member</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Level</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Nomor WhatsApp</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Total Poin</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow><TableCell colSpan={5} className="text-center py-10">Memuat...</TableCell></TableRow>
             ) : customers.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-16 text-gray-500">Belum ada data member terdaftar.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center py-16 text-gray-500 dark:text-gray-400">Belum ada data member terdaftar.</TableCell></TableRow>
             ) : (
               customers.map((c) => (
                 <TableRow key={c.id} className="border-b border-gray-50">
-                  <TableCell className="px-6 font-bold text-gray-900 py-4">{c.name}</TableCell>
+                  <TableCell className="px-6 font-bold text-gray-900 dark:text-gray-100 py-4">{c.name}</TableCell>
                   <TableCell className="px-6 text-center py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                       c.customer_level === 'VIP' ? 'bg-purple-100 text-purple-700' : 
-                      c.customer_level === 'GOLD' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
+                      c.customer_level === 'GOLD' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 dark:bg-[#2a303c] text-gray-600 dark:text-gray-400'
                     }`}>
                       {c.customer_level}
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 text-center text-gray-600 py-4">{c.phone || '-'}</TableCell>
-                  <TableCell className="px-6 text-center font-bold text-slate-900 py-4">{c.points}</TableCell>
+                  <TableCell className="px-6 text-center text-gray-600 dark:text-gray-400 py-4">{c.phone || '-'}</TableCell>
+                  <TableCell className="px-6 text-center font-bold text-slate-900 dark:text-slate-100 py-4">{c.points}</TableCell>
                   <TableCell className="px-6 text-right py-4 space-x-2">
                     <button onClick={() => handleOpenEdit(c)} className="text-slate-600 hover:text-slate-700"><Edit2 className="h-4 w-4" /></button>
                     <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
@@ -162,16 +162,16 @@ export default function CustomersPage() {
           <DialogHeader><DialogTitle>{editingId ? 'Edit Pelanggan' : 'Pelanggan Baru'}</DialogTitle></DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label>
               <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">No. WhatsApp</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">No. WhatsApp</label>
               <input type="text" value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Level</label>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Level</label>
                 <select value={customerLevel} onChange={e => setCustomerLevel(e.target.value)} className="w-full px-3 py-2 border rounded-lg">
                   <option value="REGULER">Reguler</option>
                   <option value="GOLD">Gold</option>
@@ -179,7 +179,7 @@ export default function CustomersPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Poin Loyalitas</label>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Poin Loyalitas</label>
                 <input type="number" value={points} onChange={e => setPoints(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
               </div>
             </div>

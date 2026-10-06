@@ -115,8 +115,8 @@ export default function TutupKasPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Tutup Kas (Rekonsiliasi Shift)</h1>
-        <p className="text-gray-500 mt-1">Lakukan rekonsiliasi uang fisik (Tunai) pada akhir shift Anda.</p>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Tutup Kas (Rekonsiliasi Shift)</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Lakukan rekonsiliasi uang fisik (Tunai) pada akhir shift Anda.</p>
       </div>
 
       {successMsg && (
@@ -127,33 +127,33 @@ export default function TutupKasPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column: Form */}
-        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
-            <h2 className="text-lg font-bold text-gray-900">Form Tutup Kas Shift</h2>
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden border">
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#1e2329]/50">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Form Tutup Kas Shift</h2>
           </div>
           <CardContent className="px-6 py-6 space-y-6">
-            <div className="bg-[#f0f4ff] p-5 rounded-xl border border-transparent">
-              <label className="block text-sm font-semibold text-slate-900 mb-1">Saldo Tunai Seharusnya (Sistem)</label>
-              <div className="text-2xl font-semibold text-slate-900">Rp {systemCash.toLocaleString()}</div>
+            <div className="bg-[#f0f4ff] dark:bg-blue-900/20 p-5 rounded-xl border border-transparent">
+              <label className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Saldo Tunai Seharusnya (Sistem)</label>
+              <div className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Rp {systemCash.toLocaleString()}</div>
             </div>
             
             <form onSubmit={handleCloseShift} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Total Uang Fisik (Tunai Aktual)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Total Uang Fisik (Tunai Aktual)</label>
                 <div className="relative">
                   <span className="absolute left-4 top-3 text-sm font-bold text-gray-400">Rp</span>
                   <input 
                     type="number" 
                     value={actualCashInput}
                     onChange={(e) => setActualCashInput(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-base font-bold focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb]"
+                    className="w-full pl-12 pr-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-base font-bold focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb]"
                     required
                   />
                 </div>
               </div>
 
               {actualCashInput !== "" && (
-                <div className="p-3 bg-gray-50 rounded-xl flex justify-between text-xs font-bold text-gray-600">
+                <div className="p-3 bg-gray-50 dark:bg-[#1e2329] rounded-xl flex justify-between text-xs font-bold text-gray-600 dark:text-gray-400">
                   <span>Selisih:</span>
                   <span className={parseFloat(actualCashInput) - systemCash === 0 ? "text-green-600" : "text-amber-600"}>
                     {parseFloat(actualCashInput) - systemCash >= 0 ? "+" : ""}
@@ -170,9 +170,9 @@ export default function TutupKasPage() {
         </Card>
 
         {/* Right Column: Riwayat */}
-        <Card className="rounded-xl border-gray-200 shadow-sm overflow-hidden border flex flex-col">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
-            <h2 className="text-lg font-bold text-gray-900">Riwayat Tutup Kas</h2>
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden border flex flex-col">
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#1e2329]/50">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Riwayat Tutup Kas</h2>
           </div>
           <CardContent className="p-0 flex-1">
             {closings.length === 0 ? (
@@ -182,7 +182,7 @@ export default function TutupKasPage() {
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-b border-gray-100 text-xs">
+                  <TableRow className="border-b border-gray-100 dark:border-gray-800/50 text-xs">
                     <TableHead className="py-3 px-4">Waktu</TableHead>
                     <TableHead className="py-3 px-4 text-right">Sistem</TableHead>
                     <TableHead className="py-3 px-4 text-right">Fisik</TableHead>
@@ -192,7 +192,7 @@ export default function TutupKasPage() {
                 <TableBody>
                   {closings.map((c) => (
                     <TableRow key={c.id} className="border-b border-gray-50">
-                      <TableCell className="py-3.5 px-4 font-semibold text-xs text-gray-700">{c.timestamp}</TableCell>
+                      <TableCell className="py-3.5 px-4 font-semibold text-xs text-gray-700 dark:text-gray-300">{c.timestamp}</TableCell>
                       <TableCell className="py-3.5 px-4 text-right font-medium text-xs">Rp {c.systemCash.toLocaleString()}</TableCell>
                       <TableCell className="py-3.5 px-4 text-right font-bold text-xs">Rp {c.actualCash.toLocaleString()}</TableCell>
                       <TableCell className="py-3.5 px-4 text-center">

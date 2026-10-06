@@ -101,10 +101,10 @@ export default function RestockPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal flex items-center gap-2.5">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal flex items-center gap-2.5">
              Sistem Restock & Min. Stock
           </h1>
-          <p className="text-gray-500 mt-1">Rekomendasi belanja cerdas berdasarkan kecepatan penjualan (sales velocity) 30 hari terakhir.</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Rekomendasi belanja cerdas berdasarkan kecepatan penjualan (sales velocity) 30 hari terakhir.</p>
         </div>
         <Button 
           onClick={handleRunAnalysis}
@@ -116,32 +116,32 @@ export default function RestockPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
           <div className="relative max-w-md w-full">
             <input 
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari produk rekomendasi..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
           </div>
-          <div className="text-xs font-bold text-gray-500">
+          <div className="text-xs font-bold text-gray-500 dark:text-gray-400">
             Ditemukan {filtered.length} item rekomendasi
           </div>
         </div>
 
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Produk & Kode</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Sisa Stok</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Velocity (Hari)</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Rekomendasi Order</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Est. Modal</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Produk & Kode</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Sisa Stok</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Velocity (Hari)</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Rekomendasi Order</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Est. Modal</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -153,24 +153,24 @@ export default function RestockPage() {
               </TableRow>
             ) : (
               filtered.map((r) => (
-                <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
                   <TableCell className="px-6 py-4">
-                    <p className="font-bold text-gray-900 text-sm">{r.name}</p>
-                    <p className="font-mono text-xs text-slate-900 font-bold">{r.code}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{r.name}</p>
+                    <p className="font-mono text-xs text-slate-900 dark:text-slate-100 font-bold">{r.code}</p>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
                     <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
                       {r.currentStock} pcs
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700">
+                  <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300">
                     {r.velocity} pcs / hari
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="font-semibold text-slate-900 text-sm">+{r.suggestedQty} pcs</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm">+{r.suggestedQty} pcs</span>
                     <p className="text-[10px] text-gray-400">buffer 14 hari</p>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-right font-bold text-gray-900 text-sm">
+                  <TableCell className="px-6 py-4 text-right font-bold text-gray-900 dark:text-gray-100 text-sm">
                     Rp {r.estCost.toLocaleString()}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">

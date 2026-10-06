@@ -90,8 +90,8 @@ export default function AuditTrailPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Audit Trail</h1>
-          <p className="text-gray-500 mt-1">Catatan seluruh aktivitas penting dalam sistem. Data ini tidak dapat dihapus oleh siapa pun.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Audit Trail</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Catatan seluruh aktivitas penting dalam sistem. Data ini tidak dapat dihapus oleh siapa pun.</p>
         </div>
         <Button 
           onClick={handleAddSampleAudit}
@@ -101,24 +101,24 @@ export default function AuditTrailPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2">Cari</label>
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Cari</label>
             <input 
               type="text" 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari aktivitas..." 
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2">Aktivitas</label>
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Aktivitas</label>
             <select 
               value={activityFilter}
               onChange={(e) => setActivityFilter(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
             >
               <option value="Semua Aktivitas">Semua Aktivitas</option>
               <option value="LOGIN">LOGIN</option>
@@ -128,11 +128,11 @@ export default function AuditTrailPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2">User</label>
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">User</label>
             <select 
               value={userFilter}
               onChange={(e) => setUserFilter(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
             >
               <option value="Semua User">Semua User</option>
               <option value="vrimae23@gmail.com">vrimae23@gmail.com (Owner)</option>
@@ -140,27 +140,27 @@ export default function AuditTrailPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2">Dari Tanggal</label>
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Dari Tanggal</label>
             <div className="relative">
               <input 
                 type="text" 
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
                 placeholder="dd/mm/yyyy" 
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                className="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
               />
               <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2">Sampai Tanggal</label>
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Sampai Tanggal</label>
             <div className="relative">
               <input 
                 type="text" 
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
                 placeholder="dd/mm/yyyy" 
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                className="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
               />
               <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
             </div>
@@ -169,14 +169,14 @@ export default function AuditTrailPage() {
       </div>
 
       <div>
-        <p className="text-sm text-gray-500 mb-4">
-          Menampilkan <span className="font-bold text-gray-900">{filteredLogs.length}</span> dari <span className="font-bold text-gray-900">{logs.length}</span> catatan audit.
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Menampilkan <span className="font-bold text-gray-900 dark:text-gray-100">{filteredLogs.length}</span> dari <span className="font-bold text-gray-900 dark:text-gray-100">{logs.length}</span> catatan audit.
         </p>
         
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
+        <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
           <Table>
             <TableHeader>
-              <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
+              <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0 border-t border-gray-100 dark:border-gray-800/50">
                 <TableHead className="font-bold text-gray-400 text-[10px] uppercase tracking-wider py-4 px-6">TANGGAL</TableHead>
                 <TableHead className="font-bold text-gray-400 text-[10px] uppercase tracking-wider py-4 px-6 text-center">JAM</TableHead>
                 <TableHead className="font-bold text-gray-400 text-[10px] uppercase tracking-wider py-4 px-6 text-center">USER</TableHead>
@@ -195,18 +195,18 @@ export default function AuditTrailPage() {
                 </TableRow>
               ) : (
                 filteredLogs.map((log) => (
-                  <TableRow key={log.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                    <TableCell className="px-6 py-4 font-semibold text-xs text-gray-800">{log.date}</TableCell>
-                    <TableCell className="px-6 py-4 text-center font-mono text-xs text-gray-500">{log.time}</TableCell>
-                    <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700">{log.user}</TableCell>
+                  <TableRow key={log.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
+                    <TableCell className="px-6 py-4 font-semibold text-xs text-gray-800 dark:text-gray-200">{log.date}</TableCell>
+                    <TableCell className="px-6 py-4 text-center font-mono text-xs text-gray-500 dark:text-gray-400">{log.time}</TableCell>
+                    <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300">{log.user}</TableCell>
                     <TableCell className="px-6 py-4 text-center">
-                      <span className="bg-slate-100 text-blue-700 text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full">
+                      <span className="bg-slate-100 dark:bg-[#2a303c] text-blue-700 text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full">
                         {log.activity}
                       </span>
                     </TableCell>
-                    <TableCell className="px-6 py-4 text-center text-xs text-gray-500 font-mono">{log.before}</TableCell>
-                    <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-800 font-mono">{log.after}</TableCell>
-                    <TableCell className="px-6 py-4 text-right text-xs text-gray-600">{log.reason}</TableCell>
+                    <TableCell className="px-6 py-4 text-center text-xs text-gray-500 dark:text-gray-400 font-mono">{log.before}</TableCell>
+                    <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-800 dark:text-gray-200 font-mono">{log.after}</TableCell>
+                    <TableCell className="px-6 py-4 text-right text-xs text-gray-600 dark:text-gray-400">{log.reason}</TableCell>
                   </TableRow>
                 ))
               )}

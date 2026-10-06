@@ -84,8 +84,8 @@ export default function SlowMovingPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Laporan Stok Mengendap</h1>
-          <p className="text-gray-500 mt-1">Temukan modal yang tertahan dalam stok yang tidak bergerak.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Laporan Stok Mengendap</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Temukan modal yang tertahan dalam stok yang tidak bergerak.</p>
         </div>
         <div className="bg-[#fff7ed] border border-[#ffedd5] px-6 py-3 rounded-xl shadow-sm text-right shrink-0">
           <p className="text-xs font-bold text-[#ea580c] uppercase tracking-wider mb-0.5">Total Modal Tertahan</p>
@@ -93,13 +93,13 @@ export default function SlowMovingPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-wrap gap-6 items-center">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-4 flex flex-wrap gap-6 items-center">
         <div className="flex items-center gap-3">
-          <label className="text-sm font-bold text-gray-700">Filter Tidak Laku:</label>
+          <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Filter Tidak Laku:</label>
           <select 
             value={filterPeriod}
             onChange={(e) => setFilterPeriod(e.target.value)}
-            className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="px-3.5 py-2 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="≥ 1 Bulan">≥ 1 Bulan</option>
             <option value="≥ 2 Bulan">≥ 2 Bulan</option>
@@ -107,11 +107,11 @@ export default function SlowMovingPage() {
           </select>
         </div>
         <div className="flex items-center gap-3">
-          <label className="text-sm font-bold text-gray-700">Urutkan Berdasarkan:</label>
+          <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Urutkan Berdasarkan:</label>
           <select 
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="px-3.5 py-2 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="Paling Lama Tidak Laku">Paling Lama Tidak Laku</option>
             <option value="Modal Tertahan Terbesar">Modal Tertahan Terbesar</option>
@@ -122,16 +122,16 @@ export default function SlowMovingPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Produk</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Stok Tertahan</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Usia Tidak Laku</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Terakhir Terjual</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Modal Tertahan</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Solusi Cepat</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Produk</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Stok Tertahan</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Usia Tidak Laku</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Terakhir Terjual</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Modal Tertahan</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Solusi Cepat</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -143,12 +143,12 @@ export default function SlowMovingPage() {
               </TableRow>
             ) : (
               items.map((item) => (
-                <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
                   <TableCell className="px-6 py-4">
-                    <p className="font-bold text-gray-900 text-sm">{item.name}</p>
-                    <p className="font-mono text-xs text-slate-900 font-bold">{item.code}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{item.name}</p>
+                    <p className="font-mono text-xs text-slate-900 dark:text-slate-100 font-bold">{item.code}</p>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center font-bold text-gray-700 text-sm">
+                  <TableCell className="px-6 py-4 text-center font-bold text-gray-700 dark:text-gray-300 text-sm">
                     {item.stock} pcs
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
@@ -156,10 +156,10 @@ export default function SlowMovingPage() {
                       {item.age}
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-500">
+                  <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">
                     {item.lastSold}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">
+                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-gray-100 text-sm">
                     Rp {item.costStuck.toLocaleString()}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">

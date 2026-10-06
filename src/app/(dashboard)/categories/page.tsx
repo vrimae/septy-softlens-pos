@@ -134,8 +134,8 @@ export default function CategoriesPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Manajemen Kategori</h1>
-          <p className="text-gray-500 mt-1">Atur kategori barang dan target margin profit Anda.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Manajemen Kategori</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Atur kategori barang dan target margin profit Anda.</p>
         </div>
         <Button 
           onClick={handleOpenAddModal}
@@ -145,45 +145,45 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Nama Kategori</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Target Margin Profit (%)</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Gunakan Expired</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b border-gray-100 dark:border-gray-800/50">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Nama Kategori</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Target Margin Profit (%)</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Gunakan Expired</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-16 text-gray-500">
+                <TableCell colSpan={4} className="text-center py-16 text-gray-500 dark:text-gray-400">
                   Memuat data...
                 </TableCell>
               </TableRow>
             ) : categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-16 text-gray-500">
+                <TableCell colSpan={4} className="text-center py-16 text-gray-500 dark:text-gray-400">
                   Belum ada kategori.
                 </TableCell>
               </TableRow>
             ) : (
               categories.map((cat) => (
-                <TableRow key={cat.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                  <TableCell className="font-bold text-gray-900 px-6 py-4">{cat.name}</TableCell>
-                  <TableCell className="text-center text-gray-600 px-6 py-4">{cat.target_margin}%</TableCell>
+                <TableRow key={cat.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
+                  <TableCell className="font-bold text-gray-900 dark:text-gray-100 px-6 py-4">{cat.name}</TableCell>
+                  <TableCell className="text-center text-gray-600 dark:text-gray-400 px-6 py-4">{cat.target_margin}%</TableCell>
                   <TableCell className="text-center px-6 py-4">
                     {cat.use_expired ? (
                       <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-bold">YA</span>
                     ) : (
-                      <span className="bg-gray-100 text-gray-500 px-2 py-1 rounded-md text-xs font-bold">TIDAK</span>
+                      <span className="bg-gray-100 dark:bg-[#2a303c] text-gray-500 dark:text-gray-400 px-2 py-1 rounded-md text-xs font-bold">TIDAK</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right px-6 py-4">
                     <button 
                       onClick={() => handleOpenEditModal(cat)}
-                      className="text-slate-900 hover:text-slate-700 transition-colors p-2"
+                      className="text-slate-900 dark:text-slate-100 hover:text-slate-700 transition-colors p-2"
                       title="Edit"
                     >
                       <Edit2 className="h-4 w-4" />
@@ -210,18 +210,18 @@ export default function CategoriesPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Nama Kategori</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Kategori</label>
               <input 
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Contoh: Softlens Minus"
-                className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Target Margin Profit (%)</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Target Margin Profit (%)</label>
               <input 
                 type="number" 
                 value={targetMargin}
@@ -229,7 +229,7 @@ export default function CategoriesPage() {
                 placeholder="Contoh: 15"
                 min="0"
                 step="0.1"
-                className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div className="flex items-center gap-2 pt-2">
@@ -238,9 +238,9 @@ export default function CategoriesPage() {
                 id="use-expired" 
                 checked={useExpired}
                 onChange={(e) => setUseExpired(e.target.checked)}
-                className="w-4 h-4 text-slate-900 rounded"
+                className="w-4 h-4 text-slate-900 dark:text-slate-100 rounded"
               />
-              <label htmlFor="use-expired" className="text-sm font-bold text-gray-700 cursor-pointer">
+              <label htmlFor="use-expired" className="text-sm font-bold text-gray-700 dark:text-gray-300 cursor-pointer">
                 Lacak Tanggal Kadaluwarsa (Expired Date)
               </label>
             </div>

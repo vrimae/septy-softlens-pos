@@ -151,14 +151,14 @@ export default function ReturnsPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Retur / Tukar Barang</h1>
-          <p className="text-gray-500 mt-1">Kebijakan retur fleksibel. Hanya melayani tukar barang.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Retur / Tukar Barang</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Kebijakan retur fleksibel. Hanya melayani tukar barang.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={fetchReturns}
             variant="outline"
-            className="rounded-xl h-11 px-3 border-gray-200"
+            className="rounded-xl h-11 px-3 border-gray-200 dark:border-gray-800"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -172,37 +172,37 @@ export default function ReturnsPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1 mt-4">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1 mt-4">
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">ID Retur</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Tanggal</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Trx Asal</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Item Retur & Alasan</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Tukar Dengan</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Selisih Biaya</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0 border-t border-gray-100 dark:border-gray-800/50">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">ID Retur</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Tanggal</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Trx Asal</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Item Retur & Alasan</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Tukar Dengan</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Selisih Biaya</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {returnsList.map((r) => (
-              <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                <TableCell className="px-6 py-4 font-mono font-bold text-slate-900 text-xs">{r.id}</TableCell>
-                <TableCell className="px-6 py-4 text-xs font-medium text-gray-600">{r.date}</TableCell>
+              <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
+                <TableCell className="px-6 py-4 font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">{r.id}</TableCell>
+                <TableCell className="px-6 py-4 text-xs font-medium text-gray-600 dark:text-gray-400">{r.date}</TableCell>
                 <TableCell className="px-6 py-4 text-center">
-                  <span className="font-mono text-xs font-bold bg-gray-100 px-2 py-1 rounded text-gray-700">
+                  <span className="font-mono text-xs font-bold bg-gray-100 dark:bg-[#2a303c] px-2 py-1 rounded text-gray-700 dark:text-gray-300">
                     {r.originalTrx}
                   </span>
                 </TableCell>
                 <TableCell className="px-6 py-4 text-center">
-                  <p className="font-bold text-gray-900 text-xs">{r.item} ({r.qty} pcs)</p>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-xs">{r.item} ({r.qty} pcs)</p>
                   <p className="text-[11px] text-red-500 font-medium mt-0.5">{r.reason}</p>
                 </TableCell>
                 <TableCell className="px-6 py-4 text-center">
                   <p className="font-bold text-emerald-600 text-xs">{r.exchangeWith}</p>
                   <p className="text-[10px] text-gray-400">Menuju: {r.destination}</p>
                 </TableCell>
-                <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">
+                <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-gray-100 text-sm">
                   {r.difference === 0 ? "Rp 0 (Pas)" : `Rp ${r.difference.toLocaleString()}`}
                 </TableCell>
               </TableRow>
@@ -219,45 +219,45 @@ export default function ReturnsPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">No. Invoice / Resi Transaksi Asal</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">No. Invoice / Resi Transaksi Asal</label>
               <input
                 type="text"
                 placeholder="Contoh: INV-20261006-0001"
                 value={originalTrx}
                 onChange={(e) => setOriginalTrx(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Barang Yang Diretur</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Barang Yang Diretur</label>
               <input
                 type="text"
                 placeholder="Contoh: Softlens Gray 14.5mm"
                 value={item}
                 onChange={(e) => setItem(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Jumlah (Pcs)</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Jumlah (Pcs)</label>
                 <input
                   type="number"
                   min="1"
                   value={qty}
                   onChange={(e) => setQty(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Alasan Retur</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Alasan Retur</label>
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
                 >
                   <option value="Salah Minus / Warna">Salah Minus / Warna</option>
                   <option value="Barang Cacat Pabrik">Barang Cacat Pabrik</option>
@@ -267,35 +267,35 @@ export default function ReturnsPage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Ditukar Dengan (Item Baru)</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ditukar Dengan (Item Baru)</label>
               <input
                 type="text"
                 placeholder="Contoh: Softlens Brown 14.5mm Minus -2.00"
                 value={exchangeWith}
                 onChange={(e) => setExchangeWith(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Tujuan Fisik Barang Retur</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Tujuan Fisik Barang Retur</label>
                 <select
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
                 >
                   <option value="Gudang Baik (Bisa Dijual Lagi)">Gudang Baik</option>
                   <option value="Gudang Rusak (Klaim Pabrik)">Gudang Rusak</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Selisih Harga (Rp)</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Selisih Harga (Rp)</label>
                 <input
                   type="number"
                   placeholder="0 jika harga sama"
                   value={difference}
                   onChange={(e) => setDifference(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                 />
               </div>
             </div>

@@ -68,11 +68,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f6fb] p-4 font-sans select-none">
-      <div className="w-full max-w-[430px] bg-white rounded-[28px] shadow-[0_16px_40px_rgba(28,95,251,0.06),0_4px_16px_rgba(0,0,0,0.03)] overflow-hidden border border-gray-100">
+      <div className="w-full max-w-[430px] bg-white dark:bg-[#13151a] rounded-[28px] shadow-[0_16px_40px_rgba(28,95,251,0.06),0_4px_16px_rgba(0,0,0,0.03)] overflow-hidden border border-gray-100 dark:border-gray-800/50">
         
         {/* Header Gradient */}
         <div className="bg-gradient-to-b from-[#1b62fc] to-[#3a3beb] pt-9 pb-8 text-center text-white relative">
-          <div className="w-[74px] h-[74px] bg-white rounded-full mx-auto flex flex-col items-center justify-center mb-3.5 shadow-sm">
+          <div className="w-[74px] h-[74px] bg-white dark:bg-[#13151a] rounded-full mx-auto flex flex-col items-center justify-center mb-3.5 shadow-sm">
             <span className="text-[#f45b78] font-bold text-2xl tracking-normal leading-none italic font-serif">
               Septy
             </span>
@@ -89,10 +89,10 @@ export default function RegisterPage() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-gray-100 px-7 pt-4 bg-white">
+        <div className="flex border-b border-gray-100 dark:border-gray-800/50 px-7 pt-4 bg-white dark:bg-[#13151a]">
           <Link 
             href="/login"
-            className="flex-1 pb-3 text-[14px] font-bold transition-all border-b-[3px] text-center text-[#8a9bb2] border-transparent hover:text-gray-700"
+            className="flex-1 pb-3 text-[14px] font-bold transition-all border-b-[3px] text-center text-[#8a9bb2] border-transparent hover:text-gray-700 dark:text-gray-300"
           >
             Login Owner
           </Link>
@@ -104,7 +104,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Container */}
-        <div className="px-7 pt-5 pb-7 bg-white">
+        <div className="px-7 pt-5 pb-7 bg-white dark:bg-[#13151a]">
           <form onSubmit={handleRegister} className="space-y-4">
             {error && (
               <div className="bg-red-50 border border-red-200/60 text-red-600 px-3.5 py-2.5 rounded-xl text-xs text-center font-semibold">
@@ -118,11 +118,11 @@ export default function RegisterPage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-bold text-gray-700">Nama Pemilik Toko</label>
+              <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Nama Pemilik Toko</label>
               <input 
                 type="text" 
                 placeholder="Contoh: Septy Wulandari"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white focus:border-[#1b62fc] transition-all"
+                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -130,11 +130,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-bold text-gray-700">Nama Toko</label>
+              <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Nama Toko</label>
               <input 
                 type="text" 
                 placeholder="Contoh: Septy Softlens Cabang 1"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white focus:border-[#1b62fc] transition-all"
+                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
                 value={storeName}
                 onChange={(e) => setStoreName(e.target.value)}
                 required
@@ -142,11 +142,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-bold text-gray-700">Email Owner</label>
+              <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Email Owner</label>
               <input 
                 type="email" 
                 placeholder="nama@email.com"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white focus:border-[#1b62fc] transition-all"
+                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -154,11 +154,11 @@ export default function RegisterPage() {
             </div>
             
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-bold text-gray-700">Password</label>
+              <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Password</label>
               <input 
                 type="password" 
                 placeholder="••••••"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white focus:border-[#1b62fc] transition-all"
+                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -166,11 +166,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-bold text-gray-700">Ulangi Password</label>
+              <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Ulangi Password</label>
               <input 
                 type="password" 
                 placeholder="••••••"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white focus:border-[#1b62fc] transition-all"
+                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required

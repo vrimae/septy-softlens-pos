@@ -23,62 +23,62 @@ export default function DashboardPage() {
     <div className="space-y-8 max-w-6xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Halo, {activeProfile?.full_name || (role === 'owner' ? 'Owner' : 'Kasir')}!</h1>
-          <p className="text-gray-500 mt-1">Ringkasan aktivitas dan performa sistem.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Halo, {activeProfile?.full_name || (role === 'owner' ? 'Owner' : 'Kasir')}!</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Ringkasan aktivitas dan performa sistem.</p>
         </div>
         
-        <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm">
+        <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-full shadow-sm">
           <div className="w-2 h-2 rounded-full bg-green-500"></div>
-          <span className="text-sm font-semibold text-gray-700">Sistem POS Aktif & Tersinkronisasi</span>
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Sistem POS Aktif & Tersinkronisasi</span>
         </div>
       </div>
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="rounded-xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm">
           <CardContent className="p-6 space-y-4">
-            <span className="inline-block px-3 py-1 bg-slate-100 text-slate-600 font-medium text-xs rounded-lg">Omzet</span>
+            <span className="inline-block px-3 py-1 bg-slate-100 dark:bg-[#2a303c] text-slate-600 font-medium text-xs rounded-lg">Omzet</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">TOTAL OMZET BULAN INI</p>
-              <div className="text-2xl font-semibold text-gray-900">Rp 0</div>
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp 0</div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="rounded-xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <span className="inline-block px-3 py-1 bg-green-50 text-green-500 font-medium text-xs rounded-lg">Laba</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">LABA KOTOR BULAN INI</p>
-              <div className="text-2xl font-semibold text-gray-900">Rp 0</div>
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp 0</div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="rounded-xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <span className="inline-block px-3 py-1 bg-purple-50 text-purple-500 font-medium text-xs rounded-lg">Transaksi</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">TOTAL TRANSAKSI</p>
-              <div className="text-2xl font-semibold text-gray-900">0 <span className="text-xl">Trx</span></div>
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">0 <span className="text-xl">Trx</span></div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-gray-200 shadow-sm">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <span className="inline-block px-3 py-1 bg-orange-50 text-orange-500 font-medium text-xs rounded-lg">Upselling</span>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">TOTAL UPSELLING</p>
-              <div className="text-2xl font-semibold text-gray-900">0 <span className="text-xl">Transaksi</span></div>
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">0 <span className="text-xl">Transaksi</span></div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Line Chart Placeholder */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h3 className="text-lg font-bold text-gray-800 mb-6">Grafik Laba Kotor Harian (Bulan Ini)</h3>
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-6">Grafik Laba Kotor Harian (Bulan Ini)</h3>
         <div className="h-64 border-l border-b border-gray-300 relative w-full flex items-end">
           {/* Y Axis labels */}
           <div className="absolute -left-6 top-0 h-full flex flex-col justify-between text-xs text-gray-400 py-2">
@@ -112,23 +112,23 @@ export default function DashboardPage() {
       </div>
 
       {/* SP Ranking Table */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
         <div className="bg-[#ff4f20] px-6 py-4 text-white font-bold text-lg">
           Papan Peringkat SP (Bulan Ini)
         </div>
         <Table>
-          <TableHeader className="bg-white">
-            <TableRow className="border-b-0 hover:bg-white">
-              <TableHead className="font-bold text-gray-900 py-5">Peringkat</TableHead>
-              <TableHead className="font-bold text-gray-900 py-5">Nama SP</TableHead>
-              <TableHead className="font-bold text-gray-900 py-5">Total Transaksi</TableHead>
-              <TableHead className="font-bold text-gray-900 py-5">Upselling</TableHead>
-              <TableHead className="font-bold text-gray-900 py-5 text-right">Target Barang Tercapai</TableHead>
+          <TableHeader className="bg-white dark:bg-[#13151a]">
+            <TableRow className="border-b-0 hover:bg-white dark:bg-[#13151a]">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 py-5">Peringkat</TableHead>
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 py-5">Nama SP</TableHead>
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 py-5">Total Transaksi</TableHead>
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 py-5">Upselling</TableHead>
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 py-5 text-right">Target Barang Tercapai</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-10 text-gray-500">
+              <TableCell colSpan={5} className="text-center py-10 text-gray-500 dark:text-gray-400">
                 Belum ada data peringkat.
               </TableCell>
             </TableRow>

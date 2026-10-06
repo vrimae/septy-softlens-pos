@@ -24,8 +24,8 @@ export default function ConnectionStatusPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow p-6 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#1e2329] p-4">
+      <div className="max-w-md w-full bg-white dark:bg-[#13151a] rounded-lg shadow p-6 text-center">
         <h1 className="text-2xl font-bold mb-4">Status Koneksi Supabase</h1>
         
         {status === "checking" && (
@@ -38,7 +38,7 @@ export default function ConnectionStatusPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <p className="font-medium text-lg">Berhasil Terhubung!</p>
-            <p className="text-sm text-gray-500 mt-2">Klien Supabase dapat berkomunikasi dengan database.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Klien Supabase dapat berkomunikasi dengan database.</p>
           </div>
         )}
 
@@ -49,7 +49,7 @@ export default function ConnectionStatusPage() {
             </svg>
             <p className="font-medium text-lg">Gagal Terhubung</p>
             <p className="text-sm text-red-500 mt-2">{errorMsg}</p>
-            <p className="text-sm text-gray-500 mt-4">Pastikan URL dan Anon Key Supabase di `.env` sudah benar dan RLS policy mengizinkan koneksi.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Pastikan URL dan Anon Key Supabase di `.env` sudah benar dan RLS policy mengizinkan koneksi.</p>
           </div>
         )}
       </div>

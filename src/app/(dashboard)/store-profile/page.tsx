@@ -28,75 +28,75 @@ export default function StoreProfilePage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6">
+      <form onSubmit={handleSave} className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-8 space-y-6">
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Nama Toko</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Nama Toko</label>
             <input 
               type="text" 
               value={storeName}
               onChange={(e) => setStoreName(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
+              className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Alamat Lengkap</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Alamat Lengkap</label>
             <textarea 
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] resize-none font-medium"
+              className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] resize-none font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Nomor WhatsApp / Telp</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Nomor WhatsApp / Telp</label>
             <input 
               type="text" 
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
+              className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Pesan Penutup Struk (Footer)</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Pesan Penutup Struk (Footer)</label>
             <input 
               type="text" 
               value={footer}
               onChange={(e) => setFooter(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
+              className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Teks Kode QRIS (Raw String)</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Teks Kode QRIS (Raw String)</label>
             <input 
               type="text" 
               value={qris}
               onChange={(e) => setQris(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] text-gray-700 font-mono text-xs"
+              className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#1c5ffb] text-gray-700 dark:text-gray-300 font-mono text-xs"
             />
             <p className="text-xs text-gray-400 mt-2 font-medium">Masukkan teks/kode RAW QRIS toko Anda. Sistem akan membuatkan gambar QR secara otomatis di kasir.</p>
           </div>
         </div>
 
-        <div className="mt-10 mb-6 pt-4 border-t border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Pengaturan Tampilan</h2>
+        <div className="mt-10 mb-6 pt-4 border-t border-gray-100 dark:border-gray-800/50">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Pengaturan Tampilan</h2>
           <div 
             onClick={() => setDarkMode(!darkMode)}
-            className="border border-gray-200 rounded-xl p-4 flex justify-between items-center bg-[#fafafa] cursor-pointer hover:bg-gray-100/60 transition-colors"
+            className="border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex justify-between items-center bg-[#fafafa] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#2a303c] dark:bg-[#2a303c]/60 transition-colors"
           >
             <div>
-              <h3 className="font-bold text-gray-700">Tema Gelap (Dark Mode)</h3>
-              <p className="text-xs text-gray-500 mt-1">Ganti tampilan aplikasi ke mode gelap.</p>
+              <h3 className="font-bold text-gray-700 dark:text-gray-300">Tema Gelap (Dark Mode)</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ganti tampilan aplikasi ke mode gelap.</p>
             </div>
-            <div className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-colors ${darkMode ? "bg-slate-800 text-yellow-300" : "bg-white text-gray-400"}`}>
+            <div className={`w-10 h-10 rounded-full border border-gray-200 dark:border-gray-800 flex items-center justify-center transition-colors ${darkMode ? "bg-slate-800 text-yellow-300" : "bg-white dark:bg-[#13151a] text-gray-400"}`}>
               {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </div>
           </div>

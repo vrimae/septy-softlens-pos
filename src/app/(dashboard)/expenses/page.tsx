@@ -63,8 +63,8 @@ export default function ExpensesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Pengeluaran</h1>
-          <p className="text-sm text-gray-500">Pencatatan biaya operasional toko.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Pengeluaran</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Pencatatan biaya operasional toko.</p>
         </div>
         <Button onClick={() => setIsFormOpen(true)} className="bg-teal-600 hover:bg-teal-700">
           <Plus className="h-4 w-4 mr-2" /> Tambah Pengeluaran
@@ -86,7 +86,7 @@ export default function ExpensesPage() {
               {loading ? (
                 <TableRow><TableCell colSpan={4} className="text-center">Memuat...</TableCell></TableRow>
               ) : expenses.length === 0 ? (
-                <TableRow><TableCell colSpan={4} className="text-center text-gray-500">Tidak ada data</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center text-gray-500 dark:text-gray-400">Tidak ada data</TableCell></TableRow>
               ) : (
                 expenses.map(e => (
                   <TableRow key={e.id}>

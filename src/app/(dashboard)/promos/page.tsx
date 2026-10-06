@@ -82,8 +82,8 @@ export default function PromosPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Master Promo</h1>
-          <p className="text-gray-500 mt-1">Kelola daftar promo diskon, harga khusus, dan Beli X Gratis Y.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Master Promo</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola daftar promo diskon, harga khusus, dan Beli X Gratis Y.</p>
         </div>
         <Button 
           onClick={handleOpenAdd}
@@ -93,43 +93,43 @@ export default function PromosPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Status</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Nama Promo</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Jenis</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Target</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Periode</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Aksi</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b border-gray-100 dark:border-gray-800/50">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Status</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Nama Promo</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Jenis</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Target</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Periode</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {promos.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-16 text-gray-500 font-medium">
+                <TableCell colSpan={6} className="text-center py-16 text-gray-500 dark:text-gray-400 font-medium">
                   Belum ada promo yang ditambahkan.
                 </TableCell>
               </TableRow>
             ) : (
               promos.map((p) => (
-                <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
                   <TableCell className="px-6 py-4">
                     <span className="bg-green-100 text-green-700 text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full">
                       {p.status}
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center font-bold text-gray-900 text-sm">
+                  <TableCell className="px-6 py-4 text-center font-bold text-gray-900 dark:text-gray-100 text-sm">
                     {p.name}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-600">
+                  <TableCell className="px-6 py-4 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
                     {p.type}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs text-slate-900 font-bold">
+                  <TableCell className="px-6 py-4 text-center text-xs text-slate-900 dark:text-slate-100 font-bold">
                     {p.target}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs text-gray-500 font-medium">
+                  <TableCell className="px-6 py-4 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">
                     {p.period}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
@@ -156,22 +156,22 @@ export default function PromosPage() {
           </DialogHeader>
           <form onSubmit={handleCreatePromo} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Promo</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Promo</label>
               <input
                 type="text"
                 placeholder="Contoh: Diskon Pelanggan Baru 10%"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Jenis Promo</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Jenis Promo</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
               >
                 <option value="Persentase (%)">Diskon Persentase (%)</option>
                 <option value="Nominal Potongan (Rp)">Nominal Potongan (Rp)</option>
@@ -180,24 +180,24 @@ export default function PromosPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Target Produk</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Target Produk</label>
               <input
                 type="text"
                 placeholder="Contoh: Semua Produk / Kategori Minus"
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Periode Berlaku</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Periode Berlaku</label>
               <input
                 type="text"
                 placeholder="Contoh: Selama Bulan Ini"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <DialogFooter className="pt-3 border-t">

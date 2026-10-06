@@ -171,14 +171,14 @@ export default function WarehousePage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Produk Gudang Barang Bermasalah</h1>
-          <p className="text-gray-500 mt-1">Status dan tempat untuk barang rusak, retur, expired, dll yang menunggu keputusan.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Produk Gudang Barang Bermasalah</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Status dan tempat untuk barang rusak, retur, expired, dll yang menunggu keputusan.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={fetchDamagedGoods}
             variant="outline"
-            className="rounded-xl h-11 px-3 border-gray-200"
+            className="rounded-xl h-11 px-3 border-gray-200 dark:border-gray-800"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -193,36 +193,36 @@ export default function WarehousePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="rounded-xl border-gray-200 shadow-sm border p-6 flex items-center gap-4 bg-white">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm border p-6 flex items-center gap-4 bg-white dark:bg-[#13151a]">
           <div className="w-14 h-14 rounded-xl bg-red-50 text-red-500 flex items-center justify-center font-semibold text-2xl">
             {totalPcs}
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Pcs di Gudang</p>
-            <p className="text-2xl font-semibold text-gray-900">Menunggu Keputusan Owner</p>
+            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Menunggu Keputusan Owner</p>
           </div>
         </Card>
 
-        <Card className="rounded-xl border-gray-200 shadow-sm border p-6 flex items-center gap-4 bg-white">
+        <Card className="rounded-xl border-gray-200 dark:border-gray-800 shadow-sm border p-6 flex items-center gap-4 bg-white dark:bg-[#13151a]">
           <div className="w-14 h-14 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center font-semibold text-xl">
             Rp
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Nilai Modal Tertahan</p>
-            <p className="text-2xl font-semibold text-gray-900">Rp {totalModal.toLocaleString()}</p>
+            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp {totalModal.toLocaleString()}</p>
           </div>
         </Card>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
-        <div className="p-4 border-b border-gray-100">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-800/50">
           <div className="relative max-w-md">
             <input 
               type="text" 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari kode atau nama barang bermasalah..." 
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           </div>
@@ -230,37 +230,37 @@ export default function WarehousePage() {
         
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0 border-t border-gray-100">
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Kode</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6">Nama Barang & Masalah</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Kategori</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Qty Gudang</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-right">Nilai Modal (Total)</TableHead>
-              <TableHead className="font-bold text-gray-700 py-4 px-6 text-center">Aksi Keputusan Owner</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0 border-t border-gray-100 dark:border-gray-800/50">
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Kode</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Nama Barang & Masalah</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Kategori</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Qty Gudang</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Nilai Modal (Total)</TableHead>
+              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Aksi Keputusan Owner</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-16 text-gray-500 font-medium border-b-0">
+                <TableCell colSpan={6} className="text-center py-16 text-gray-500 dark:text-gray-400 font-medium border-b-0">
                   Tidak ada barang bermasalah di Gudang.
                 </TableCell>
               </TableRow>
             ) : (
               filtered.map((item) => (
-                <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                  <TableCell className="px-6 py-4 font-mono font-bold text-xs text-slate-900">{item.code}</TableCell>
+                <TableRow key={item.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
+                  <TableCell className="px-6 py-4 font-mono font-bold text-xs text-slate-900 dark:text-slate-100">{item.code}</TableCell>
                   <TableCell className="px-6 py-4">
-                    <p className="font-bold text-gray-900 text-sm">{item.name}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{item.name}</p>
                     <p className="text-xs text-red-500 font-medium mt-0.5">{item.issue}</p>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-md">
+                    <span className="bg-gray-100 dark:bg-[#2a303c] text-gray-600 dark:text-gray-400 text-xs font-bold px-2.5 py-1 rounded-md">
                       {item.category}
                     </span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-center font-semibold text-gray-900 text-sm">{item.qty} pcs</TableCell>
-                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">
+                  <TableCell className="px-6 py-4 text-center font-semibold text-gray-900 dark:text-gray-100 text-sm">{item.qty} pcs</TableCell>
+                  <TableCell className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-gray-100 text-sm">
                     Rp {(item.qty * item.costPrice).toLocaleString()}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
@@ -297,59 +297,59 @@ export default function WarehousePage() {
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4 pt-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Kode Barang</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kode Barang</label>
               <input
                 type="text"
                 placeholder="Contoh: SFT-GR-050"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Nama Produk</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Produk</label>
               <input
                 type="text"
                 placeholder="Contoh: Softlens Gray Minus -0.50"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Jumlah (Pcs)</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Jumlah (Pcs)</label>
                 <input
                   type="number"
                   min="1"
                   value={qty}
                   onChange={(e) => setQty(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Harga Modal / Pcs</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Harga Modal / Pcs</label>
                 <input
                   type="number"
                   placeholder="28000"
                   value={costPrice}
                   onChange={(e) => setCostPrice(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                   required
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Detail Kerusakan / Masalah</label>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Detail Kerusakan / Masalah</label>
               <input
                 type="text"
                 placeholder="Contoh: Kemasan blister sobek saat proses ekspedisi"
                 value={issue}
                 onChange={(e) => setIssue(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
             </div>

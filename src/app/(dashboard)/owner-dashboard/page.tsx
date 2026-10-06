@@ -60,7 +60,7 @@ export default function OwnerDashboardPage() {
           <p className="text-slate-300 font-medium mb-6">Pusat kendali komprehensif aset, arus kas, dan performa cabang.</p>
           <button 
             onClick={() => alert("Menampilkan data Real Time dari semua cabang aktif...")}
-            className="bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-bold px-4 py-2.5 rounded-lg backdrop-blur-sm"
+            className="bg-white dark:bg-[#13151a]/20 hover:bg-white dark:bg-[#13151a]/30 transition-colors text-white text-sm font-bold px-4 py-2.5 rounded-lg backdrop-blur-sm"
           >
             Menampilkan Data: Semua Cabang (REAL TIME)
           </button>
@@ -69,45 +69,45 @@ export default function OwnerDashboardPage() {
 
       {/* Primary KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
-          <div className="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center mb-4">
+        <Card className="rounded-xl border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
+          <div className="w-10 h-10 bg-slate-100 dark:bg-[#2a303c] text-slate-600 rounded-xl flex items-center justify-center mb-4">
             <TrendingUp className="h-5 w-5" />
           </div>
-          <p className="text-sm font-bold text-gray-500 mb-1">Total Omzet Keseluruhan</p>
-          <h3 className="text-2xl font-semibold text-gray-900">Rp {totalOmzet.toLocaleString()}</h3>
+          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-1">Total Omzet Keseluruhan</p>
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp {totalOmzet.toLocaleString()}</h3>
         </Card>
 
-        <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
+        <Card className="rounded-xl border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
           <div className="w-10 h-10 bg-green-50 text-green-500 rounded-xl flex items-center justify-center mb-4">
             <ArrowUpRight className="h-5 w-5" />
           </div>
-          <p className="text-sm font-bold text-gray-500 mb-1">Total Laba Kotor</p>
-          <h3 className="text-2xl font-semibold text-gray-900">Rp {totalLaba.toLocaleString()}</h3>
+          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-1">Total Laba Kotor</p>
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp {totalLaba.toLocaleString()}</h3>
         </Card>
 
-        <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
+        <Card className="rounded-xl border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
           <div className="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center mb-4">
             <PackageSearch className="h-5 w-5" />
           </div>
-          <p className="text-sm font-bold text-gray-500 mb-1">Nilai Aset Stok (HPP)</p>
-          <h3 className="text-2xl font-semibold text-gray-900">Rp {asetStok.toLocaleString()}</h3>
+          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-1">Nilai Aset Stok (HPP)</p>
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp {asetStok.toLocaleString()}</h3>
         </Card>
 
-        <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
+        <Card className="rounded-xl border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden p-6 hover:shadow-sm transition-shadow">
           <div className="w-10 h-10 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center mb-4">
             <Wallet className="h-5 w-5" />
           </div>
-          <p className="text-sm font-bold text-gray-500 mb-1">Saldo Kas Toko Utama</p>
-          <h3 className="text-2xl font-semibold text-gray-900">Rp {saldoKas.toLocaleString()}</h3>
+          <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-1">Saldo Kas Toko Utama</p>
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rp {saldoKas.toLocaleString()}</h3>
         </Card>
       </div>
 
       {/* Charts section placeholders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="rounded-xl border-gray-100 shadow-sm p-6 lg:col-span-2 flex items-center justify-center h-64 text-gray-400 font-bold">
+        <Card className="rounded-xl border-gray-100 dark:border-gray-800/50 shadow-sm p-6 lg:col-span-2 flex items-center justify-center h-64 text-gray-400 font-bold">
           [ Area Grafik Tren Omzet Live ]
         </Card>
-        <Card className="rounded-xl border-gray-100 shadow-sm p-6 flex items-center justify-center h-64 text-gray-400 font-bold">
+        <Card className="rounded-xl border-gray-100 dark:border-gray-800/50 shadow-sm p-6 flex items-center justify-center h-64 text-gray-400 font-bold">
           [ Top 5 Kategori ]
         </Card>
       </div>

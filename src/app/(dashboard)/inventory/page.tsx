@@ -41,8 +41,8 @@ export default function InventoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Riwayat Stok</h1>
-        <p className="text-sm text-gray-500">Melihat pergerakan barang masuk dan keluar.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Riwayat Stok</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Melihat pergerakan barang masuk dan keluar.</p>
       </div>
 
       <Card>
@@ -61,7 +61,7 @@ export default function InventoryPage() {
               {loading ? (
                 <TableRow><TableCell colSpan={5} className="text-center">Memuat...</TableCell></TableRow>
               ) : movements.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center text-gray-500">Belum ada pergerakan stok</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center text-gray-500 dark:text-gray-400">Belum ada pergerakan stok</TableCell></TableRow>
               ) : (
                 movements.map(m => (
                   <TableRow key={m.id}>
@@ -76,7 +76,7 @@ export default function InventoryPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right font-bold">{m.qty > 0 ? `+${m.qty}` : m.qty}</TableCell>
-                    <TableCell className="text-gray-600">{m.notes || "-"}</TableCell>
+                    <TableCell className="text-gray-600 dark:text-gray-400">{m.notes || "-"}</TableCell>
                   </TableRow>
                 ))
               )}

@@ -127,8 +127,8 @@ export default function ProductsPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-normal">Master Barang</h1>
-          <p className="text-gray-500 mt-1">Kelola data stok dan harga produk softlens.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Master Barang</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola data stok dan harga produk softlens.</p>
         </div>
         <div className="flex gap-3">
           <Button onClick={handleOpenAddModal} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
@@ -143,13 +143,13 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-1">
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
           <div className="relative w-full max-w-sm">
             <input 
               type="text"
               placeholder="Cari nama barang atau kode..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
@@ -157,34 +157,34 @@ export default function ProductsPage() {
         
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white border-b-0">
-              <TableHead className="font-bold text-gray-600 py-4 px-6">Kode</TableHead>
-              <TableHead className="font-bold text-gray-600 py-4 px-6">Nama Produk</TableHead>
-              <TableHead className="font-bold text-gray-600 py-4 px-6">Harga (Reguler/Gold/VIP)</TableHead>
-              <TableHead className="font-bold text-gray-600 py-4 px-6 text-right">Stok</TableHead>
-              <TableHead className="font-bold text-gray-600 py-4 px-6 text-center">Aksi</TableHead>
+            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0">
+              <TableHead className="font-bold text-gray-600 dark:text-gray-400 py-4 px-6">Kode</TableHead>
+              <TableHead className="font-bold text-gray-600 dark:text-gray-400 py-4 px-6">Nama Produk</TableHead>
+              <TableHead className="font-bold text-gray-600 dark:text-gray-400 py-4 px-6">Harga (Reguler/Gold/VIP)</TableHead>
+              <TableHead className="font-bold text-gray-600 dark:text-gray-400 py-4 px-6 text-right">Stok</TableHead>
+              <TableHead className="font-bold text-gray-600 dark:text-gray-400 py-4 px-6 text-center">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow><TableCell colSpan={5} className="text-center py-10">Memuat...</TableCell></TableRow>
             ) : products.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-16 text-gray-500">Belum ada data barang.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center py-16 text-gray-500 dark:text-gray-400">Belum ada data barang.</TableCell></TableRow>
             ) : (
               products.map((p) => (
-                <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                  <TableCell className="px-6 font-bold text-gray-700">{p.product_code}</TableCell>
-                  <TableCell className="px-6 font-bold text-gray-900">{p.name}</TableCell>
+                <TableRow key={p.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
+                  <TableCell className="px-6 font-bold text-gray-700 dark:text-gray-300">{p.product_code}</TableCell>
+                  <TableCell className="px-6 font-bold text-gray-900 dark:text-gray-100">{p.name}</TableCell>
                   <TableCell className="px-6">
                     <div className="text-xs space-y-1">
-                      <div>R: <span className="font-semibold text-gray-900">Rp {p.price_regular.toLocaleString()}</span></div>
-                      <div>G: <span className="font-semibold text-gray-900">Rp {p.price_gold.toLocaleString()}</span></div>
-                      <div>V: <span className="font-semibold text-gray-900">Rp {p.price_vip.toLocaleString()}</span></div>
+                      <div>R: <span className="font-semibold text-gray-900 dark:text-gray-100">Rp {p.price_regular.toLocaleString()}</span></div>
+                      <div>G: <span className="font-semibold text-gray-900 dark:text-gray-100">Rp {p.price_gold.toLocaleString()}</span></div>
+                      <div>V: <span className="font-semibold text-gray-900 dark:text-gray-100">Rp {p.price_vip.toLocaleString()}</span></div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-6 text-right font-semibold text-gray-900">{p.stock_global}</TableCell>
+                  <TableCell className="px-6 text-right font-semibold text-gray-900 dark:text-gray-100">{p.stock_global}</TableCell>
                   <TableCell className="px-6 text-center space-x-2">
-                    <button onClick={() => handleOpenEditModal(p)} className="text-slate-900 hover:bg-slate-100 p-2 rounded-lg"><Edit2 className="h-4 w-4" /></button>
+                    <button onClick={() => handleOpenEditModal(p)} className="text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-[#2a303c] dark:bg-[#2a303c] p-2 rounded-lg"><Edit2 className="h-4 w-4" /></button>
                     <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg"><Trash2 className="h-4 w-4" /></button>
                   </TableCell>
                 </TableRow>
@@ -202,33 +202,33 @@ export default function ProductsPage() {
           <form onSubmit={handleSubmit} className="space-y-4 pt-4 max-h-[70vh] overflow-y-auto px-1">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Kode Barang</label>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Kode Barang</label>
                 <input required type="text" value={productCode} onChange={(e) => setProductCode(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Stok Awal</label>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Stok Awal</label>
                 <input required type="number" value={stock} onChange={(e) => setStock(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Nama Barang</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Barang</label>
               <input required type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Harga Pokok (HPP) / Modal</label>
-              <input required type="number" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className="w-full px-3 py-2 border rounded-lg bg-gray-50" />
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Harga Pokok (HPP) / Modal</label>
+              <input required type="number" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-[#1e2329]" />
             </div>
             <div className="grid grid-cols-3 gap-4 pt-2 border-t">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Harga Reguler</label>
-                <input required type="number" value={priceRegular} onChange={(e) => setPriceRegular(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-slate-200" />
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Harga Reguler</label>
+                <input required type="number" value={priceRegular} onChange={(e) => setPriceRegular(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-slate-200 dark:border-slate-800" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Harga Gold</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Harga Gold</label>
                 <input required type="number" value={priceGold} onChange={(e) => setPriceGold(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-yellow-200" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Harga VIP</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Harga VIP</label>
                 <input required type="number" value={priceVip} onChange={(e) => setPriceVip(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-purple-200" />
               </div>
             </div>
