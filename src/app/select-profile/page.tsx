@@ -40,10 +40,12 @@ export default function SelectProfilePage() {
     auditService.log("LOGIN_SISTEM", { reason: "Login perangkat kasir: " + profile.full_name }).catch(console.error);
     
     // Redirect directly based on role to avoid flashes or errors
+    // We use window.location.href instead of router.push to force a hard reload
+    // so the AuthProvider can read the new active profile from localStorage.
     if (profile.role?.toUpperCase() === 'OWNER') {
-      router.push("/");
+      window.location.href = "/";
     } else {
-      router.push("/pos");
+      window.location.href = "/pos";
     }
   };
 
