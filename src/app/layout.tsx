@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-
-const inter = Inter({ subsets: ["latin"] });
+import NextTopLoader from "nextjs-toploader";
+import { SWRProvider } from "@/components/providers/swr-provider";
 
 export const metadata: Metadata = {
   title: "Septy Softlens POS",
@@ -18,15 +17,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased">
+        <NextTopLoader color="#3b82f6" showSpinner={false} />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           disableTransitionOnChange
         >
+          <SWRProvider>
           <AuthProvider>
             {children}
           </AuthProvider>
+          </SWRProvider>
         </ThemeProvider>
       </body>
     </html>

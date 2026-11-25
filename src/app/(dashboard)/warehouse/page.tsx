@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { unwrap, scopeBranch, withBranch, friendlyError } from "@/lib/supabase/db";
 import {
   Dialog,
   DialogContent,
@@ -41,54 +42,25 @@ export default function WarehousePage() {
   const fetchDamagedGoods = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("damaged_goods")
-        .select(`
-          id,
-          qty,
-          cost_price,
-          reason,
-          status,
-          product:products(name, product_code)
-        `)
-        .eq("status", "PENDING")
-        .order("created_at", { ascending: false });
+      const rows = unwrap(await scopeBranch(
+        supabase.from("damaged_goods").select(`
+          id, code, name, category, qty, unit_cost, issue_description,
+          product:products(name)
+        `).eq("status", "PENDING") as any
+      ).order("created_at", { ascending: false }) as any);
 
-      if (!error && data && data.length > 0) {
-        const mapped: DamagedProduct[] = data.map((d: any) => ({
-          id: d.id,
-          code: d.product?.product_code || `DMG-${d.id.slice(0, 6)}`,
-          name: d.product?.name || "Barang Bermasalah",
-          category: "Softlens & Aksesoris",
-          qty: d.qty || 1,
-          costPrice: Number(d.cost_price) || 0,
-          issue: d.reason || "Kerusakan fisik",
-        }));
-        setItems(mapped);
-      } else {
-        setItems([
-          {
-            id: "1",
-            code: "SFT-GR-050",
-            name: "Softlens Gray Minus -0.50 (Kemasan Robek)",
-            category: "Softlens Warna",
-            qty: 3,
-            costPrice: 28000,
-            issue: "Kemasan blister bocor saat ekspedisi",
-          },
-          {
-            id: "2",
-            code: "CLN-60ML",
-            name: "Cairan Pembersih 60ml (Expired 1 Bulan)",
-            category: "Aksesoris",
-            qty: 5,
-            costPrice: 12000,
-            issue: "Melewati tanggal kedaluwarsa",
-          },
-        ]);
-      }
+      const mapped: DamagedProduct[] = ((rows as any[]) || []).map((d: any) => ({
+        id: d.id,
+        code: d.code || "BRG-RUSAK",
+        name: d.name || d.product?.name || "Barang Rusak",
+        category: d.category || "Lain-lain",
+        qty: Number(d.qty) || 0,
+        costPrice: Number(d.unit_cost) || 0,
+        issue: d.issue_description || "Kerusakan fisik",
+      }));
+      setItems(mapped);
     } catch (err) {
-      console.error("Error fetching damaged goods:", err);
+      alert(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -121,41 +93,76 @@ export default function WarehousePage() {
       const parsedCost = parseFloat(costPrice) || 0;
 
       // Cari product
-      const { data: prod } = await supabase
-        .from("products")
-        .select("id")
-        .or(`product_code.eq.${code.trim()},name.ilike.%${name.trim()}%`)
-        .limit(1)
-        .maybeSingle();
+      const { data: prod } = await scopeBranch(
+        supabase.from("products").select("id, stock_global").or(`product_code.eq.${code.trim()},name.ilike.%${name.trim()}%`)
+      ).limit(1).maybeSingle();
 
-      await supabase.from("damaged_goods").insert({
+      unwrap(await supabase.from("damaged_goods").insert(withBranch({
         product_id: prod?.id || null,
+        code: code.trim(),
+        name: name.trim(),
+        category: category,
         qty: parsedQty,
-        cost_price: parsedCost,
-        reason: `${issue.trim()} (${name.trim()})`,
+        unit_cost: parsedCost,
+        issue_description: issue.trim(),
         status: "PENDING",
-      });
+      })));
+
+      // If product exists, reduce global stock and log movement
+      if (prod?.id) {
+        const qtyAfter = Math.max(0, (prod.stock_global || 0) - parsedQty);
+        unwrap(await supabase.from("products").update({ stock_global: qtyAfter }).eq("id", prod.id));
+        
+        const activeProfile = JSON.parse(localStorage.getItem('activeProfile') || '{}');
+        unwrap(await supabase.from('stock_movements').insert(withBranch({
+          product_id: prod.id, 
+          movement_type: 'OUT', 
+          qty_change: -parsedQty, 
+          qty_after: qtyAfter,
+          reference_table: 'damaged_goods', 
+          notes: `Masuk gudang bermasalah: ${issue.trim()}`, 
+          created_by: activeProfile?.id,
+        })));
+      }
 
       setIsModalOpen(false);
       fetchDamagedGoods();
     } catch (err: any) {
-      console.error(err);
-      alert(`Gagal mencatat barang bermasalah: ${err.message || "Error"}`);
+      alert(friendlyError(err));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleResolve = async (id: string, actionName: string) => {
-    if (confirm(`Apakah Anda yakin ingin memproses aksi "${actionName}" untuk barang ini?`)) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    if (confirm(`Ajukan aksi "${actionName}" ke Owner untuk barang ini?`)) {
       try {
-        await supabase
-          .from("damaged_goods")
-          .update({ status: "RESOLVED", resolved_at: new Date().toISOString() })
-          .eq("id", id);
+        const activeProfile = JSON.parse(localStorage.getItem('activeProfile') || '{}');
+        
+        unwrap(await supabase.from("damaged_goods").update({
+          status: "WAITING_APPROVAL",
+        }).eq("id", id));
+
+        unwrap(await supabase.from("approvals").insert(withBranch({
+          category: 'DAMAGED_WRITE_OFF',
+          title: `Pengajuan ${actionName}: ${item.name}`,
+          requester_id: activeProfile?.id || null,
+          details: {
+             damaged_goods_id: id,
+             action_name: actionName,
+             qty: item.qty,
+             cost_price: item.costPrice,
+             issue: item.issue
+          }
+        })));
+
         fetchDamagedGoods();
+        alert("Pengajuan berhasil dikirim ke Pusat Approval Owner.");
       } catch (err) {
-        setItems(items.filter((item) => item.id !== id));
+        alert(friendlyError(err));
       }
     }
   };
@@ -178,14 +185,14 @@ export default function WarehousePage() {
           <Button
             onClick={fetchDamagedGoods}
             variant="outline"
-            className="rounded-xl h-11 px-3 border-gray-200 dark:border-gray-800"
+            className="border-gray-200 dark:border-gray-800"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold shadow-sm flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" /> Catat Barang Bermasalah
           </Button>

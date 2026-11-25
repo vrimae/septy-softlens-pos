@@ -96,5 +96,71 @@ export const settingsService = {
 
     if (error) throw new Error(error.message);
     return data as Branch;
+  },
+
+  async getSubscriptionConfig() {
+    const settings = await settingsService.getStoreSettings();
+    const rolePerms = (settings as any)?.role_permissions || {};
+    return {
+      global: rolePerms.global_subscription || {
+        default_ai_daily_limit: 50,
+        default_expires_at: '2026-12-31',
+      },
+      accounts: (rolePerms.accounts_config || {}) as Record<string, {
+        ai_daily_limit: number;
+        expires_at: string;
+        is_lifetime?: boolean;
+        updated_at?: string;
+      }>
+    };
+  },
+
+  async updateAccountSubscription(accountKey: string, payload: {
+    ai_daily_limit: number;
+    expires_at: string;
+    is_lifetime?: boolean;
+    status?: string;
+  }) {
+    const settings = await settingsService.getStoreSettings();
+    if (!settings?.id) throw new Error("Store settings belum dikonfigurasi");
+
+    const currentPerms = (settings as any).role_permissions || {};
+    const accountsConfig = { ...(currentPerms.accounts_config || {}) };
+
+    accountsConfig[accountKey] = {
+      ai_daily_limit: payload.ai_daily_limit,
+      expires_at: payload.expires_at,
+      is_lifetime: !!payload.is_lifetime,
+      updated_at: new Date().toISOString()
+    };
+
+    const updatedPerms = {
+      ...currentPerms,
+      accounts_config: accountsConfig
+    };
+
+    const { error } = await supabase
+      .from('store_settings')
+      .update({
+        role_permissions: updatedPerms,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', settings.id);
+
+    if (error) throw new Error(error.message);
+
+    // Jika ada perubahan status akun, sinkronkan ke tabel profiles
+    if (payload.status) {
+      await supabase
+        .from('profiles')
+        .update({
+          status: payload.status,
+          is_active: payload.status === 'ACTIVE',
+          updated_at: new Date().toISOString()
+        })
+        .or(`id.eq.${accountKey},email.ilike.${accountKey}`);
+    }
+
+    return accountsConfig[accountKey];
   }
 };

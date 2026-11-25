@@ -26,10 +26,10 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
 
-export function Sidebar() {
+export function Sidebar({ isMobile }: { isMobile?: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { activeProfile, role, branches, activeBranch, setActiveBranch } = useAuth();
+  const { user, activeProfile, role, branches, activeBranch, setActiveBranch } = useAuth();
   const [searchMenu, setSearchMenu] = useState("");
   
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
@@ -41,6 +41,31 @@ export function Sidebar() {
     'keuangan': false,
     'sistem': false,
   });
+
+  const [rolePermissions, setRolePermissions] = useState<Record<string, boolean> | null>(null);
+  const [loadingPerms, setLoadingPerms] = useState(true);
+
+  useEffect(() => {
+    async function loadPerms() {
+      if (role === 'owner') {
+        setLoadingPerms(false);
+        return; // owner bypasses
+      }
+      
+      const { data } = await supabase.from('store_settings').select('role_permissions').limit(1).maybeSingle();
+      if (data?.role_permissions) {
+        if (role === 'admin') {
+          setRolePermissions(data.role_permissions.admin || {});
+        } else {
+          setRolePermissions(data.role_permissions.kasir || {});
+        }
+      } else {
+        setRolePermissions({}); // no settings yet
+      }
+      setLoadingPerms(false);
+    }
+    if (role) loadPerms();
+  }, [role]);
 
   useEffect(() => {
     if (pathname.includes('/products') || pathname.includes('/categories') || pathname.includes('/customers') || pathname.includes('/promos') || pathname.includes('/rewards')) {
@@ -55,7 +80,7 @@ export function Sidebar() {
     if (pathname.includes('/cashflow') || pathname.includes('/laporan-utama') || pathname.includes('/reports')) {
       setOpenMenus(prev => ({ ...prev, keuangan: true }));
     }
-    if (pathname.includes('/users') || pathname.includes('/settings') || pathname.includes('/audit-trail') || pathname.includes('/superadmin')) {
+    if (pathname.includes('/users') || pathname.includes('/settings') || pathname.includes('/audit-trail') || pathname.includes('/superadmin') || pathname.includes('/ai-insights')) {
       setOpenMenus(prev => ({ ...prev, sistem: true }));
     }
   }, [pathname]);
@@ -75,6 +100,64 @@ export function Sidebar() {
     "Cabang 1 (Sidoarjo)",
   ];
 
+  const permissionMap: Record<string, string> = {
+    '/': 'Dashboard',
+    '/owner-dashboard': 'Dashboard',
+    '/products': 'Master Barang',
+    '/categories': 'Kategori Barang',
+    '/customers': 'Pelanggan',
+    '/promos': 'Master Promo',
+    '/rewards': 'Master Reward',
+    '/approvals': 'Approval Owner', // Only owner/admin usually, map to "Pengaturan Akses" or similar? Wait, Approvals is missing from settings.
+    '/pos': 'Kasir (POS)',
+    '/riwayat-transaksi': 'Kasir (POS)', // History
+    '/tutup-kas': 'Kasir (POS)',
+    '/returns': 'Retur / Tukar Barang',
+    '/purchases': 'Restock Barang',
+    '/suppliers': 'Restock Barang', 
+    '/slow-moving': 'Laporan Stok Mengendap',
+    '/warehouse': 'Gudang Barang Bermasalah',
+    '/restock': 'AI Restock',
+    '/ai-insights': 'Insight AI Owner',
+    '/cashflow': 'Buku Kas',
+    '/laporan-utama': 'Laporan ERP',
+    '/reports': 'Laporan ERP',
+    '/users': 'Manajemen User',
+    '/settings': 'Pengaturan Akses',
+    '/audit-trail': 'Pengaturan Akses',
+    '/superadmin': 'Pengaturan Akses', // Hide superadmin under pengaturan akses 
+  };
+
+  const hasAccess = (href: string) => {
+    // Menu Super Admin Panel HANYA boleh muncul untuk akun / role yang menggunakan email vrimae
+    if (href === '/superadmin') {
+      const activeEmail = (activeProfile?.email || '').toLowerCase().trim();
+      if (activeEmail) {
+        return activeEmail.includes('vrimae');
+      }
+      // Fallback jika belum memilih profil, cek email sesi auth
+      if (!activeProfile && user?.email) {
+        return user.email.toLowerCase().trim().includes('vrimae');
+      }
+      return false;
+    }
+
+    if (role === 'owner') return true;
+    if (loadingPerms) return false; // wait for fetch
+    
+    // Hardcode: Owner dashboard, approvals, ai insights, dan audit-trail strictly owner only
+    if (['/owner-dashboard', '/approvals', '/ai-insights', '/audit-trail'].includes(href)) {
+      return false; // Nobody except owner can see these
+    }
+
+    if (!rolePermissions) return false;
+    
+    const permKey = permissionMap[href];
+    if (!permKey) return false; // If we didn't map it, assume it's hidden
+    
+    return rolePermissions[permKey] === true;
+  };
+
   const menuItems = [
     { 
       title: 'Master Data', icon: Box, key: 'master',
@@ -83,8 +166,8 @@ export function Sidebar() {
         { title: 'Kategori Barang', href: '/categories' },
         { title: 'Pelanggan', href: '/customers' },
         { title: 'Master Promo', href: '/promos' },
-        { title: 'Master Reward (...)', href: '/rewards' },
-      ]
+        { title: 'Master Reward', href: '/rewards' },
+      ].filter(c => hasAccess(c.href))
     },
     { 
       title: 'Transaksi', icon: ShoppingCart, key: 'transaksi',
@@ -94,7 +177,7 @@ export function Sidebar() {
         { title: 'Riwayat Transaksi', href: '/riwayat-transaksi' },
         { title: 'Tutup Kas', href: '/tutup-kas' },
         { title: 'Retur / Tukar', href: '/returns' },
-      ]
+      ].filter(c => hasAccess(c.href))
     },
     { 
       title: 'Gudang & Supplier', icon: Store, key: 'gudang',
@@ -102,9 +185,9 @@ export function Sidebar() {
         { title: 'Restock Barang', href: '/purchases' },
         { title: 'Utang Supplier', href: '/suppliers' },
         { title: 'Stok Mengendap', href: '/slow-moving' },
-        { title: 'Barang Bermasa...', href: '/warehouse' },
-        { title: 'Sistem Restock', href: '/restock' },
-      ]
+        { title: 'Barang Bermasalah', href: '/warehouse' },
+        { title: 'AI Restock', href: '/restock' },
+      ].filter(c => hasAccess(c.href))
     },
     { 
       title: 'Keuangan & Laporan', icon: Wallet, key: 'keuangan',
@@ -112,22 +195,22 @@ export function Sidebar() {
         { title: 'Buku Kas', href: '/cashflow' },
         { title: 'Laporan Utama', href: '/laporan-utama' },
         { title: 'Laporan (Lama)', href: '/reports' },
-      ]
+      ].filter(c => hasAccess(c.href))
     },
     { 
       title: 'Sistem & Admin', icon: Settings, key: 'sistem',
       children: [
         { title: 'Manajemen User', href: '/users' },
-        { title: 'Pengaturan (Ca...', href: '/settings' },
+        { title: 'Pengaturan Sistem', href: '/settings' },
         { title: 'Audit Trail', href: '/audit-trail' },
-        { title: 'Insight AI Owner', href: '/restock' },
+        { title: 'Insight AI Owner', href: '/ai-insights' },
         { title: 'Super Admin Panel', href: '/superadmin' },
-      ]
+      ].filter(c => hasAccess(c.href))
     },
-  ];
+  ].filter(m => m.children.length > 0);
 
   return (
-    <aside className="w-[280px] bg-white dark:bg-[#13151a] border-r border-gray-100 dark:border-gray-800/50 flex-col hidden md:flex h-full shrink-0 select-none">
+    <aside className={cn("w-[280px] bg-white dark:bg-[#13151a] border-r border-gray-100 dark:border-gray-800/50 flex-col h-full shrink-0 select-none", !isMobile && "hidden md:flex", isMobile && "flex w-full")}>
       <div className="h-20 flex items-center px-6 gap-3 shrink-0">
         <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold italic text-xs shadow-sm">
           Septy
@@ -148,7 +231,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 custom-scrollbar pb-4">
+      <div className="flex-1 overflow-y-auto overflow-x-auto px-4 pb-4">
         {/* Cabang Switcher Interaktif */}
         <div className="mb-6 relative">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">KONTINER AKTIF</p>
@@ -280,10 +363,12 @@ export function Sidebar() {
 
       <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 shrink-0 space-y-2">
         <div className="flex items-center justify-between mb-4 px-1">
+          {role === 'owner' ? (
           <Link href="/store-profile" className="flex items-center gap-3 py-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors rounded-lg">
             <Settings className="h-4 w-4 text-gray-400" />
             Profil Toko
           </Link>
+          ) : <span />}
           <ThemeToggle />
         </div>
         <div 

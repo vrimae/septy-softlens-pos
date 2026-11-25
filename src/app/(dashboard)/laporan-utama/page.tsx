@@ -92,13 +92,13 @@ export default function LaporanUtamaPage() {
           <Button 
             onClick={() => setIsFilterModalOpen(true)}
             variant="outline" 
-            className="bg-white dark:bg-[#13151a] hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329] font-bold shadow-sm h-11 px-5 border-gray-200 dark:border-gray-800 rounded-xl flex items-center gap-2"
+            className="bg-white dark:bg-[#13151a] hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329] font-bold shadow-sm border-gray-200 dark:border-gray-800 flex items-center gap-2"
           >
             <Filter className="h-4 w-4" /> Filter Lanjut
           </Button>
           <Button 
             onClick={handleExportCSV}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm h-11 px-5 rounded-xl flex items-center gap-2"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm flex items-center gap-2"
           >
             <Download className="h-4 w-4" /> Export CSV
           </Button>

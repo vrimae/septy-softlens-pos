@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { returnsService } from "@/lib/services";
+import { unwrap, scopeBranch, withBranch, friendlyError, getActiveProfileId } from "@/lib/supabase/db";
 import {
   Dialog,
   DialogContent,
@@ -44,54 +45,30 @@ export default function ReturnsPage() {
   const fetchReturns = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("returns")
-        .select(`
-          id,
-          return_number,
-          return_type,
-          price_difference,
-          created_at,
+      let query = supabase.from("returns").select(`
+          id, return_number, created_at, return_type, price_difference,
           sale:sales(invoice_number, receipt_number)
-        `)
-        .order("created_at", { ascending: false });
+        `);
+      query = scopeBranch(query);
+      const rows = unwrap(await query.order("created_at", { ascending: false }));
 
-      if (!error && data && data.length > 0) {
-        const mapped: ReturnItem[] = data.map((r: any) => ({
-          id: r.return_number || `RET-${r.id.slice(0, 6)}`,
-          date: new Date(r.created_at).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
-          originalTrx: r.sale?.invoice_number || r.sale?.receipt_number || "TRX-POS",
-          item: "Lensa Kontak Softlens",
-          qty: 1,
-          reason: "Tukar Varian / Minus",
-          destination: "Gudang Baik",
-          exchangeWith: "Varian Sesuai Resep",
-          difference: Number(r.price_difference) || 0,
-          handler: "Kasir & Owner",
-        }));
-        setReturnsList(mapped);
-      } else {
-        setReturnsList([
-          {
-            id: "RET-101",
-            date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-            originalTrx: "INV-20261006-0001",
-            item: "X2 Sanso Color Hazel Plano",
-            qty: 1,
-            reason: "Minus Salah Beli",
-            destination: "Gudang Baik",
-            exchangeWith: "X2 Sanso Color Hazel -2.00",
-            difference: 0,
-            handler: "Kasir Utama",
-          },
-        ]);
-      }
+      const mapped: ReturnItem[] = (rows || []).map((r: any) => ({
+        id: r.return_number || `RET-${r.id.slice(0, 6)}`,
+        date: new Date(r.created_at).toLocaleDateString("id-ID", {
+          day: "numeric", month: "short", year: "numeric",
+        }),
+        originalTrx: r.sale?.invoice_number || r.sale?.receipt_number || "TRX-POS",
+        item: "Lensa Kontak Softlens",
+        qty: 1,
+        reason: "Tukar Varian / Minus",
+        destination: "Gudang Baik",
+        exchangeWith: "Varian Sesuai Resep",
+        difference: Number(r.price_difference) || 0,
+        handler: "Kasir",
+      }));
+      setReturnsList(mapped);
     } catch (err) {
-      console.error("Error fetching returns:", err);
+      alert(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -121,27 +98,23 @@ export default function ReturnsPage() {
       const returnNumber = `RTN-${Date.now().toString().slice(-6)}`;
       const diffAmount = parseFloat(difference) || 0;
 
-      // Cek sale id
-      const { data: saleData } = await supabase
-        .from("sales")
-        .select("id")
-        .or(`invoice_number.eq.${originalTrx.trim()},receipt_number.eq.${originalTrx.trim()}`)
-        .limit(1)
-        .maybeSingle();
+      let saleQuery = supabase.from("sales").select("id").or(`invoice_number.eq.${originalTrx.trim()},receipt_number.eq.${originalTrx.trim()}`);
+      saleQuery = scopeBranch(saleQuery);
+      const saleData = unwrap(await saleQuery.limit(1).maybeSingle());
 
-      await supabase.from("returns").insert({
+      unwrap(await supabase.from("returns").insert(withBranch({
         return_number: returnNumber,
         sale_id: saleData?.id || null,
         return_type: diffAmount > 0 ? "REFUND" : "EXCHANGE",
         price_difference: diffAmount,
         status: "COMPLETED",
-      });
+        cashier_id: getActiveProfileId(),
+      })));
 
       setIsModalOpen(false);
       fetchReturns();
     } catch (err: any) {
-      console.error(err);
-      alert(`Gagal memproses retur: ${err.message || "Error"}`);
+      alert(friendlyError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -158,14 +131,14 @@ export default function ReturnsPage() {
           <Button
             onClick={fetchReturns}
             variant="outline"
-            className="rounded-xl h-11 px-3 border-gray-200 dark:border-gray-800"
+            className="border-gray-200 dark:border-gray-800"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" /> Proses Retur / Tukar
           </Button>

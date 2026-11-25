@@ -43,7 +43,7 @@ export default function AuditTrailPage() {
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Audit Trail</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Catatan seluruh aktivitas penting dalam sistem. Data ini tidak dapat dihapus oleh siapapun.</p>
         </div>
-        <Button onClick={fetchLogs} className="bg-slate-900 dark:bg-[#13151a] hover:bg-slate-800 dark:hover:bg-[#2a303c] text-white font-bold rounded-lg px-4 h-10 shadow-sm transition-colors">
+        <Button onClick={fetchLogs} className="bg-slate-900 dark:bg-[#13151a] hover:bg-slate-800 dark:hover:bg-[#2a303c] text-white font-bold shadow-sm transition-colors">
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh Data
         </Button>

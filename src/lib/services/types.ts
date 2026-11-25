@@ -119,14 +119,17 @@ export interface PrescriptionData {
 
 export interface Customer {
   id: string;
-  customer_code: string;
   name: string;
+  customer_code?: string;
   phone?: string | null;
   email?: string | null;
   address?: string | null;
-  points: number;
-  total_spent: number;
+  customer_level?: string;
+  points?: number;
+  total_spend?: number;
+  total_spent?: number;
   notes?: string | null;
+  prescription_notes?: any;
   prescription_data?: PrescriptionData | null;
   created_at?: string;
   updated_at?: string;

@@ -1726,3 +1726,135 @@ GRANT EXECUTE ON FUNCTION public.get_all_users_for_admin() TO anon, authenticate
 -- FILE: supabase\migrations\20261006100003_seed_data.sql
 -- ==============================================================================
 -- ==============================================================================
+-- ==============================================================================
+-- ADDED RPC: create_user_by_admin (For SuperAdmin / Owner)
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.create_user_by_admin(
+  p_email VARCHAR,
+  p_password VARCHAR,
+  p_full_name VARCHAR,
+  p_role VARCHAR,
+  p_branch_id UUID DEFAULT NULL
+) RETURNS UUID AS $$
+DECLARE
+  new_user_id UUID;
+BEGIN
+  new_user_id := gen_random_uuid();
+
+  INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    created_at,
+    updated_at
+  ) VALUES (
+    '00000000-0000-0000-0000-000000000000',
+    new_user_id,
+    'authenticated',
+    'authenticated',
+    p_email,
+    crypt(p_password, gen_salt('bf')),
+    now(),
+    '{"provider":"email","providers":["email"]}',
+    jsonb_build_object('full_name', p_full_name),
+    now(),
+    now()
+  );
+  
+  INSERT INTO public.profiles (
+    id,
+    email,
+    full_name,
+    role,
+    branch_id,
+    status,
+    is_active
+  ) VALUES (
+    new_user_id,
+    p_email,
+    p_full_name,
+    p_role,
+    p_branch_id,
+    'ACTIVE',
+    true
+  );
+
+  RETURN new_user_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth, extensions;
+-- ==============================================================================
+-- UPDATED RPC: get_current_system_cash & close_cash_shift (Uses cash_flows for exact drawer cash)
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.get_current_system_cash(p_cashier_id UUID)
+ RETURNS NUMERIC
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'pg_temp'
+AS $$
+DECLARE
+  v_system_cash NUMERIC(15,2);
+  v_last_closing TIMESTAMP WITH TIME ZONE;
+BEGIN
+  SELECT COALESCE(MAX(shift_end), '1970-01-01 00:00:00+00') INTO v_last_closing
+  FROM public.shift_closings
+  WHERE closed_by = p_cashier_id;
+
+  SELECT COALESCE(SUM(amount), 0.00)
+  INTO v_system_cash
+  FROM public.cash_flows
+  WHERE flow_type = 'IN'
+    AND created_by = p_cashier_id
+    AND created_at > v_last_closing;
+
+  v_system_cash := v_system_cash - COALESCE(
+    (SELECT SUM(amount) FROM public.cash_flows 
+     WHERE flow_type = 'OUT' AND created_by = p_cashier_id AND created_at > v_last_closing),
+    0.00
+  );
+  
+  RETURN GREATEST(0.00, v_system_cash);
+END;
+$$;
+-- ==============================================================================
+-- UPDATED RPC 2: Fix column closed_by -> cashier_id
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.get_current_system_cash(p_cashier_id UUID)
+ RETURNS NUMERIC
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'pg_temp'
+AS $$
+DECLARE
+  v_system_cash NUMERIC(15,2);
+  v_last_closing TIMESTAMP WITH TIME ZONE;
+BEGIN
+  SELECT COALESCE(MAX(shift_end), '1970-01-01 00:00:00+00') INTO v_last_closing
+  FROM public.shift_closings
+  WHERE cashier_id = p_cashier_id;
+
+  SELECT COALESCE(SUM(amount), 0.00)
+  INTO v_system_cash
+  FROM public.cash_flows
+  WHERE flow_type = 'IN'
+    AND created_by = p_cashier_id
+    AND created_at > v_last_closing;
+
+  v_system_cash := v_system_cash - COALESCE(
+    (SELECT SUM(amount) FROM public.cash_flows 
+     WHERE flow_type = 'OUT' AND created_by = p_cashier_id AND created_at > v_last_closing),
+    0.00
+  );
+  
+  RETURN GREATEST(0.00, v_system_cash);
+END;
+$$;
+-- ==============================================================================
+-- UPDATED SCHEMA: Add branch_id to approvals
+-- ==============================================================================
+ALTER TABLE public.approvals ADD COLUMN IF NOT EXISTS branch_id UUID REFERENCES public.branches(id);

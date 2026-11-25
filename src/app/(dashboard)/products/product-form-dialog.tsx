@@ -23,9 +23,13 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
     color: "",
     sku: "",
     sell_price: 0,
+    price_gold: 0,
+    price_vip: 0,
     cost_price: 0,
     is_active: true
   });
+  const [isManualGold, setIsManualGold] = useState(false);
+  const [isManualVip, setIsManualVip] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -35,14 +39,20 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
         type: product.type || "",
         color: product.color || "",
         sku: product.sku || "",
-        sell_price: product.sell_price || 0,
+        sell_price: product.sell_price || product.price_regular || 0,
+        price_gold: product.price_gold || 0,
+        price_vip: product.price_vip || 0,
         cost_price: product.cost_price || 0,
         is_active: product.is_active ?? true
       });
+      setIsManualGold(true);
+      setIsManualVip(true);
     } else {
       setFormData({
-        name: "", brand: "", type: "", color: "", sku: "", sell_price: 0, cost_price: 0, is_active: true
+        name: "", brand: "", type: "", color: "", sku: "", sell_price: 0, price_gold: 0, price_vip: 0, cost_price: 0, is_active: true
       });
+      setIsManualGold(false);
+      setIsManualVip(false);
     }
   }, [product, isOpen]);
 
@@ -113,7 +123,54 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sell_price">Harga Jual *</Label>
-                <Input id="sell_price" type="number" required value={formData.sell_price} onChange={(e) => setFormData({...formData, sell_price: Number(e.target.value)})} />
+                <Input 
+                  id="sell_price" 
+                  type="number" 
+                  required 
+                  value={formData.sell_price} 
+                  onChange={(e) => {
+                    const sp = Number(e.target.value) || 0;
+                    setFormData({
+                      ...formData, 
+                      sell_price: sp,
+                      price_gold: !isManualGold ? (sp > 0 ? Math.max(0, sp - 3000) : 0) : formData.price_gold,
+                      price_vip: !isManualVip ? (sp > 0 ? Math.max(0, sp - 5000) : 0) : formData.price_vip,
+                    });
+                  }} 
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="price_gold">Harga Gold</Label>
+                  <span className="text-[10px] text-amber-600 font-semibold">{isManualGold ? "(Manual)" : "(-3k Otomatis)"}</span>
+                </div>
+                <Input 
+                  id="price_gold" 
+                  type="number" 
+                  value={formData.price_gold} 
+                  onChange={(e) => {
+                    setIsManualGold(true);
+                    setFormData({...formData, price_gold: Number(e.target.value) || 0});
+                  }} 
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="price_vip">Harga VIP</Label>
+                  <span className="text-[10px] text-purple-600 font-semibold">{isManualVip ? "(Manual)" : "(-5k Otomatis)"}</span>
+                </div>
+                <Input 
+                  id="price_vip" 
+                  type="number" 
+                  value={formData.price_vip} 
+                  onChange={(e) => {
+                    setIsManualVip(true);
+                    setFormData({...formData, price_vip: Number(e.target.value) || 0});
+                  }} 
+                />
               </div>
             </div>
           </div>

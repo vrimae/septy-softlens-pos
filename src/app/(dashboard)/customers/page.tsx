@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { unwrap, scopeBranch, withBranch, friendlyError } from "@/lib/supabase/db";
+import { auditService } from "@/lib/services/audit.service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useAuth } from "@/components/providers/auth-provider";
+import useSWR from "swr";
 
 type Customer = {
   id: string;
@@ -17,9 +21,9 @@ type Customer = {
 };
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loading, setLoading] = useState(true);
-  
+  const { role } = useAuth();
+  const isOwner = role === "owner";
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -31,21 +35,15 @@ export default function CustomersPage() {
   const [customerLevel, setCustomerLevel] = useState("REGULER");
   const [points, setPoints] = useState("0");
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+  const { data: customers = [], mutate, isValidating } = useSWR('customers_list', async () => {
+    return (unwrap(await scopeBranch(
+      supabase.from('customers').select('*').is('deleted_at', null)
+    ).order('created_at', { ascending: false })) as Customer[]) || [];
+  });
+  const loading = !customers.length && isValidating;
 
   const fetchCustomers = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.from('customers').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      if (data) setCustomers(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    await mutate();
   };
 
   const handleOpenAdd = () => {
@@ -69,10 +67,11 @@ export default function CustomersPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Hapus pelanggan ini?")) return;
     try {
-      await supabase.from('customers').delete().eq('id', id);
+      unwrap(await supabase.from('customers').update({ deleted_at: new Date().toISOString() }).eq('id', id));
+      auditService.log("HAPUS_PELANGGAN", { tableName: "customers", recordId: id });
       fetchCustomers();
     } catch (err) {
-      alert("Gagal menghapus.");
+      alert(friendlyError(err));
     }
   };
 
@@ -80,25 +79,29 @@ export default function CustomersPage() {
     e.preventDefault();
     if (!name.trim()) return;
     setIsSubmitting(true);
-    
+
     try {
+      // Member baru otomatis menjadi Reguler. Perubahan level member hanya bisa dilakukan oleh Owner.
+      const resolvedLevel = !editingId ? "REGULER" : (isOwner ? customerLevel : (customers.find(c => c.id === editingId)?.customer_level || "REGULER"));
+
       const payload = {
-        name,
-        phone,
-        customer_level: customerLevel,
-        points: parseInt(points) || 0
+        name: name.trim(),
+        phone: phone.trim(),
+        customer_level: resolvedLevel,
+        points: Math.max(0, parseInt(points) || 0)
       };
 
       if (editingId) {
-        await supabase.from('customers').update(payload).eq('id', editingId);
+        unwrap(await supabase.from('customers').update(payload).eq('id', editingId));
+        auditService.log("UBAH_PELANGGAN", { tableName: "customers", recordId: editingId, after: payload });
       } else {
-        await supabase.from('customers').insert(payload);
+        const created = unwrap(await supabase.from('customers').insert(withBranch(payload)).select('id').single());
+        if (created?.id) auditService.log("TAMBAH_PELANGGAN", { tableName: "customers", recordId: created.id, after: payload });
       }
       setIsModalOpen(false);
       fetchCustomers();
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Gagal menyimpan.");
+      alert(friendlyError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -111,7 +114,7 @@ export default function CustomersPage() {
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal">Database Pelanggan</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola data member dan reward poin loyalitas.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-5 font-semibold shadow-sm h-11">
+        <Button onClick={handleOpenAdd} className="bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm h-11">
           <Plus className="h-4 w-4 mr-2" /> Daftarkan Member Baru
         </Button>
       </div>
@@ -171,17 +174,49 @@ export default function CustomersPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Level</label>
-                <select value={customerLevel} onChange={e => setCustomerLevel(e.target.value)} className="w-full px-3 py-2 border rounded-lg">
-                  <option value="REGULER">Reguler</option>
-                  <option value="GOLD">Gold</option>
-                  <option value="VIP">VIP</option>
-                </select>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
+                  Level Member {!isOwner && <span className="text-[11px] text-amber-600 font-normal">(Khusus Owner)</span>}
+                </label>
+                {!editingId ? (
+                  <div>
+                    <input
+                      disabled
+                      type="text"
+                      value="REGULER (Otomatis Member Baru)"
+                      className="w-full px-3 py-2 border rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-semibold"
+                    />
+                    <p className="text-[11px] text-gray-500 mt-1">Member baru otomatis terdaftar sebagai Reguler.</p>
+                  </div>
+                ) : isOwner ? (
+                  <select
+                    value={customerLevel}
+                    onChange={e => setCustomerLevel(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg font-semibold"
+                  >
+                    <option value="REGULER">Reguler</option>
+                    <option value="GOLD">Gold (Harga Reseller/Grosir)</option>
+                    <option value="VIP">VIP (Harga Khusus)</option>
+                  </select>
+                ) : (
+                  <div>
+                    <input
+                      disabled
+                      type="text"
+                      value={customerLevel}
+                      className="w-full px-3 py-2 border rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold text-xs"
+                    />
+                    <p className="text-[11px] text-amber-600 font-medium mt-1">Perubahan level member hanya dapat dilakukan oleh Owner.</p>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Poin Loyalitas</label>
                 <input type="number" value={points} onChange={e => setPoints(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
               </div>
+            </div>
+
+            <div className="p-2.5 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg text-xs text-blue-800 dark:text-blue-300">
+              ℹ️ Membership Septy Softlens tidak memiliki masa berlaku (Aktif Permanen).
             </div>
             <DialogFooter className="pt-4 border-t">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Batal</Button>

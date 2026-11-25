@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase/client";
+import { unwrap, scopeBranch, withBranch, friendlyError } from "@/lib/supabase/db";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Trash2, Tag } from "lucide-react";
 import {
@@ -43,38 +45,71 @@ export default function PromosPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
-  const [type, setType] = useState("Persentase (%)");
+  const [type, setType] = useState("PERCENT");
   const [target, setTarget] = useState("Semua Softlens");
   const [period, setPeriod] = useState("30 Hari Kedepan");
 
+  const fetchPromos = async () => {
+    try {
+      const rows = unwrap(await scopeBranch(
+        supabase.from("promos").select("*").order("created_at", { ascending: false })
+      ));
+      const mapped: Promo[] = (rows || []).map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        type: r.promo_type === "PERCENT" ? "Persentase (%)" :
+              r.promo_type === "FLAT" ? "Nominal Potongan (Rp)" :
+              r.promo_type === "BUY_X_GET_Y" ? "Beli X Gratis Y" :
+              r.promo_type === "GROSIR" ? "Harga Grosir" : r.promo_type,
+        target: r.target || "Semua Barang",
+        period: r.period || "Selamanya",
+        status: r.status || "AKTIF",
+      }));
+      setPromos(mapped);
+    } catch (err) {
+      alert(friendlyError(err));
+    }
+  };
+
+  useEffect(() => {
+    fetchPromos();
+  }, []);
+
   const handleOpenAdd = () => {
     setName("");
-    setType("Persentase (%)");
+    setType("PERCENT");
     setTarget("Semua Softlens");
     setPeriod("30 Hari Kedepan");
     setIsModalOpen(true);
   };
 
-  const handleCreatePromo = (e: React.FormEvent) => {
+  const handleCreatePromo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-
-    const newPromo: Promo = {
-      id: Date.now().toString(),
-      name,
-      type,
-      target,
-      period,
-      status: "AKTIF",
-    };
-
-    setPromos([...promos, newPromo]);
-    setIsModalOpen(false);
+    try {
+      unwrap(await supabase.from("promos").insert(withBranch({
+        name: name.trim(),
+        promo_type: type,
+        target: target,
+        period: period,
+        status: "AKTIF",
+        is_active: true
+      })));
+      setIsModalOpen(false);
+      fetchPromos();
+    } catch (err) {
+      alert(friendlyError(err));
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Hapus promo ini?")) {
-      setPromos(promos.filter((p) => p.id !== id));
+      try {
+        unwrap(await supabase.from("promos").delete().eq("id", id));
+        fetchPromos();
+      } catch (err) {
+        alert(friendlyError(err));
+      }
     }
   };
 
@@ -87,7 +122,7 @@ export default function PromosPage() {
         </div>
         <Button 
           onClick={handleOpenAdd}
-          className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm flex items-center gap-2 shrink-0"
         >
           <Plus className="h-4 w-4" /> Tambah Promo
         </Button>
@@ -173,10 +208,10 @@ export default function PromosPage() {
                 onChange={(e) => setType(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
               >
-                <option value="Persentase (%)">Diskon Persentase (%)</option>
-                <option value="Nominal Potongan (Rp)">Nominal Potongan (Rp)</option>
-                <option value="Buy X Get Y">Beli X Gratis Y</option>
-                <option value="Harga Grosir">Harga Khusus Grosir</option>
+                <option value="PERCENT">Diskon Persentase (%)</option>
+                <option value="FLAT">Nominal Potongan (Rp)</option>
+                <option value="BUY_X_GET_Y">Beli X Gratis Y</option>
+                <option value="GROSIR">Harga Khusus Grosir</option>
               </select>
             </div>
             <div>

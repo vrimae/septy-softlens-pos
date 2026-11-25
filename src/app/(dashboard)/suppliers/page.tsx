@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, Plus, CreditCard, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/client";
-import { purchasesService } from "@/lib/services";
+import { unwrap, scopeBranch, withBranch, friendlyError } from "@/lib/supabase/db";
 import {
   Dialog,
   DialogContent,
@@ -42,51 +42,35 @@ export default function SuppliersPage() {
   const fetchDebts = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("purchases")
-        .select(`
+      const rows = unwrap(await scopeBranch(
+        (supabase.from("purchases").select(`
           id,
           po_number,
-          total_amount,
-          debt_amount,
+          total_cost,
+          debt_balance,
           payment_status,
           created_at,
           supplier:suppliers(name)
-        `)
-        .order("created_at", { ascending: false });
+        `) as any)
+      ).order("created_at", { ascending: false }));
 
-      if (!error && data && data.length > 0) {
-        const mapped: DebtItem[] = data.map((item: any) => ({
-          id: item.id,
-          poNumber: item.po_number || `PO-${item.id.slice(0, 8)}`,
-          supplier: item.supplier?.name || "PT Optik Sentosa Abadi",
-          date: new Date(item.created_at).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
-          dueDate: "30 Hari Lagi",
-          totalDebt: Number(item.total_amount) || 0,
-          remainingDebt: Number(item.debt_amount) || 0,
-          status: Number(item.debt_amount) === 0 ? "LUNAS" : "BELUM LUNAS",
-        }));
-        setDebts(mapped);
-      } else {
-        setDebts([
-          {
-            id: "1",
-            poNumber: "PO-2026-001",
-            supplier: "PT Optik Sentosa Abadi",
-            date: "01 Okt 2026",
-            dueDate: "30 Okt 2026",
-            totalDebt: 5000000,
-            remainingDebt: 2500000,
-            status: "BELUM LUNAS",
-          },
-        ]);
-      }
+      const mapped: DebtItem[] = ((rows as any[]) || []).map((item: any) => ({
+        id: item.id,
+        poNumber: item.po_number || `PO-${item.id.slice(0, 8)}`,
+        supplier: item.supplier?.name || "PT Optik Sentosa Abadi",
+        date: new Date(item.created_at).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        dueDate: "30 Hari Lagi",
+        totalDebt: Number(item.total_cost) || 0,
+        remainingDebt: Number(item.debt_balance) || 0,
+        status: Number(item.debt_balance) === 0 ? "LUNAS" : "BELUM LUNAS",
+      }));
+      setDebts(mapped);
     } catch (err) {
-      console.error("Error fetching debts:", err);
+      alert(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -115,45 +99,35 @@ export default function SuppliersPage() {
       const parsed = parseFloat(amount) || 0;
       let supplierId = null;
 
-      const { data: existingSup } = await supabase
-        .from("suppliers")
-        .select("id")
-        .ilike("name", supplier.trim())
-        .limit(1)
-        .maybeSingle();
+      const { data: existingSup } = await (scopeBranch(
+        supabase.from("suppliers").select("id").ilike("name", supplier.trim()) as any
+      ) as any).limit(1).maybeSingle();
 
       if (existingSup) {
         supplierId = existingSup.id;
       } else {
-        const { data: newSup } = await supabase
-          .from("suppliers")
-          .insert({
-            code: `SUP-${Date.now().toString().slice(-4)}`,
-            name: supplier.trim(),
-            is_active: true,
-          })
-          .select("id")
-          .single();
+        const newSup = unwrap(await supabase.from("suppliers").insert(withBranch({
+          name: supplier.trim(),
+        })).select("id").single());
         if (newSup) supplierId = newSup.id;
       }
 
       if (supplierId) {
-        await supabase.from("purchases").insert({
+        unwrap(await supabase.from("purchases").insert(withBranch({
           po_number: poNumber,
           supplier_id: supplierId,
-          total_amount: parsed,
-          paid_amount: 0,
-          debt_amount: parsed,
-          payment_status: "UNPAID",
+          total_cost: parsed,
+          total_paid: 0,
+          debt_balance: parsed,
+          payment_status: "UTANG",
           status: "ORDERED",
-        });
+        })));
       }
 
       setIsModalOpen(false);
       fetchDebts();
     } catch (err: any) {
-      console.error(err);
-      alert(`Gagal mencatat utang: ${err.message || "Error"}`);
+      alert(friendlyError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -173,34 +147,12 @@ export default function SuppliersPage() {
     if (payAmount <= 0) return;
 
     try {
-      // Coba panggil service payPurchaseDebt via RPC
-      await purchasesService.payPurchaseDebt(id, payAmount);
+      const res = await supabase.rpc('pay_purchase_debt', { p_purchase_id: id, p_amount: payAmount });
+      if (res.error) throw res.error;
       alert("Pembayaran cicilan berhasil dicatat!");
       fetchDebts();
     } catch (err: any) {
-      // Fallback manual update jika ID mock
-      console.warn("RPC pay_purchase_debt note:", err.message);
-      const newRemaining = Math.max(0, target.remainingDebt - payAmount);
-      await supabase
-        .from("purchases")
-        .update({
-          debt_amount: newRemaining,
-          payment_status: newRemaining === 0 ? "PAID" : "PARTIAL",
-        })
-        .eq("id", id);
-
-      setDebts(
-        debts.map((d) => {
-          if (d.id === id) {
-            return {
-              ...d,
-              remainingDebt: newRemaining,
-              status: newRemaining === 0 ? "LUNAS" : "BELUM LUNAS",
-            };
-          }
-          return d;
-        })
-      );
+      alert(friendlyError(err));
     }
   };
 
@@ -220,14 +172,14 @@ export default function SuppliersPage() {
           <Button
             onClick={fetchDebts}
             variant="outline"
-            className="rounded-xl h-11 px-3 border-gray-200 dark:border-gray-800"
+            className="border-gray-200 dark:border-gray-800"
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 font-semibold shadow-sm h-11 flex items-center gap-2 shrink-0"
+            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm flex items-center gap-2 shrink-0"
           >
             <Plus className="h-4 w-4" /> Catat Utang Baru
           </Button>

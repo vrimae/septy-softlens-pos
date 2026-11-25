@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/lib/supabase/client";
-import { cashflowService } from "@/lib/services";
+import { unwrap, scopeBranch, withBranch, friendlyError, getActiveBranchId, getActiveProfileId } from "@/lib/supabase/db";
 
 type ShiftClosing = {
   id: string;
@@ -14,64 +14,47 @@ type ShiftClosing = {
   actualCash: number;
   difference: number;
   status: "PAS" | "LEBIH" | "KURANG";
+  notes?: string;
 };
 
 export default function TutupKasPage() {
   const [systemCash, setSystemCash] = useState(0);
   const [actualCashInput, setActualCashInput] = useState("0");
+  const [notes, setNotes] = useState("");
   const [closings, setClosings] = useState<ShiftClosing[]>([]);
   const [successMsg, setSuccessMsg] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchClosings = async () => {
     try {
-      const data = await cashflowService.getShiftClosings(10);
-      if (data && data.length > 0) {
-        const mapped: ShiftClosing[] = data.map((item: any) => ({
-          id: item.id,
-          timestamp: new Date(item.closed_at).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          systemCash: Number(item.system_expected_cash) || 0,
-          actualCash: Number(item.physical_counted_cash) || 0,
-          difference: Number(item.difference_amount) || 0,
-          status: item.difference_amount === 0 ? "PAS" : item.difference_amount > 0 ? "LEBIH" : "KURANG",
-        }));
-        setClosings(mapped);
-      } else {
-        setClosings([
-          {
-            id: "CLS-1",
-            timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
-            systemCash: 150000,
-            actualCash: 150000,
-            difference: 0,
-            status: "PAS",
-          },
-        ]);
-      }
+      const rows = unwrap(await scopeBranch(
+        supabase.from("shift_closings").select("*").order("shift_end", { ascending: false }).limit(10)
+      ));
+      const mapped: ShiftClosing[] = (rows || []).map((item: any) => ({
+        id: item.id,
+        timestamp: new Date(item.shift_end).toLocaleDateString("id-ID", {
+          day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+        }),
+        systemCash: Number(item.system_cash) || 0,
+        actualCash: Number(item.actual_cash) || 0,
+        difference: Number(item.difference) || 0,
+        status: item.status,
+        notes: item.notes,
+      }));
+      setClosings(mapped);
     } catch (err) {
-      console.error(err);
+      alert(friendlyError(err));
     }
   };
 
   const getCashSales = async () => {
     try {
-      const { data } = await supabase
-        .from("sales")
-        .select("total_amount, payment_method")
-        .eq("payment_method", "TUNAI")
-        .eq("status", "COMPLETED");
-
-      if (data && data.length > 0) {
-        const total = data.reduce((acc, curr) => acc + (curr.total_amount || 0), 0);
-        setSystemCash(total);
+      const { data } = await supabase.rpc('get_current_system_cash', { p_cashier_id: getActiveProfileId() });
+      if (data !== null) {
+        setSystemCash(Number(data));
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Could not calculate system cash:", err);
     }
   };
 
@@ -83,30 +66,32 @@ export default function TutupKasPage() {
   const handleCloseShift = async (e: React.FormEvent) => {
     e.preventDefault();
     const actual = parseFloat(actualCashInput) || 0;
-    setIsSubmitting(true);
+    const diffAmount = actual - systemCash;
+    
+    if (diffAmount !== 0 && !notes.trim()) {
+      alert("Harap isi alasan / keterangan untuk selisih kas!");
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
-      await cashflowService.closeShift(actual, "Tutup shift harian kasir");
+      const payload = {
+        branch_id: getActiveBranchId(),
+        cashier_id: getActiveProfileId(),
+        actual_cash: actual,
+        notes: notes.trim() || "Tutup shift harian kasir"
+      };
+      const res = await supabase.rpc('close_cash_shift', { p_payload: payload });
+      if (res.error) throw res.error;
+      
       setSuccessMsg(true);
       setTimeout(() => setSuccessMsg(false), 3000);
       fetchClosings();
       getCashSales();
+      setActualCashInput("0");
+      setNotes("");
     } catch (err: any) {
-      console.warn("close_cash_shift note:", err.message);
-      // Fallback local update
-      const diff = actual - systemCash;
-      const status: ShiftClosing["status"] = diff === 0 ? "PAS" : diff > 0 ? "LEBIH" : "KURANG";
-      const newClosing: ShiftClosing = {
-        id: `CLS-${Date.now()}`,
-        timestamp: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
-        systemCash,
-        actualCash: actual,
-        difference: diff,
-        status,
-      };
-      setClosings([newClosing, ...closings]);
-      setSuccessMsg(true);
-      setTimeout(() => setSuccessMsg(false), 3000);
+      alert(friendlyError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -162,7 +147,20 @@ export default function TutupKasPage() {
                 </div>
               )}
 
-              <Button type="submit" disabled={isSubmitting} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl h-12 text-sm shadow-sm">
+              {actualCashInput !== "" && (parseFloat(actualCashInput) - systemCash !== 0) && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Alasan / Keterangan Selisih</label>
+                  <textarea 
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Wajib diisi jika ada selisih kas..."
+                    className="w-full px-4 py-3 bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-[#1c5ffb] resize-none h-24"
+                    required
+                  />
+                </div>
+              )}
+
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-sm">
                 {isSubmitting ? "Menyimpan..." : "Kirim Tutup Kas"}
               </Button>
             </form>
@@ -192,7 +190,14 @@ export default function TutupKasPage() {
                 <TableBody>
                   {closings.map((c) => (
                     <TableRow key={c.id} className="border-b border-gray-50">
-                      <TableCell className="py-3.5 px-4 font-semibold text-xs text-gray-700 dark:text-gray-300">{c.timestamp}</TableCell>
+                      <TableCell className="py-3.5 px-4 font-semibold text-xs text-gray-700 dark:text-gray-300">
+                        {c.timestamp}
+                        {c.notes && c.notes !== "Tutup shift harian kasir" && (
+                          <div className="text-[10px] text-gray-400 font-normal mt-1 leading-tight break-words max-w-[150px]">
+                            Alasan: {c.notes}
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="py-3.5 px-4 text-right font-medium text-xs">Rp {c.systemCash.toLocaleString()}</TableCell>
                       <TableCell className="py-3.5 px-4 text-right font-bold text-xs">Rp {c.actualCash.toLocaleString()}</TableCell>
                       <TableCell className="py-3.5 px-4 text-center">
@@ -201,6 +206,11 @@ export default function TutupKasPage() {
                         }`}>
                           {c.status}
                         </span>
+                        {c.difference !== 0 && (
+                          <div className={`text-[10px] font-bold mt-1 ${c.difference > 0 ? "text-blue-600" : "text-red-600"}`}>
+                            {c.difference > 0 ? "+" : ""}Rp {c.difference.toLocaleString()}
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

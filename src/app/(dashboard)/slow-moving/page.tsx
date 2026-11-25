@@ -117,7 +117,7 @@ export default function SlowMovingPage() {
             <option value="Modal Tertahan Terbesar">Modal Tertahan Terbesar</option>
           </select>
         </div>
-        <Button onClick={fetchSlowMoving} variant="outline" size="sm" className="rounded-xl h-10 px-3">
+        <Button onClick={fetchSlowMoving} variant="outline" size="sm" className="px-3">
           <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
         </Button>
       </div>
@@ -166,7 +166,7 @@ export default function SlowMovingPage() {
                     <Button 
                       onClick={() => handleActionPromo(item.name)}
                       size="sm" 
-                      className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs h-8 px-3"
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3"
                     >
                       <Tag className="h-3 w-3 mr-1" /> Buat Promo Bundling
                     </Button>

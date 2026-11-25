@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+/scratch/
+fix_all.sql
+run_fix.js
 
 # debug
 npm-debug.log*

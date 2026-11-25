@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase/client";
+import { unwrap, scopeBranch, withBranch, friendlyError } from "@/lib/supabase/db";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2, Check, Gift } from "lucide-react";
@@ -22,16 +24,30 @@ type Reward = {
 export default function RewardsPage() {
   const [pointMultiple, setPointMultiple] = useState("10000");
   const [pointExpiry, setPointExpiry] = useState("12");
-  const [rewards, setRewards] = useState<Reward[]>([
-    { id: "1", name: "Cairan Pembersih Softlens 60ml", points: 50 },
-    { id: "2", name: "Kotak Softlens Karakter Lucu", points: 25 },
-    { id: "3", name: "Voucher Diskon Rp 25.000", points: 100 },
-  ]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rewardName, setRewardName] = useState("");
   const [pointsRequired, setPointsRequired] = useState("");
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  const fetchRewards = async () => {
+    try {
+      const rows = unwrap(await scopeBranch(
+        supabase.from("rewards").select("*").order("points_required", { ascending: true })
+      ));
+      const mapped: Reward[] = (rows || []).map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        points: r.points_required,
+      }));
+      setRewards(mapped);
+    } catch (err) {
+      alert(friendlyError(err));
+    }
+  };
+
+  useEffect(() => { fetchRewards(); }, []);
 
   const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,25 +55,33 @@ export default function RewardsPage() {
     setTimeout(() => setSavedSuccess(false), 3000);
   };
 
-  const handleCreateReward = (e: React.FormEvent) => {
+  const handleCreateReward = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rewardName.trim() || !pointsRequired) return;
 
-    const newRew: Reward = {
-      id: Date.now().toString(),
-      name: rewardName.trim(),
-      points: parseInt(pointsRequired) || 0,
-    };
-
-    setRewards([...rewards, newRew]);
-    setRewardName("");
-    setPointsRequired("");
-    setIsModalOpen(false);
+    try {
+      unwrap(await supabase.from("rewards").insert(withBranch({
+        name: rewardName.trim(),
+        points_required: parseInt(pointsRequired) || 0,
+        is_active: true
+      })));
+      setRewardName("");
+      setPointsRequired("");
+      setIsModalOpen(false);
+      fetchRewards();
+    } catch (err) {
+      alert(friendlyError(err));
+    }
   };
 
-  const handleDeleteReward = (id: string) => {
+  const handleDeleteReward = async (id: string) => {
     if (confirm("Hapus reward ini?")) {
-      setRewards(rewards.filter((r) => r.id !== id));
+      try {
+        unwrap(await supabase.from("rewards").delete().eq("id", id));
+        fetchRewards();
+      } catch (err) {
+        alert(friendlyError(err));
+      }
     }
   };
 
@@ -110,7 +134,7 @@ export default function RewardsPage() {
                 </p>
               </div>
 
-              <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl h-12 shadow-sm">
+              <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-sm">
                 Simpan Pengaturan
               </Button>
             </form>
@@ -123,7 +147,7 @@ export default function RewardsPage() {
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Daftar Reward / Hadiah</h2>
             <Button 
               onClick={() => setIsModalOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-4 font-semibold shadow-sm h-10 text-xs flex items-center gap-1.5"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm text-xs flex items-center gap-1.5"
             >
               <Plus className="h-3.5 w-3.5" /> Tambah Reward
             </Button>

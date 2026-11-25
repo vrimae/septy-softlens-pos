@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, UserCheck, UserX, Plus, Edit2, Trash2 } from "lucide-react";
+import { Users, UserCheck, UserX, Plus, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,8 @@ export default function UsersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("KASIR");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,6 +58,7 @@ export default function UsersPage() {
     setEditingId(null);
     setName("");
     setEmail("");
+    setPassword("");
     setRole("KASIR");
     setIsModalOpen(true);
   };
@@ -64,6 +67,7 @@ export default function UsersPage() {
     setEditingId(emp.id);
     setName(emp.full_name || "");
     setEmail(emp.email || "");
+    setPassword("");
     setRole(emp.role || "KASIR");
     setIsModalOpen(true);
   };
@@ -71,10 +75,13 @@ export default function UsersPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus user ini?")) {
       try {
-        await usersService.deleteUser(id);
+        const res = await usersService.deleteUser(id);
+        if (res?.message) {
+          alert(res.message);
+        }
         fetchUsers();
       } catch (e: any) {
-        alert(e.message);
+        alert("Gagal memproses penghapusan user: " + (e.message || "Terjadi kesalahan sistem"));
       }
     }
   };
@@ -88,17 +95,25 @@ export default function UsersPage() {
       if (editingId) {
         // Implement update if needed, for now just update role
         await usersService.updateUserRole(editingId, role as 'owner'|'admin'|'kasir'|'warehouse');
+        if (password) {
+          await usersService.updateUserPassword(editingId, password);
+        }
       } else {
         await usersService.createUser({
           full_name: name,
           email: email,
-          role: role
+          role: role,
+          password: password || undefined
         });
       }
       setIsModalOpen(false);
       fetchUsers();
     } catch (e: any) {
-      alert(e.message);
+      if (e.message?.includes("duplicate key") || e.message?.includes("users_email_partial_key") || e.message?.includes("already registered")) {
+        alert("Gagal: Email ini sudah terdaftar di sistem. Silakan gunakan alamat email lain.");
+      } else {
+        alert("Gagal menyimpan: " + e.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +170,7 @@ export default function UsersPage() {
           <h2 className="font-semibold text-gray-800 dark:text-gray-200">Daftar Pengguna</h2>
           <Button 
             onClick={handleOpenAdd}
-            className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg px-4 h-10 shadow-sm"
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-sm"
           >
             <Plus className="h-4 w-4 mr-2" /> Tambah User
           </Button>
@@ -247,9 +262,32 @@ export default function UsersPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={!!editingId}
                 placeholder="email@toko.com"
-                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
+                className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-900 disabled:opacity-50"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={editingId ? "Kosongkan jika tidak ingin mengubah password" : "Buat password..."}
+                  className="w-full px-3.5 py-2.5 pr-10 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
+                  required={!editingId}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                  tabIndex={-1}
+                  title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                  aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Role / Jabatan</label>

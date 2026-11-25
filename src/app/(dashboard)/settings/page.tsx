@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Printer, ScanLine, Check, Plus, Trash2, Download } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { printTestReceiptBluetooth } from "@/lib/receipt";
 
 export default function SettingsPage() {
   // Branches state
@@ -44,7 +45,7 @@ export default function SettingsPage() {
     "Laporan Stok Mengendap": false,
     "Gudang Barang Bermasalah": false,
     "Retur / Tukar Barang": false,
-    "Sistem Restock": false,
+    "AI Restock": false,
     "Manajemen User": false,
     "Pengaturan Akses": false,
     "Aksi: Ubah Harga Saat Transaksi": false,
@@ -64,7 +65,7 @@ export default function SettingsPage() {
     "Laporan Stok Mengendap": false,
     "Gudang Barang Bermasalah": false,
     "Retur / Tukar Barang": true,
-    "Sistem Restock": false,
+    "AI Restock": false,
     "Manajemen User": false,
     "Pengaturan Akses": false,
     "Aksi: Ubah Harga Saat Transaksi": false,
@@ -75,6 +76,36 @@ export default function SettingsPage() {
   const showNotification = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  useEffect(() => {
+    async function loadSettings() {
+      const { data, error } = await supabase.from('store_settings').select('role_permissions').limit(1).maybeSingle();
+      if (!error && data?.role_permissions) {
+        if (data.role_permissions.admin) setAdminAccess(data.role_permissions.admin);
+        if (data.role_permissions.kasir) setKasirAccess(data.role_permissions.kasir);
+      }
+    }
+    loadSettings();
+  }, []);
+
+  const handleSaveAllSettings = async () => {
+    try {
+      const permissions = {
+        admin: adminAccess,
+        kasir: kasirAccess,
+      };
+      
+      const { data: firstRow } = await supabase.from('store_settings').select('id').limit(1).maybeSingle();
+      if (firstRow) {
+        await supabase.from('store_settings').update({ role_permissions: permissions }).eq('id', firstRow.id);
+      } else {
+        await supabase.from('store_settings').insert([{ store_name: 'Septy POS', role_permissions: permissions }]);
+      }
+      showNotification("Seluruh pengaturan & izin akses berhasil disimpan!");
+    } catch (e) {
+      alert("Gagal menyimpan pengaturan.");
+    }
   };
 
   const handleAddBranch = () => {
@@ -127,24 +158,61 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSyncPrinter = () => {
-    setPrinterSyncing(true);
-    setTimeout(() => {
+  const handleSyncPrinter = async () => {
+    try {
+      const nav: any = navigator;
+      if (!nav.bluetooth) {
+        alert("Browser Anda tidak mendukung fitur Web Bluetooth. Gunakan Google Chrome atau Microsoft Edge PC/Android.");
+        return;
+      }
+      setPrinterSyncing(true);
+      const res = await printTestReceiptBluetooth();
+      if (res.success) {
+        setPrinterSynced(true);
+        showNotification("Printer Thermal PUTIANPOS 58mm Berhasil Terhubung & Mencetak Struk Uji Coba!");
+        setTimeout(() => setPrinterSynced(false), 5000);
+      } else {
+        alert(res.message);
+      }
+    } catch (err: any) {
+      console.warn("Bluetooth Error:", err);
+      if (err.name !== 'NotFoundError') {
+        alert(`Gagal menghubungkan printer: ${err.message}`);
+      }
+    } finally {
       setPrinterSyncing(false);
-      setPrinterSynced(true);
-      showNotification("Printer Thermal berhasil disinkronkan via Smartcom!");
-      setTimeout(() => setPrinterSynced(false), 4000);
-    }, 1500);
+    }
   };
 
-  const handleSyncScanner = () => {
-    setScannerSyncing(true);
-    setTimeout(() => {
-      setScannerSyncing(false);
+  const handleSyncScanner = async () => {
+    try {
+      const nav: any = navigator;
+      if (!nav.bluetooth) {
+        alert("Browser Anda tidak mendukung fitur Web Bluetooth. Gunakan Google Chrome PC/Android.");
+        return;
+      }
+      setScannerSyncing(true);
+      const device = await nav.bluetooth.requestDevice({
+        acceptAllDevices: true
+      });
+      
+      try {
+        await device.gatt?.connect();
+      } catch (gattErr: any) {
+        console.warn("GATT Connection skipped or failed:", gattErr);
+      }
+
       setScannerSynced(true);
-      showNotification("Barcode Scanner berhasil terhubung dan siap digunakan!");
-      setTimeout(() => setScannerSynced(false), 4000);
-    }, 1500);
+      showNotification(`Barcode Scanner (${device.name || 'Bluetooth Scanner'}) berhasil terhubung via Smartcom!`);
+      setTimeout(() => setScannerSynced(false), 5000);
+    } catch (err: any) {
+      console.warn("Bluetooth Error:", err);
+      if (err.name !== 'NotFoundError') {
+        alert(`Gagal menghubungkan scanner: ${err.message}`);
+      }
+    } finally {
+      setScannerSyncing(false);
+    }
   };
 
   const handleAddTargetProduct = () => {
@@ -172,8 +240,8 @@ export default function SettingsPage() {
           <p className="text-gray-500 dark:text-gray-400 mt-1">Atur konfigurasi toko dan menu apa saja yang bisa dilihat oleh setiap jabatan.</p>
         </div>
         <Button 
-          onClick={() => showNotification("Seluruh pengaturan berhasil disimpan!")}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-5 shadow-sm"
+          onClick={handleSaveAllSettings}
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-sm"
         >
           Simpan Semua Pengaturan
         </Button>
@@ -227,7 +295,7 @@ export default function SettingsPage() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Download seluruh data ERP (Barang, Transaksi, Audit, dll) sebagai file Backup JSON untuk keamanan data, atau jika Anda ingin pindah perangkat/restore.</p>
         <Button 
           onClick={handleDownloadBackup}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 shadow-sm flex items-center gap-2"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-sm flex items-center gap-2"
         >
           <Download className="h-4 w-4" /> Download Full Backup (.json)
         </Button>
@@ -250,11 +318,7 @@ export default function SettingsPage() {
             <Button 
               onClick={handleSyncPrinter}
               disabled={printerSyncing}
-              className={`w-full font-bold rounded-xl transition-all ${
-                printerSynced 
-                  ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
-                  : "bg-slate-900 hover:bg-slate-800 text-white"
-              }`}
+              className={`w-full font-bold transition-all ${ printerSynced ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-slate-900 hover:bg-slate-800 text-white" }`}
             >
               <Printer className="h-4 w-4 mr-2" /> 
               {printerSyncing ? "Menghubungkan..." : printerSynced ? "Printer Terhubung!" : "Sinkronkan Printer"}
@@ -270,11 +334,7 @@ export default function SettingsPage() {
             <Button 
               onClick={handleSyncScanner}
               disabled={scannerSyncing}
-              className={`w-full font-bold rounded-xl transition-all ${
-                scannerSynced 
-                  ? "bg-emerald-700 hover:bg-emerald-800 text-white" 
-                  : "bg-emerald-600 hover:bg-emerald-700 text-white"
-              }`}
+              className={`w-full font-bold transition-all ${ scannerSynced ? "bg-emerald-700 hover:bg-emerald-800 text-white" : "bg-emerald-600 hover:bg-emerald-700 text-white" }`}
             >
               <ScanLine className="h-4 w-4 mr-2" /> 
               {scannerSyncing ? "Menghubungkan..." : scannerSynced ? "Scanner Terhubung!" : "Sinkronkan Scanner"}

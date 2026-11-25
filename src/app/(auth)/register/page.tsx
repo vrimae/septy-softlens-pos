@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
@@ -10,7 +11,9 @@ export default function RegisterPage() {
   const [storeName, setStoreName] = useState("Septy Softlens");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -45,19 +48,21 @@ export default function RegisterPage() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Buat record profil di tabel profiles dengan status PENDING menunggu Super Admin
-        await supabase.from("profiles").upsert({
-          id: data.user.id,
-          full_name: fullName.trim() || "Owner",
-          role: "OWNER",
-          status: "PENDING",
+        // Panggil RPC untuk membuat Toko (Tenant) baru dan profil Owner secara aman menembus RLS
+        const { error: rpcError } = await supabase.rpc('register_new_tenant', {
+          p_user_id: data.user.id,
+          p_email: email.trim(),
+          p_full_name: fullName.trim() || "Owner",
+          p_store_name: storeName.trim(),
         });
+        
+        if (rpcError) throw rpcError;
       }
 
-      setSuccess("Pendaftaran berhasil! Akun Anda sedang menunggu konfirmasi/verifikasi dari Super Admin (vrimae23@gmail.com). Silakan hubungi Super Admin untuk mengaktifkan akun Anda.");
+      setSuccess("Pendaftaran berhasil! Toko baru Anda telah dibuat. Silakan login.");
       setTimeout(() => {
         router.push("/login");
-      }, 3500);
+      }, 2500);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Terjadi kesalahan saat pendaftaran akun.");
@@ -155,26 +160,50 @@ export default function RegisterPage() {
             
             <div className="space-y-1.5">
               <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Password</label>
-              <input 
-                type="password" 
-                placeholder="••••••"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="••••••"
+                  className="w-full px-4 py-3 pr-11 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1b62fc] transition-colors p-1.5 rounded-lg focus:outline-none"
+                  tabIndex={-1}
+                  title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                  aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Ulangi Password</label>
-              <input 
-                type="password" 
-                placeholder="••••••"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  placeholder="••••••"
+                  className="w-full px-4 py-3 pr-11 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1b62fc] transition-colors p-1.5 rounded-lg focus:outline-none"
+                  tabIndex={-1}
+                  title={showConfirmPassword ? "Sembunyikan password" : "Lihat password"}
+                  aria-label={showConfirmPassword ? "Sembunyikan password" : "Lihat password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             <button 

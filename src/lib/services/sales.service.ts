@@ -58,6 +58,23 @@ export const salesService = {
   },
 
   /**
+   * Hapus transaksi penjualan secara permanen (Khusus Owner)
+   */
+  async deleteSale(saleId: string, restoreStock: boolean = true) {
+    const { data, error } = await supabase.rpc('delete_sale', {
+      p_sale_id: saleId,
+      p_restore_stock: restoreStock,
+    });
+
+    if (error) {
+      console.error('Error executing delete_sale RPC:', error);
+      throw new Error(error.message || 'Gagal menghapus transaksi.');
+    }
+
+    return data;
+  },
+
+  /**
    * Ambil daftar riwayat transaksi penjualan
    */
   async getSales(options?: {

@@ -21,10 +21,9 @@ type Category = {
   use_expired: boolean;
 };
 
+import useSWR from "swr";
+
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -35,40 +34,25 @@ export default function CategoriesPage() {
   const [useExpired, setUseExpired] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  const { data: categories = [], mutate, isValidating } = useSWR('categories_list', async () => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error || !data) return [];
+    
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      target_margin: item.target_margin || 0,
+      use_expired: item.use_expired || false,
+    })) as Category[];
+  });
+  const loading = !categories.length && isValidating;
 
   const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        // Fallback for when table doesn't exist yet, we don't want to crash the UI
-        console.error("Error fetching categories:", error);
-        return;
-      }
-      
-      if (data) {
-        // Map to our UI type (assuming target_margin and use_expired are added to schema later, 
-        // or we just use defaults for now if they don't exist in the basic schema)
-        const mappedData = data.map(item => ({
-          id: item.id,
-          name: item.name,
-          target_margin: item.target_margin || 0,
-          use_expired: item.use_expired || false,
-        }));
-        setCategories(mappedData);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    await mutate();
   };
 
   const handleOpenAddModal = () => {
@@ -139,7 +123,7 @@ export default function CategoriesPage() {
         </div>
         <Button 
           onClick={handleOpenAddModal}
-          className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-5 font-semibold shadow-sm h-11"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm h-11"
         >
           <Plus className="h-4 w-4 mr-2" /> Tambah Kategori
         </Button>

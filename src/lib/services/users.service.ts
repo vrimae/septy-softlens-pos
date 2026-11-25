@@ -67,6 +67,16 @@ export const usersService = {
     return data as Profile;
   },
 
+  async updateUserPassword(userId: string, password: string) {
+    const { error } = await supabase.rpc('update_user_password_by_admin', {
+      p_user_id: userId,
+      p_password: password
+    });
+    if (error) throw new Error(error.message);
+    auditService.log("UPDATE_USER_PASSWORD", { tableName: "profiles", recordId: userId, reason: "Ubah Password oleh Owner" }).catch(console.error);
+    return true;
+  },
+
   /**
    * Aktifkan / Nonaktifkan akun staf
    */
@@ -83,29 +93,95 @@ export const usersService = {
     return data as Profile;
   },
 
-  async createUser(payload: { full_name: string; email: string; role: string; branch_id?: string | null }) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .insert({
-        id: crypto.randomUUID(),
-        full_name: payload.full_name,
-        email: payload.email,
-        role: payload.role,
-        branch_id: payload.branch_id || null,
-        is_active: true
-      })
-      .select()
-      .single();
+  async createUser(payload: { full_name: string; email: string; role: string; branch_id?: string | null; password?: string }) {
+    const defaultPassword = payload.password || 'password123';
+    const { data, error } = await supabase.rpc('create_user_by_admin', {
+      p_email: payload.email,
+      p_password: defaultPassword,
+      p_full_name: payload.full_name,
+      p_role: payload.role,
+      p_branch_id: payload.branch_id || null
+    });
       
     if (error) throw new Error(error.message);
-    auditService.log("UPDATE_USER", { tableName: "profiles", recordId: data.id, after: data, reason: "Perubahan User Profile/Role" }).catch(console.error);
-    return data as Profile;
+    auditService.log("TAMBAH_USER", { tableName: "profiles", recordId: data, after: payload, reason: "Penambahan Karyawan Baru" }).catch(console.error);
+    return data;
   },
 
   async deleteUser(userId: string) {
-    const { error } = await supabase.from('profiles').delete().eq('id', userId);
-    if (error) throw new Error(error.message);
-    auditService.log("HAPUS_USER", { tableName: "profiles", recordId: userId, reason: "Penghapusan User" }).catch(console.error);
-    return true;
+    try {
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      if (error) {
+        const isFkError = 
+          error.code === '23503' || 
+          error.message?.toLowerCase().includes('foreign key') ||
+          error.message?.toLowerCase().includes('violates foreign key');
+
+        if (isFkError) {
+          // Deactivate the user instead so transaction and audit histories remain intact
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              is_active: false,
+              status: 'INACTIVE',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+
+          if (updateError) throw new Error(updateError.message);
+
+          auditService.log("NONAKTIFKAN_USER", { 
+            tableName: "profiles", 
+            recordId: userId, 
+            reason: "User dinonaktifkan otomatis karena memiliki riwayat transaksi/pergerakan stok" 
+          }).catch(console.error);
+
+          return {
+            success: true,
+            softDeleted: true,
+            message: "User memiliki riwayat transaksi atau pergerakan stok sehingga tidak dapat dihapus permanen demi menjaga keabsahan pembukuan. Status user telah berhasil diubah menjadi NONAKTIF."
+          };
+        }
+        throw new Error(error.message);
+      }
+
+      auditService.log("HAPUS_USER", { tableName: "profiles", recordId: userId, reason: "Penghapusan User Permanen" }).catch(console.error);
+      return {
+        success: true,
+        softDeleted: false,
+        message: "User berhasil dihapus permanen dari sistem."
+      };
+    } catch (err: any) {
+      const isFkError = 
+        err?.code === '23503' || 
+        err?.message?.toLowerCase().includes('foreign key') ||
+        err?.message?.toLowerCase().includes('violates foreign key');
+
+      if (isFkError) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            is_active: false,
+            status: 'INACTIVE',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+
+        if (!updateError) {
+          auditService.log("NONAKTIFKAN_USER", { 
+            tableName: "profiles", 
+            recordId: userId, 
+            reason: "User dinonaktifkan otomatis karena memiliki riwayat transaksi/pergerakan stok" 
+          }).catch(console.error);
+
+          return {
+            success: true,
+            softDeleted: true,
+            message: "User memiliki riwayat transaksi atau pergerakan stok sehingga tidak dapat dihapus permanen demi menjaga keabsahan pembukuan. Status user telah berhasil diubah menjadi NONAKTIF."
+          };
+        }
+      }
+      throw err;
+    }
   }
 };

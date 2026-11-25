@@ -4,16 +4,83 @@ import * as React from "react"
 import { cn } from "cn"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
+  const topScrollRef = React.useRef<HTMLDivElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const tableRef = React.useRef<HTMLTableElement>(null)
+  const [contentWidth, setContentWidth] = React.useState(0)
+  const [hasOverflow, setHasOverflow] = React.useState(false)
+  const syncingRef = React.useRef(false)
+
+  React.useEffect(() => {
+    const container = containerRef.current
+    const table = tableRef.current
+    if (!container || !table) return
+
+    const update = () => {
+      const sw = Math.max(container.scrollWidth, table.scrollWidth)
+      const cw = container.clientWidth
+      setContentWidth(sw)
+      setHasOverflow(sw > cw + 2)
+    }
+
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(container)
+    ro.observe(table)
+    window.addEventListener("resize", update)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener("resize", update)
+    }
+  }, [])
+
+  const onTopScroll = () => {
+    if (syncingRef.current) return
+    syncingRef.current = true
+    if (containerRef.current && topScrollRef.current) {
+      containerRef.current.scrollLeft = topScrollRef.current.scrollLeft
+    }
+    requestAnimationFrame(() => {
+      syncingRef.current = false
+    })
+  }
+
+  const onBottomScroll = () => {
+    if (syncingRef.current) return
+    syncingRef.current = true
+    if (topScrollRef.current && containerRef.current) {
+      topScrollRef.current.scrollLeft = containerRef.current.scrollLeft
+    }
+    requestAnimationFrame(() => {
+      syncingRef.current = false
+    })
+  }
+
   return (
-    <div
-      data-slot="table-container"
-      className="relative w-full overflow-x-auto"
-    >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
+    <div className="relative w-full">
+      {hasOverflow && (
+        <div
+          ref={topScrollRef}
+          onScroll={onTopScroll}
+          aria-label="Scroll horizontal tabel"
+          className="w-full overflow-x-scroll overflow-y-hidden border-b border-gray-100 dark:border-gray-800/60 py-0.5"
+        >
+          <div style={{ width: contentWidth, height: 1 }} />
+        </div>
+      )}
+      <div
+        ref={containerRef}
+        onScroll={onBottomScroll}
+        data-slot="table-container"
+        className="relative w-full max-h-[70vh] overflow-x-scroll overflow-y-auto pb-1"
+      >
+        <table
+          ref={tableRef}
+          data-slot="table"
+          className={cn("w-full caption-bottom text-sm", className)}
+          {...props}
+        />
+      </div>
     </div>
   )
 }
@@ -22,7 +89,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      className={cn("sticky top-0 z-10 bg-white dark:bg-[#13151a] [&_tr]:border-b", className)}
       {...props}
     />
   )

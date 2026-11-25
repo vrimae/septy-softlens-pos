@@ -1,191 +1,172 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Sparkles, ShoppingBag, Search, ArrowRight, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { reportsService } from "@/lib/services";
 
-type RestockRecommendation = {
+type RestockCard = {
   id: string;
   code: string;
   name: string;
   currentStock: number;
-  velocity: number; // pcs per hari
-  safeStockDays: number;
+  minStock: number | null;
+  sold30: number;
+  velocity: number;
   suggestedQty: number;
-  estCost: number;
+  status: "Kritis" | "Waspada" | "Aman";
 };
 
-export default function RestockPage() {
+const STATUS_STYLE: Record<RestockCard["status"], { card: string; badge: string }> = {
+  Kritis: { card: "border-red-200", badge: "bg-red-100 text-red-600" },
+  Waspada: { card: "border-amber-200", badge: "bg-amber-100 text-amber-700" },
+  Aman: { card: "border-emerald-200", badge: "bg-emerald-100 text-emerald-700" },
+};
+
+function buildAnalysis(c: RestockCard): string[] {
+  const lines = [
+    `Penjualan rata-rata 30 hari = ${c.sold30} pcs.`,
+    `Stok sekarang = ${c.currentStock} pcs.`,
+  ];
+  if (c.velocity <= 0) {
+    lines.push(
+      c.currentStock <= 0
+        ? "Belum ada penjualan 30 hari terakhir dan stok kosong. Restock hanya jika produk ini memang masih dijual."
+        : "Belum ada penjualan 30 hari terakhir, stok saat ini masih cukup."
+    );
+  } else {
+    const daysLeft = c.currentStock / c.velocity;
+    if (c.currentStock <= 0) {
+      lines.push(`Stok habis, padahal kecepatan penjualan ${c.velocity} pcs/hari. Segera restock.`);
+    } else if (daysLeft < 7) {
+      lines.push(`Stok hanya cukup ± ${daysLeft.toFixed(1)} hari pada kecepatan penjualan ${c.velocity} pcs/hari. Segera restock.`);
+    } else if (daysLeft < 14) {
+      lines.push(`Stok cukup ± ${daysLeft.toFixed(1)} hari. Disarankan mulai merencanakan restock.`);
+    } else {
+      lines.push(`AI menyimpulkan stok saat ini masih cukup untuk memenuhi kecepatan penjualan (${c.velocity} pcs/hari).`);
+    }
+  }
+  return lines;
+}
+
+import useSWR from "swr";
+
+export default function AiRestockPage() {
   const [search, setSearch] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [recommendations, setRecommendations] = useState<RestockRecommendation[]>([]);
 
-  const fetchRecommendations = async () => {
-    try {
-      const data = await reportsService.getAiRestockRecommendations();
-      if (data && data.length > 0) {
-        const mapped: RestockRecommendation[] = data.map((item: any, idx: number) => ({
-          id: item.variant_id || String(idx),
-          code: item.product_code || `PRD-00${idx + 1}`,
-          name: item.product_name || "Produk",
-          currentStock: Number(item.current_stock) || 0,
-          velocity: item.sold_last_30_days ? Number((item.sold_last_30_days / 30).toFixed(1)) : 1.5,
-          safeStockDays: 14,
-          suggestedQty: Number(item.suggested_order_qty) || 20,
-          estCost: (Number(item.suggested_order_qty) || 20) * 35000,
-        }));
-        setRecommendations(mapped);
-      } else {
-        setRecommendations([
-          {
-            id: "1",
-            code: "PRD-X2-SANSO",
-            name: "X2 Sanso Color Silicone Hydrogel",
-            currentStock: 3,
-            velocity: 2.4,
-            safeStockDays: 14,
-            suggestedQty: 30,
-            estCost: 1650000,
-          },
-          {
-            id: "2",
-            code: "PRD-X2-BLACK",
-            name: "X2 Black Series Deep Black",
-            currentStock: 2,
-            velocity: 3.1,
-            safeStockDays: 14,
-            suggestedQty: 45,
-            estCost: 1800000,
-          },
-          {
-            id: "3",
-            code: "PRD-RENU-355",
-            name: "Bausch + Lomb Renu Fresh Solution 355ml",
-            currentStock: 4,
-            velocity: 1.8,
-            safeStockDays: 14,
-            suggestedQty: 25,
-            estCost: 1125000,
-          },
-        ]);
+  const fetchRestock = async () => {
+    const data: any[] = await reportsService.getAiRestockRecommendations();
+    return (data || []).map((item: any, idx: number) => {
+      const currentStock = Number(item.current_stock) || 0;
+      const sold30 = Number(item.sold_last_30_days) || 0;
+      const velocity = Number((sold30 / 30).toFixed(1));
+      const suggestedQty = Number(item.suggested_order_qty) || 0;
+      const minStock = item.min_stock != null ? Number(item.min_stock) : null;
+      const daysLeft = velocity > 0 ? currentStock / velocity : Infinity;
+
+      let status: RestockCard["status"] = "Aman";
+      if (currentStock <= 0 || daysLeft < 7 || String(item.priority || "").toUpperCase() === "KRITIS" || String(item.priority || "").toUpperCase() === "HABIS") {
+        status = "Kritis";
+      } else if (daysLeft < 14 || (minStock !== null && currentStock <= minStock)) {
+        status = "Waspada";
       }
-    } catch (err) {
-      console.error(err);
-    }
+
+      return {
+        id: item.variant_id || item.product_id || String(idx),
+        code: item.product_code || "-",
+        name: item.product_name || "Produk",
+        currentStock,
+        minStock,
+        sold30,
+        velocity,
+        suggestedQty,
+        status,
+      } as RestockCard;
+    });
   };
 
-  useEffect(() => {
-    fetchRecommendations();
-  }, []);
+  const { data: cards = [], isValidating } = useSWR('restock_list', fetchRestock);
+  const loading = !cards.length && isValidating;
 
-  const handleRunAnalysis = async () => {
-    setIsAnalyzing(true);
-    try {
-      await fetchRecommendations();
-      alert("Kalkulasi selesai! Produk dengan stok mendekati batas minimum telah diperbarui.");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const filtered = recommendations.filter(
-    (r) =>
-      r.name.toLowerCase().includes(search.toLowerCase()) ||
-      r.code.toLowerCase().includes(search.toLowerCase())
+  const filtered = cards.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.code.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-normal flex items-center gap-2.5">
-             Sistem Restock & Min. Stock
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Rekomendasi belanja cerdas berdasarkan kecepatan penjualan (sales velocity) 30 hari terakhir.</p>
-        </div>
-        <Button 
-          onClick={handleRunAnalysis}
-          disabled={isAnalyzing}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-5 h-11 flex items-center gap-2 shadow-sm shrink-0"
-        >
-          
-          {isAnalyzing ? "Menganalisis Data..." : "Jalankan Kalkulasi Restock"}
-        </Button>
+    <div className="space-y-5 max-w-7xl mx-auto pb-10">
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">AI Restock &amp; Min. Stock</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+          Rekomendasi belanja berdasarkan kecepatan penjualan 30 hari terakhir.
+        </p>
       </div>
 
-      <div className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-1">
-        <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
-          <div className="relative max-w-md w-full">
-            <input 
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari produk rekomendasi..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-          </div>
-          <div className="text-xs font-bold text-gray-500 dark:text-gray-400">
-            Ditemukan {filtered.length} item rekomendasi
-          </div>
-        </div>
-
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-white dark:bg-[#13151a] hover:bg-white dark:bg-[#13151a] border-b-0">
-              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6">Produk & Kode</TableHead>
-              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Sisa Stok</TableHead>
-              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Velocity (Hari)</TableHead>
-              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-center">Rekomendasi Order</TableHead>
-              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Est. Modal</TableHead>
-              <TableHead className="font-bold text-gray-700 dark:text-gray-300 py-4 px-6 text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-16 text-gray-400 font-medium border-b-0">
-                  Tidak ada produk yang membutuhkan restock mendesak saat ini.
-                </TableCell>
-              </TableRow>
-            ) : (
-              filtered.map((r) => (
-                <TableRow key={r.id} className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-[#2a303c] dark:bg-[#1e2329]/50">
-                  <TableCell className="px-6 py-4">
-                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{r.name}</p>
-                    <p className="font-mono text-xs text-slate-900 dark:text-slate-100 font-bold">{r.code}</p>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-center">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
-                      {r.currentStock} pcs
-                    </span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300">
-                    {r.velocity} pcs / hari
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-center">
-                    <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm">+{r.suggestedQty} pcs</span>
-                    <p className="text-[10px] text-gray-400">buffer 14 hari</p>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right font-bold text-gray-900 dark:text-gray-100 text-sm">
-                    Rp {r.estCost.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right">
-                    <Link href="/purchases">
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs h-8 px-3">
-                        <ShoppingBag className="h-3 w-3 mr-1" /> Buat PO
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      <div className="bg-white dark:bg-[#13151a] border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm p-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari produk..."
+          className="w-full px-4 py-2.5 bg-white dark:bg-[#1e2329] border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
       </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-400 text-sm">Menganalisis data penjualan...</div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 text-gray-400 text-sm">Tidak ada produk yang perlu dianalisis saat ini.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {filtered.map((c) => {
+            const style = STATUS_STYLE[c.status];
+            return (
+              <div
+                key={c.id}
+                className={`bg-white dark:bg-[#13151a] rounded-2xl border ${style.card} p-5 shadow-sm`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-500">{c.code}</p>
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-100 truncate">{c.name}</h3>
+                  </div>
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${style.badge}`}>{c.status}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-[#1e2329] rounded-lg p-3 mt-4">
+                  <div>
+                    <p className="text-[11px] text-gray-500">Stok Sekarang</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                      {c.currentStock} <span className="text-xs font-normal text-gray-500">pcs</span>
+                    </p>
+                    <p className="text-[10px] text-gray-400">Min: {c.minStock ?? "-"} pcs</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-gray-500">Terjual (30 Hari)</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                      {c.sold30} <span className="text-xs font-normal text-gray-500">pcs</span>
+                    </p>
+                    <p className="text-[10px] text-gray-400">~{c.velocity} / hari</p>
+                  </div>
+                </div>
+
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-4">Analisis Transparan AI:</p>
+                <div className="mt-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3 text-xs text-slate-700 dark:text-slate-300 space-y-1 leading-relaxed">
+                  {buildAnalysis(c).map((l, i) => (
+                    <p key={i}>{l}</p>
+                  ))}
+                </div>
+
+                <div className="border-t border-gray-100 dark:border-gray-800 mt-4 pt-3">
+                  <p className="text-xs text-gray-500">Rekomendasi Belanja</p>
+                  <p className="text-xl font-bold text-emerald-600">
+                    {c.suggestedQty} <span className="text-sm font-medium">pcs</span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

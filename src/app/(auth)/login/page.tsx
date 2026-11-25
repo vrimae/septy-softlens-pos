@@ -3,15 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("vrimae23@gmail.com");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [storeName, setStoreName] = useState("Septy Softlens");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -26,7 +29,7 @@ export default function LoginPage() {
     try {
       if (activeTab === "login") {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email: email.trim().toLowerCase(),
           password,
         });
         if (signInError) throw signInError;
@@ -43,7 +46,7 @@ export default function LoginPage() {
         }
 
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: email.trim(),
+          email: email.trim().toLowerCase(),
           password,
           options: {
             data: {
@@ -57,14 +60,13 @@ export default function LoginPage() {
         if (signUpError) throw signUpError;
 
         if (signUpData.user) {
-          // Buat record profil di tabel profiles dengan status PENDING menunggu Super Admin
-          await supabase.from("profiles").upsert({
-            id: signUpData.user.id,
-            full_name: fullName.trim() || "Owner",
-            role: "OWNER",
-            status: "ACTIVE",
-            email: email.trim(),
+          const { error: rpcError } = await supabase.rpc('register_new_tenant', {
+            p_user_id: signUpData.user.id,
+            p_email: email.trim().toLowerCase(),
+            p_full_name: fullName.trim() || 'Owner',
+            p_store_name: storeName.trim() || 'Toko Baru'
           });
+          if (rpcError) throw rpcError;
         }
 
         setSuccess("Pendaftaran berhasil! Silakan login menggunakan email dan password yang baru saja Anda buat.");
@@ -72,7 +74,14 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Terjadi kesalahan saat memproses otentikasi.");
+      const msg = err.message || "";
+      if (msg.includes("Invalid login credentials")) {
+        setError("Email atau password yang Anda masukkan salah. Silakan periksa kembali.");
+      } else if (msg.includes("Email not confirmed")) {
+        setError("Email belum dikonfirmasi. Silakan hubungi admin atau periksa kotak masuk email Anda.");
+      } else {
+        setError(msg || "Terjadi kesalahan saat memproses otentikasi.");
+      }
     } finally {
       setLoading(false);
     }
@@ -182,27 +191,51 @@ export default function LoginPage() {
             
             <div className="space-y-1.5">
               <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Password</label>
-              <input 
-                type="password" 
-                placeholder="••••••"
-                className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="••••••"
+                  className="w-full px-4 py-3 pr-11 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1b62fc] transition-colors p-1.5 rounded-lg focus:outline-none"
+                  tabIndex={-1}
+                  title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                  aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             {activeTab === "register" && (
               <div className="space-y-1.5">
                 <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300">Ulangi Password</label>
-                <input 
-                  type="password" 
-                  placeholder="••••••"
-                  className="w-full px-4 py-3 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"} 
+                    placeholder="••••••"
+                    className="w-full px-4 py-3 pr-11 bg-[#eaf1fc] border border-transparent rounded-[12px] text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1b62fc]/30 focus:bg-white dark:bg-[#13151a] focus:border-[#1b62fc] transition-all"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1b62fc] transition-colors p-1.5 rounded-lg focus:outline-none"
+                    tabIndex={-1}
+                    title={showConfirmPassword ? "Sembunyikan password" : "Lihat password"}
+                    aria-label={showConfirmPassword ? "Sembunyikan password" : "Lihat password"}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
             )}
 
@@ -228,3 +261,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
