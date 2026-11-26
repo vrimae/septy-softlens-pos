@@ -123,7 +123,7 @@ export function Sidebar({ isMobile }: { isMobile?: boolean }) {
     '/laporan-utama': 'Laporan ERP',
     '/reports': 'Laporan ERP',
     '/users': 'Manajemen User',
-    '/settings': 'Pengaturan Akses',
+    '/settings': 'Manajemen Sistem',
     '/audit-trail': 'Pengaturan Akses',
     '/superadmin': 'Pengaturan Akses', // Hide superadmin under pengaturan akses 
   };
@@ -152,6 +152,11 @@ export function Sidebar({ isMobile }: { isMobile?: boolean }) {
 
     if (!rolePermissions) return false;
     
+    // Akses ke halaman pengaturan/manajemen sistem dapat menggunakan key 'Manajemen Sistem' atau 'Pengaturan Akses'
+    if (href === '/settings') {
+      return rolePermissions['Manajemen Sistem'] === true || rolePermissions['Pengaturan Akses'] === true;
+    }
+
     const permKey = permissionMap[href];
     if (!permKey) return false; // If we didn't map it, assume it's hidden
     

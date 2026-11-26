@@ -51,6 +51,7 @@ export default function SettingsPage() {
     "Retur / Tukar Barang": false,
     "AI Restock": false,
     "Manajemen User": false,
+    "Manajemen Sistem": false,
     "Pengaturan Akses": false,
     "Aksi: Ubah Harga Saat Transaksi": false,
   });
@@ -71,6 +72,7 @@ export default function SettingsPage() {
     "Retur / Tukar Barang": true,
     "AI Restock": false,
     "Manajemen User": false,
+    "Manajemen Sistem": false,
     "Pengaturan Akses": false,
     "Aksi: Ubah Harga Saat Transaksi": false,
   });
@@ -102,8 +104,8 @@ export default function SettingsPage() {
         .maybeSingle();
 
       if (!error && data) {
-        if (data.role_permissions?.admin) setAdminAccess(data.role_permissions.admin);
-        if (data.role_permissions?.kasir) setKasirAccess(data.role_permissions.kasir);
+        if (data.role_permissions?.admin) setAdminAccess(prev => ({ ...prev, ...data.role_permissions.admin }));
+        if (data.role_permissions?.kasir) setKasirAccess(prev => ({ ...prev, ...data.role_permissions.kasir }));
 
         // Ambil potongan member dari kolom khusus atau role_permissions sebagai fallback
         const g = data.discount_member_gold !== undefined && data.discount_member_gold !== null
