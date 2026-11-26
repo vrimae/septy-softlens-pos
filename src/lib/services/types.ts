@@ -39,6 +39,8 @@ export interface StoreSettings {
   loyalty_points_enabled: boolean;
   points_per_amount: number;
   require_prescription: boolean;
+  discount_member_gold?: number;
+  discount_member_vip?: number;
   updated_at: string;
 }
 

@@ -30,6 +30,25 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
   });
   const [isManualGold, setIsManualGold] = useState(false);
   const [isManualVip, setIsManualVip] = useState(false);
+  const [memberDiscountGold, setMemberDiscountGold] = useState<number>(3000);
+  const [memberDiscountVip, setMemberDiscountVip] = useState<number>(5000);
+
+  const formatDiscountLabel = (amount: number) => {
+    if (amount <= 0) return "Rp 0";
+    if (amount % 1000 === 0) return `${amount / 1000}k`;
+    return `Rp ${amount.toLocaleString('id-ID')}`;
+  };
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('septy_member_discounts');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.gold !== undefined) setMemberDiscountGold(Number(parsed.gold) || 3000);
+        if (parsed.vip !== undefined) setMemberDiscountVip(Number(parsed.vip) || 5000);
+      }
+    } catch (e) {}
+  }, [isOpen]);
 
   useEffect(() => {
     if (product) {
@@ -133,8 +152,8 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
                     setFormData({
                       ...formData, 
                       sell_price: sp,
-                      price_gold: !isManualGold ? (sp > 0 ? Math.max(0, sp - 3000) : 0) : formData.price_gold,
-                      price_vip: !isManualVip ? (sp > 0 ? Math.max(0, sp - 5000) : 0) : formData.price_vip,
+                      price_gold: !isManualGold ? (sp > 0 ? Math.max(0, sp - memberDiscountGold) : 0) : formData.price_gold,
+                      price_vip: !isManualVip ? (sp > 0 ? Math.max(0, sp - memberDiscountVip) : 0) : formData.price_vip,
                     });
                   }} 
                 />
@@ -145,7 +164,9 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="price_gold">Harga Gold</Label>
-                  <span className="text-[10px] text-amber-600 font-semibold">{isManualGold ? "(Manual)" : "(-3k Otomatis)"}</span>
+                  <span className="text-[10px] text-amber-600 font-semibold">
+                    {isManualGold ? "(Manual)" : `(-${formatDiscountLabel(memberDiscountGold)} Otomatis)`}
+                  </span>
                 </div>
                 <Input 
                   id="price_gold" 
@@ -160,7 +181,9 @@ export function ProductFormDialog({ isOpen, onClose, product, onSuccess }: Produ
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="price_vip">Harga VIP</Label>
-                  <span className="text-[10px] text-purple-600 font-semibold">{isManualVip ? "(Manual)" : "(-5k Otomatis)"}</span>
+                  <span className="text-[10px] text-purple-600 font-semibold">
+                    {isManualVip ? "(Manual)" : `(-${formatDiscountLabel(memberDiscountVip)} Otomatis)`}
+                  </span>
                 </div>
                 <Input 
                   id="price_vip" 

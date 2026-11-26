@@ -185,7 +185,7 @@ interface ParsedProductRow {
   raw: any;
 }
 
-function extractProductFromRow(row: any): ParsedProductRow {
+function extractProductFromRow(row: any, discountGold = 3000, discountVip = 5000): ParsedProductRow {
   const keys = Object.keys(row || {});
   
   const getVal = (regex: RegExp, excludeRegex?: RegExp) => {
@@ -221,13 +221,13 @@ function extractProductFromRow(row: any): ParsedProductRow {
     getVal(/(normal|reguler|jual|ecer|retail|harga\s*jual|harga)/i, /(gold|vip|reseller|agen|modal|beli|hpp|pokok)/i)
   );
 
-  // Harga Gold (Prioritaskan Gold, Reseller, Member Gold, Grosir 1. Jika kosong otomatis -3k dari harga jual)
+  // Harga Gold (Prioritaskan Gold, Reseller, Member Gold, Grosir 1. Jika kosong otomatis potongan dari harga jual)
   const rawGold = parseIndoNumber(getVal(/(gold|reseller|member\s*gold|member\s*1|grosir\s*1)/i));
-  const gold = rawGold > 0 ? rawGold : (regular > 3000 ? regular - 3000 : 0);
+  const gold = rawGold > 0 ? rawGold : (regular > discountGold ? regular - discountGold : 0);
 
-  // Harga VIP (Prioritaskan VIP, Agen, Member VIP, Grosir 2. Jika kosong otomatis -5k dari harga jual)
+  // Harga VIP (Prioritaskan VIP, Agen, Member VIP, Grosir 2. Jika kosong otomatis potongan dari harga jual)
   const rawVip = parseIndoNumber(getVal(/(vip|agen|member\s*vip|member\s*2|grosir\s*2)/i));
-  const vip = rawVip > 0 ? rawVip : (regular > 5000 ? regular - 5000 : 0);
+  const vip = rawVip > 0 ? rawVip : (regular > discountVip ? regular - discountVip : 0);
 
   // Stok
   const rawStock = getVal(/(stok|stock|qty|jumlah)/i);
@@ -265,6 +265,16 @@ export default function ProductsPage() {
   const [priceVip, setPriceVip] = useState("0");
   const [isGoldManual, setIsGoldManual] = useState(false);
   const [isVipManual, setIsVipManual] = useState(false);
+
+  // Nilai potongan harga member dari Pengaturan (default 3000 & 5000)
+  const [memberDiscountGold, setMemberDiscountGold] = useState<number>(3000);
+  const [memberDiscountVip, setMemberDiscountVip] = useState<number>(5000);
+
+  const formatDiscountLabel = (amount: number) => {
+    if (amount <= 0) return "Rp 0";
+    if (amount % 1000 === 0) return `${amount / 1000}k`;
+    return `Rp ${amount.toLocaleString('id-ID')}`;
+  };
   const [stock, setStock] = useState("0");
   const [categoryId, setCategoryId] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
@@ -340,6 +350,59 @@ export default function ProductsPage() {
       return matchName || matchCode || matchCat;
     });
   }, [products, search, selectedCategory]);
+
+  useEffect(() => {
+    // 1. Ambil dari localStorage terlebih dahulu
+    try {
+      const cached = localStorage.getItem('septy_member_discounts');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.gold !== undefined) setMemberDiscountGold(Number(parsed.gold) || 3000);
+        if (parsed.vip !== undefined) setMemberDiscountVip(Number(parsed.vip) || 5000);
+      }
+    } catch (e) {}
+
+    // 2. Ambil dari Supabase store_settings
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('store_settings')
+          .select('discount_member_gold, discount_member_vip, role_permissions')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (data) {
+          const g = data.discount_member_gold !== undefined && data.discount_member_gold !== null
+            ? Number(data.discount_member_gold)
+            : (data.role_permissions as any)?.member_discounts?.gold ?? 3000;
+          const v = data.discount_member_vip !== undefined && data.discount_member_vip !== null
+            ? Number(data.discount_member_vip)
+            : (data.role_permissions as any)?.member_discounts?.vip ?? 5000;
+
+          const finalG = isNaN(g) ? 3000 : g;
+          const finalV = isNaN(v) ? 5000 : v;
+          setMemberDiscountGold(finalG);
+          setMemberDiscountVip(finalV);
+          localStorage.setItem('septy_member_discounts', JSON.stringify({ gold: finalG, vip: finalV }));
+        }
+      } catch (e) {}
+    })();
+
+    // 3. Listen ke event update jika setting diubah di halaman Settings
+    const handleDiscountsUpdate = () => {
+      try {
+        const cached = localStorage.getItem('septy_member_discounts');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed.gold !== undefined) setMemberDiscountGold(Number(parsed.gold) || 3000);
+          if (parsed.vip !== undefined) setMemberDiscountVip(Number(parsed.vip) || 5000);
+        }
+      } catch (e) {}
+    };
+    window.addEventListener('septy_member_discounts_updated', handleDiscountsUpdate);
+    return () => window.removeEventListener('septy_member_discounts_updated', handleDiscountsUpdate);
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -619,8 +682,8 @@ export default function ProductsPage() {
         const currentGold = Number(p.price_gold || 0);
         const currentVip = Number(p.price_vip || 0);
 
-        const newGold = currentGold > 0 ? currentGold : Math.round((reg * 0.95) / 500) * 500;
-        const newVip = currentVip > 0 ? currentVip : Math.round((reg * 0.90) / 500) * 500;
+        const newGold = currentGold > 0 ? currentGold : Math.max(0, reg - memberDiscountGold);
+        const newVip = currentVip > 0 ? currentVip : Math.max(0, reg - memberDiscountVip);
 
         unwrap(await supabase.from('products').update({
           price_gold: newGold,
@@ -645,8 +708,8 @@ export default function ProductsPage() {
       alert("Masukkan Harga Reguler / Jual terlebih dahulu untuk menghitung Harga Member.");
       return;
     }
-    const goldCalc = Math.max(0, reg - 3000);
-    const vipCalc = Math.max(0, reg - 5000);
+    const goldCalc = Math.max(0, reg - memberDiscountGold);
+    const vipCalc = Math.max(0, reg - memberDiscountVip);
     setPriceGold(String(goldCalc));
     setPriceVip(String(vipCalc));
     setIsGoldManual(false);
@@ -656,12 +719,12 @@ export default function ProductsPage() {
   const handlePriceRegularChange = (val: string) => {
     setPriceRegular(val);
     const reg = parseFloat(val) || 0;
-    // Potongan harga otomatis: -3k untuk gold dan -5k untuk vip saat menambahkan produk
+    // Potongan harga otomatis dari Pengaturan saat menambahkan produk
     if (!editingId || !isGoldManual) {
-      setPriceGold(reg > 0 ? String(Math.max(0, reg - 3000)) : "0");
+      setPriceGold(reg > 0 ? String(Math.max(0, reg - memberDiscountGold)) : "0");
     }
     if (!editingId || !isVipManual) {
-      setPriceVip(reg > 0 ? String(Math.max(0, reg - 5000)) : "0");
+      setPriceVip(reg > 0 ? String(Math.max(0, reg - memberDiscountVip)) : "0");
     }
   };
 
@@ -732,21 +795,21 @@ export default function ProductsPage() {
       setCostPrice(String(parsed.cost));
     }
 
-    // Gold Price (Otomatis dari Excel atau -3k dari harga reguler)
+    // Gold Price (Otomatis dari Excel atau potongan dari harga reguler)
     if (parsed.gold > 0) {
       setPriceGold(String(parsed.gold));
       setIsGoldManual(false);
-    } else if (parsed.regular > 3000) {
-      setPriceGold(String(parsed.regular - 3000));
+    } else if (parsed.regular > memberDiscountGold) {
+      setPriceGold(String(parsed.regular - memberDiscountGold));
       setIsGoldManual(false);
     }
 
-    // VIP Price (Otomatis dari Excel atau -5k dari harga reguler)
+    // VIP Price (Otomatis dari Excel atau potongan dari harga reguler)
     if (parsed.vip > 0) {
       setPriceVip(String(parsed.vip));
       setIsVipManual(false);
-    } else if (parsed.regular > 5000) {
-      setPriceVip(String(parsed.regular - 5000));
+    } else if (parsed.regular > memberDiscountVip) {
+      setPriceVip(String(parsed.regular - memberDiscountVip));
       setIsVipManual(false);
     }
 
@@ -1339,14 +1402,18 @@ export default function ProductsPage() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-bold text-amber-700 dark:text-amber-400">Harga Gold</label>
-                  <span className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold">{isGoldManual ? "(Manual)" : "(-3k Otomatis)"}</span>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold">
+                    {isGoldManual ? "(Manual)" : `(-${formatDiscountLabel(memberDiscountGold)} Otomatis)`}
+                  </span>
                 </div>
                 <input type="number" value={priceGold} onChange={(e) => handlePriceGoldChange(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-amber-300 bg-amber-50/20" placeholder="0" />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-bold text-purple-700 dark:text-purple-400">Harga VIP</label>
-                  <span className="text-[10px] text-purple-600 dark:text-purple-500 font-semibold">{isVipManual ? "(Manual)" : "(-5k Otomatis)"}</span>
+                  <span className="text-[10px] text-purple-600 dark:text-purple-500 font-semibold">
+                    {isVipManual ? "(Manual)" : `(-${formatDiscountLabel(memberDiscountVip)} Otomatis)`}
+                  </span>
                 </div>
                 <input type="number" value={priceVip} onChange={(e) => handlePriceVipChange(e.target.value)} className="w-full px-3 py-2 border rounded-lg border-purple-300 bg-purple-50/20" placeholder="0" />
               </div>
@@ -1354,15 +1421,15 @@ export default function ProductsPage() {
 
             <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-lg border text-xs">
               <span className="text-gray-600 dark:text-gray-400">
-                💡 Harga Gold otomatis -Rp 3.000 dan VIP -Rp 5.000 dari Harga Jual. Anda tetap bisa menyesuaikannya secara manual.
+                💡 Harga Gold otomatis -Rp {memberDiscountGold.toLocaleString('id-ID')} dan VIP -Rp {memberDiscountVip.toLocaleString('id-ID')} dari Harga Jual (dapat diubah di Pengaturan). Anda tetap bisa menyesuaikannya secara manual.
               </span>
               <button
                 type="button"
                 onClick={handleAutoCalculateMemberPrices}
                 className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0 ml-2"
-                title="Hitung ulang otomatis: Gold (-3k) dan VIP (-5k) dari harga reguler"
+                title={`Hitung ulang otomatis: Gold (-${formatDiscountLabel(memberDiscountGold)}) dan VIP (-${formatDiscountLabel(memberDiscountVip)}) dari harga reguler`}
               >
-                <Sparkles className="h-3.5 w-3.5" /> Hitung Ulang (-3k / -5k)
+                <Sparkles className="h-3.5 w-3.5" /> Hitung Ulang (-{formatDiscountLabel(memberDiscountGold)} / -{formatDiscountLabel(memberDiscountVip)})
               </button>
             </div>
             

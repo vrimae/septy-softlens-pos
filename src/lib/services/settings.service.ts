@@ -50,6 +50,8 @@ export const settingsService = {
           email: settings.email || '',
           address: settings.address || '',
           tax_percentage: settings.tax_percentage || 0,
+          discount_member_gold: settings.discount_member_gold ?? 3000,
+          discount_member_vip: settings.discount_member_vip ?? 5000,
         })
         .select()
         .single();
@@ -57,6 +59,63 @@ export const settingsService = {
       if (error) throw new Error(error.message);
       return data as StoreSettings;
     }
+  },
+
+  async getMemberDiscounts(): Promise<{ gold: number; vip: number }> {
+    try {
+      const { data, error } = await supabase
+        .from('store_settings')
+        .select('discount_member_gold, discount_member_vip, role_permissions')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        const gold = data.discount_member_gold !== undefined && data.discount_member_gold !== null
+          ? Number(data.discount_member_gold)
+          : (data.role_permissions as any)?.member_discounts?.gold ?? 3000;
+        const vip = data.discount_member_vip !== undefined && data.discount_member_vip !== null
+          ? Number(data.discount_member_vip)
+          : (data.role_permissions as any)?.member_discounts?.vip ?? 5000;
+        return { gold: isNaN(gold) ? 3000 : gold, vip: isNaN(vip) ? 5000 : vip };
+      }
+    } catch (e) {
+      console.warn('Error reading member discounts:', e);
+    }
+    return { gold: 3000, vip: 5000 };
+  },
+
+  async updateMemberDiscounts(gold: number, vip: number) {
+    const existing = await settingsService.getStoreSettings();
+    const currentPerms = (existing as any)?.role_permissions || {};
+    const updatedPerms = {
+      ...currentPerms,
+      member_discounts: { gold, vip }
+    };
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from('store_settings')
+        .update({
+          discount_member_gold: gold,
+          discount_member_vip: vip,
+          role_permissions: updatedPerms,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase
+        .from('store_settings')
+        .insert({
+          store_name: 'Septy POS',
+          discount_member_gold: gold,
+          discount_member_vip: vip,
+          role_permissions: updatedPerms
+        });
+      if (error) throw new Error(error.message);
+    }
+    return { gold, vip };
   },
 
   async getBranches() {

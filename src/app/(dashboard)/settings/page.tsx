@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Printer, ScanLine, Check, Plus, Trash2, Download } from "lucide-react";
+import { Printer, ScanLine, Check, Plus, Trash2, Download, Crown, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { printTestReceiptBluetooth } from "@/lib/receipt";
 
@@ -26,6 +26,10 @@ export default function SettingsPage() {
   const [incentivePerItem, setIncentivePerItem] = useState("1000");
   const [incentiveUpselling, setIncentiveUpselling] = useState("5000");
   const [expiredNotificationMonth, setExpiredNotificationMonth] = useState("6 Bulan");
+
+  // Potongan Member (Gold & VIP)
+  const [discountGold, setDiscountGold] = useState("3000");
+  const [discountVip, setDiscountVip] = useState("5000");
 
   // Tabs for Access
   const [activeTab, setActiveTab] = useState<"admin" | "kasir">("admin");
@@ -80,29 +84,119 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadSettings() {
-      const { data, error } = await supabase.from('store_settings').select('role_permissions').limit(1).maybeSingle();
-      if (!error && data?.role_permissions) {
-        if (data.role_permissions.admin) setAdminAccess(data.role_permissions.admin);
-        if (data.role_permissions.kasir) setKasirAccess(data.role_permissions.kasir);
+      // Coba load dari localStorage terlebih dahulu untuk kecepatan render
+      try {
+        const cached = localStorage.getItem('septy_member_discounts');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed.gold !== undefined) setDiscountGold(String(parsed.gold));
+          if (parsed.vip !== undefined) setDiscountVip(String(parsed.vip));
+        }
+      } catch (e) {}
+
+      const { data, error } = await supabase
+        .from('store_settings')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        if (data.role_permissions?.admin) setAdminAccess(data.role_permissions.admin);
+        if (data.role_permissions?.kasir) setKasirAccess(data.role_permissions.kasir);
+
+        // Ambil potongan member dari kolom khusus atau role_permissions sebagai fallback
+        const g = data.discount_member_gold !== undefined && data.discount_member_gold !== null
+          ? Number(data.discount_member_gold)
+          : (data.role_permissions?.member_discounts?.gold ?? 3000);
+        const v = data.discount_member_vip !== undefined && data.discount_member_vip !== null
+          ? Number(data.discount_member_vip)
+          : (data.role_permissions?.member_discounts?.vip ?? 5000);
+
+        const finalGold = isNaN(g) ? 3000 : g;
+        const finalVip = isNaN(v) ? 5000 : v;
+
+        setDiscountGold(String(finalGold));
+        setDiscountVip(String(finalVip));
+
+        try {
+          localStorage.setItem('septy_member_discounts', JSON.stringify({ gold: finalGold, vip: finalVip }));
+        } catch (e) {}
       }
     }
     loadSettings();
   }, []);
 
+  const handleSaveMemberDiscountsOnly = async () => {
+    try {
+      const numGold = parseFloat(discountGold) || 0;
+      const numVip = parseFloat(discountVip) || 0;
+
+      // Update di Supabase
+      const { data: firstRow } = await supabase.from('store_settings').select('id, role_permissions').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+      const currentPerms = firstRow?.role_permissions || {};
+      const updatedPerms = {
+        ...currentPerms,
+        member_discounts: { gold: numGold, vip: numVip }
+      };
+
+      const payload = {
+        discount_member_gold: numGold,
+        discount_member_vip: numVip,
+        role_permissions: updatedPerms,
+        updated_at: new Date().toISOString()
+      };
+
+      if (firstRow?.id) {
+        await supabase.from('store_settings').update(payload).eq('id', firstRow.id);
+      } else {
+        await supabase.from('store_settings').insert([{ store_name: 'Septy POS', ...payload }]);
+      }
+
+      // Update localStorage
+      localStorage.setItem('septy_member_discounts', JSON.stringify({ gold: numGold, vip: numVip }));
+      window.dispatchEvent(new Event('septy_member_discounts_updated'));
+
+      showNotification(`Potongan harga member berhasil disimpan! Gold: -Rp ${numGold.toLocaleString('id-ID')}, VIP: -Rp ${numVip.toLocaleString('id-ID')}`);
+    } catch (e: any) {
+      alert("Gagal menyimpan potongan harga member: " + (e?.message || e));
+    }
+  };
+
   const handleSaveAllSettings = async () => {
     try {
+      const numGold = parseFloat(discountGold) || 0;
+      const numVip = parseFloat(discountVip) || 0;
+
       const permissions = {
         admin: adminAccess,
         kasir: kasirAccess,
+        member_discounts: {
+          gold: numGold,
+          vip: numVip
+        }
       };
       
-      const { data: firstRow } = await supabase.from('store_settings').select('id').limit(1).maybeSingle();
-      if (firstRow) {
-        await supabase.from('store_settings').update({ role_permissions: permissions }).eq('id', firstRow.id);
+      const payload: any = {
+        role_permissions: permissions,
+        discount_member_gold: numGold,
+        discount_member_vip: numVip,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: firstRow } = await supabase.from('store_settings').select('id').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+      if (firstRow?.id) {
+        await supabase.from('store_settings').update(payload).eq('id', firstRow.id);
       } else {
-        await supabase.from('store_settings').insert([{ store_name: 'Septy POS', role_permissions: permissions }]);
+        await supabase.from('store_settings').insert([{ store_name: 'Septy POS', ...payload }]);
       }
-      showNotification("Seluruh pengaturan & izin akses berhasil disimpan!");
+
+      try {
+        localStorage.setItem('septy_member_discounts', JSON.stringify({ gold: numGold, vip: numVip }));
+        window.dispatchEvent(new Event('septy_member_discounts_updated'));
+      } catch (e) {}
+
+      showNotification("Seluruh pengaturan & potongan harga member berhasil disimpan!");
     } catch (e) {
       alert("Gagal menyimpan pengaturan.");
     }
@@ -356,6 +450,121 @@ export default function SettingsPage() {
               Jika diaktifkan, harga barang dapat diubah (diedit) secara manual saat transaksi POS, asalkan user memiliki akses "Aksi: Ubah Harga Saat Transaksi" di bawah ini.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Pengaturan Potongan Harga Member (Gold & VIP) */}
+      <section className="bg-white dark:bg-[#13151a] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-6">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+              <Crown className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                Pengaturan Potongan Harga Member (Gold & VIP)
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                Tentukan nilai nominal potongan harga otomatis dari Harga Jual (Reguler) saat menambah produk atau menghitung ulang harga member.
+              </p>
+            </div>
+          </div>
+          <Button 
+            onClick={handleSaveMemberDiscountsOnly}
+            className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs h-9 px-4 rounded-lg shadow-sm shrink-0"
+          >
+            Simpan Potongan Member
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          {/* Gold Member */}
+          <div className="border border-amber-200 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/20 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <label className="text-sm font-bold text-amber-900 dark:text-amber-300">
+                  Potongan Harga Member Gold (Rp)
+                </label>
+              </div>
+              <span className="text-xs font-semibold px-2 py-0.5 bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 rounded">
+                Tier Gold
+              </span>
+            </div>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500">
+                Rp
+              </span>
+              <input 
+                type="number"
+                min="0"
+                step="500"
+                value={discountGold}
+                onChange={(e) => setDiscountGold(e.target.value)}
+                placeholder="3000"
+                className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-[#13151a] border border-amber-300 dark:border-amber-800/80 rounded-lg text-sm font-bold text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-2">
+              Default: Rp 3.000 (Harga Gold = Harga Jual - Rp {Number(discountGold || 0).toLocaleString('id-ID')})
+            </p>
+          </div>
+
+          {/* VIP Member */}
+          <div className="border border-purple-200 dark:border-purple-900/50 bg-purple-50/40 dark:bg-purple-950/20 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                <label className="text-sm font-bold text-purple-900 dark:text-purple-300">
+                  Potongan Harga Member VIP (Rp)
+                </label>
+              </div>
+              <span className="text-xs font-semibold px-2 py-0.5 bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 rounded">
+                Tier VIP
+              </span>
+            </div>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500">
+                Rp
+              </span>
+              <input 
+                type="number"
+                min="0"
+                step="500"
+                value={discountVip}
+                onChange={(e) => setDiscountVip(e.target.value)}
+                placeholder="5000"
+                className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-[#13151a] border border-purple-300 dark:border-purple-800/80 rounded-lg text-sm font-bold text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <p className="text-xs text-purple-700/80 dark:text-purple-400/80 mt-2">
+              Default: Rp 5.000 (Harga VIP = Harga Jual - Rp {Number(discountVip || 0).toLocaleString('id-ID')})
+            </p>
+          </div>
+        </div>
+
+        {/* Live Simulation Card */}
+        <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-[#1e2329]/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="space-y-1">
+            <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-blue-500" /> Contoh Simulasi Kalkulasi Otomatis:
+            </span>
+            <p className="text-slate-500 dark:text-slate-400">
+              Jika produk memiliki Harga Jual <strong>Rp 50.000</strong>:
+              &bull; Harga Gold menjadi <strong className="text-amber-600 dark:text-amber-400">Rp {Math.max(0, 50000 - (parseFloat(discountGold) || 0)).toLocaleString('id-ID')}</strong> (-Rp {Number(discountGold || 0).toLocaleString('id-ID')})
+              &bull; Harga VIP menjadi <strong className="text-purple-600 dark:text-purple-400">Rp {Math.max(0, 50000 - (parseFloat(discountVip) || 0)).toLocaleString('id-ID')}</strong> (-Rp {Number(discountVip || 0).toLocaleString('id-ID')})
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setDiscountGold("3000");
+              setDiscountVip("5000");
+            }}
+            className="text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:underline shrink-0"
+          >
+            Reset Bawaan (-3k / -5k)
+          </button>
         </div>
       </section>
 
